@@ -1,5 +1,4 @@
-#include <Arduino.h>
-#include <FlexCAN_T4.h>
+#include <NERduino.h>
 
 #define ACCEL_PIN1 A0
 #define ACCEL_PIN2 A1

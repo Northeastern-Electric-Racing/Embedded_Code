@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <FlexCAN_T4.h>
-#include "nerduino.h"
+#include <NERduino.h>
 
 #define BAUD_RATE 250000U // 250 kbps 
 #define MAX_MB_NUM 16 // maximum number of CAN mailboxes to use 

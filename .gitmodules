@@ -1,0 +1,12 @@
+[submodule "BrakeLightBox/lib/NERduino"]
+	path = BrakeLightBox/lib/NERduino
+	url = git@github.com:Northeastern-Electric-Racing/NERduino.git
+[submodule "Dashboard/lib/NERduino"]
+	path = Dashboard/lib/NERduino
+	url = git@github.com:Northeastern-Electric-Racing/NERduino.git
+[submodule "PedalBox/lib/NERduino"]
+	path = PedalBox/lib/NERduino
+	url = git@github.com:Northeastern-Electric-Racing/NERduino.git
+[submodule "TelemetryControlUnit/lib/NERduino"]
+	path = TelemetryControlUnit/lib/NERduino
+	url = git@github.com:Northeastern-Electric-Racing/NERduino.git

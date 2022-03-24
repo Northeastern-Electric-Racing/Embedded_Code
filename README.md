@@ -1,21 +1,34 @@
-# embedded_code
+# Embedded_Code
+Contains all the code for the embedded systems found within the car as of the 2022 competition
 
+Built off of the [NERduino](https://github.com/Northeastern-Electric-Racing/NERduino) library
+
+#### TODOs
+1. Develop MPU Code
+2. Testing MPU Code
+3. Develop Watchdog Code
+4. Testing Watchdog Code
+
+### Overview of Repo
 ```
 .
 |
-|───include
-|   |───adxl312.h      
-|   |───amc6821.h      
-|   |───canMsgHandler.h
-|   |───nerduino.h     
-|   |───sht30.h        
-|───src
-|   |───adxl312.cpp
-|   |───amc6821.cpp
-|   |───canMsgHandler.cpp
-|   |───nerduino.cpp
-|   |───sht30.cpp
-|   |───main.cpp            # not essential to functioning of library
-|───README.md
-└───platformio.ini          # PlatformIO build file
+|───MPU (Master Processing Unit)
+|───TCU (Telemetry Control Unit)
+|───Watchdog
+|
+|───Legacy Code
+|   |───Brakelight
+|   |───Dashboard
+|   └───PedalBox
+|
+└───README.md
 ```
+
+### Master Processing Unit (MPU)
+
+
+### Telemetry Control Unit (TCU)
+
+
+### Watchdog

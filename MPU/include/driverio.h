@@ -24,13 +24,10 @@ class DRIVERIO
         uint8_t accelTorqueLow = 0;
         uint8_t accelTorqueHigh = 0;
 
-        Timer ioRead_debounce;
-        Timer ssButton_debounce;
-        Timer motorCommand_wait;
-        Timer powerToggle_wait;
+        CASCADIAMC *motorController;
 
-        void disableMCLockout();
-        void writeMCState();
+        Timer ssButton_debounce;
+        Timer powerToggle_wait;
 
     public:
         DRIVERIO();

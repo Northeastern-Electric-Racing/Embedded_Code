@@ -5,6 +5,8 @@ MPU::MPU()
 {
     pedals = PEDALS(&motorController);
     driverio = DRIVERIO(&motorController);
+
+    ioRead_wait.cancelTimer();
 }
 
 
@@ -13,13 +15,17 @@ MPU::~MPU(){}
 
 void MPU::driverioProcess()
 {
-    driverio.handleSSButton();
-    driverio.handleReverseSwitch();
+    if(ioRead_wait.isTimerExpired())
+    {
+        driverio.handleSSButton();
+        driverio.handleReverseSwitch();
+        ioRead_wait.startTimer(100);
+    }
 }
 
 
 void MPU::pedalsProcess()
 {
-    pedals.readAccel();
     pedals.readBrake();
+    pedals.readAccel();
 }

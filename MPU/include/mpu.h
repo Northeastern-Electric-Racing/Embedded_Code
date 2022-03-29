@@ -16,6 +16,8 @@ class MPU
         PEDALS pedals;
         CASCADIAMC motorController;
 
+        Timer ioRead_wait;
+
     public:
         MPU();
 
@@ -32,7 +34,6 @@ class MPU
          * 
          */
         void pedalsProcess();
-
 };
 
 #endif

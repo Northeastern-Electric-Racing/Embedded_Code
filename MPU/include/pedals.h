@@ -32,8 +32,7 @@ class PEDALS
         bool brakePressed = false;
         uint32_t timeBrake = 0;   // the time at which the brake was last pressed
 
-        uint8_t accelTorqueLow = 0;
-        uint8_t accelTorqueHigh = 0;
+        CASCADIAMC *motorController;
 
         Timer brakeReading_wait;
         Timer pedalReading_wait;
@@ -41,12 +40,21 @@ class PEDALS
     public:
         PEDALS();
 
-        PEDALS(CASCADIAMC *motorController);
+        PEDALS(CASCADIAMC *p_motorController);
 
         ~PEDALS();
 
+        /**
+         * @brief Reads the status of the brake, and sets brakePressed to True if it is pressed
+         * 
+         */
         void readBrake();
 
+        /**
+         * @brief Handles the sending of acceleration commands
+         * @note Handles Regen Braking and Acceleration by using negative and positive torque commands, respectively
+         * 
+         */
         void readAccel();
 };
 

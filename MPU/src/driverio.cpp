@@ -4,7 +4,7 @@
 DRIVERIO::DRIVERIO(){}
 
 
-DRIVERIO::DRIVERIO(CASCADIAMC *motorController)
+DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController)
 {
     pinMode(REVERSE_SW_PIN, INPUT_PULLUP);
     
@@ -21,33 +21,14 @@ DRIVERIO::DRIVERIO(CASCADIAMC *motorController)
     pinMode(SPEAKER_PIN, OUTPUT);
     digitalWrite(SPEAKER_PIN, LOW);
 
-    motorCommand_wait.startTimer(0);
+    powerToggle_wait.cancelTimer();
+    ssButton_debounce.cancelTimer();
+
+    motorController = p_motorController;
 }
 
 
 DRIVERIO::~DRIVERIO(){}
-
-
-void DRIVERIO::disableMCLockout()
-{
-    while(!motorCommand_wait.isTimerExpired()){}
-
-    //sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, MOTOR_OFF); // release lockout / OFF
-
-    motorCommand_wait.startTimer(50);
-}
-
-
-void DRIVERIO::writeMCState()
-{
-    disableMCLockout();
-    while(!motorCommand_wait.isTimerExpired()){}
-
-    unsigned char message[8] = {accelTorqueLow,accelTorqueHigh,0,0,isForward,isOn,0,0};
-    sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, message);
-
-    motorCommand_wait.startTimer(50);
-}
 
 
 void DRIVERIO::handleSSButton()
@@ -67,8 +48,10 @@ void DRIVERIO::handleSSButton()
         if(digitalRead(SS_BUTT_PIN))
         {
             isOn = !isOn;
-            disableMCLockout();
             digitalWrite(SS_LED_PIN, isOn);     //Writes SS LED to the power state of the motor
+
+            motorController->toggleOn(isOn);    //Writes the power state of the motor to the MC message to be sent
+
             powerToggle_wait.startTimer(1000);
             Serial.println("Start/Stop Button Pressed!");
         }
@@ -81,6 +64,9 @@ void DRIVERIO::handleReverseSwitch()
     if((bool)digitalRead(REVERSE_SW_PIN) != isForward)
     {
         isForward = (bool)digitalRead(REVERSE_SW_PIN);
+
+        motorController->toggleDirection(isForward);    //writes the direction of the motor to the MC message to be sent
+
         Serial.println(isForward ? "Forward" : "Reverse");
     }
 }

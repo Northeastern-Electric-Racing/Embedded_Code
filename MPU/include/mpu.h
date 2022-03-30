@@ -34,6 +34,12 @@ class MPU
          * 
          */
         void pedalsProcess();
+
+        /**
+         * @brief Sends the message that was loaded into the MC
+         * 
+         */
+        void sendMCMsg();
 };
 
 #endif

@@ -42,12 +42,12 @@ void PEDALS::readAccel()
 			}
 
 		}
-		else 
+		else
 		{
 			int reading = analogRead(ACCEL1_PIN); // value from 0 to 1023 (need to reverse)
 			int16_t flippedVal = (reading * -1) + 1023; // reverse it so 0 is when pedal not pressed, and 1023 is at full press
 
-			if (flippedVal < POT_LOWER_BOUND) 
+			if (flippedVal < POT_LOWER_BOUND)
 			{ // Set low point to prevent a positive torque in the resting pedal position
 			flippedVal = 0;
 			}
@@ -74,10 +74,11 @@ void PEDALS::readBrake()
 
 		// if the brake is being pressed
 		if (brakeVal == LOW) {
-		if (!brakePressed) { // if brake was not already being pressed, set new press time
-			timeBrake = millis();
-		}
-		brakePressed = true;
+			if (!brakePressed)
+			{ // if brake was not already being pressed, set new press time
+				timeBrake = millis();
+			}
+			brakePressed = true;
 		}
 		// if brake is not being pressed, toggle brakePressed variable
 		else {

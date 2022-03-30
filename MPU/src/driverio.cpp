@@ -37,7 +37,7 @@ void DRIVERIO::handleSSButton()
     {
         ssButton_debounce.startTimer(50);
         
-        //if the button is still being held during and after the timer runs, then toggle power
+        //if the button is still being held during and after the timer runs out, then toggle power
         while(!ssButton_debounce.isTimerExpired())
         {
             if(!digitalRead(SS_BUTT_PIN))

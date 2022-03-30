@@ -24,6 +24,8 @@ class CASCADIAMC
             } config;
         }mcMsg;
 
+        bool isMcMsgLoaded = false;
+
         Timer motorCommand_wait;
 
         /**

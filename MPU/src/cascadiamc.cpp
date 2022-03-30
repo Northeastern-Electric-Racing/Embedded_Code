@@ -22,28 +22,37 @@ void CASCADIAMC::disableMCLockout()
 
 void CASCADIAMC::writeMCState()
 {
+    if (!isMcMsgLoaded)
+    {
+        return;
+    }
+    
     disableMCLockout();
     while(!motorCommand_wait.isTimerExpired()){}
 
     sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcMsg.canMsg);
 
     motorCommand_wait.startTimer(50);
+    isMcMsgLoaded = false;
 }
 
 
 void CASCADIAMC::toggleDirection(bool p_isForward)
 {
     mcMsg.config.isForward = p_isForward;
+    isMcMsgLoaded = true;
 }
 
 
 void CASCADIAMC::toggleOn(bool p_isOn)
 {
     mcMsg.config.isOn = p_isOn;
+    isMcMsgLoaded = true;
 }
 
 
 void CASCADIAMC::changeTorque(uint16_t p_accelTorque)
 {
     mcMsg.config.accelTorque = p_accelTorque;
+    isMcMsgLoaded = true;
 }

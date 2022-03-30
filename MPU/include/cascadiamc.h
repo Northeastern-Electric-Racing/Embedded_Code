@@ -1,3 +1,8 @@
+/**
+ * @file cascadiamc.h
+ * @author Nick DePatie
+ * @date 2022-03-30
+ */
 #ifndef CASCADIAMC_H
 #define CASCADIAMC_H
 

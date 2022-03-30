@@ -1,8 +1,12 @@
+/**
+ * @file mpu.h
+ * @author Nick DePatie
+ * @date 2022-03-30
+ */
 #ifndef MPU_H
 #define MPU_H
 
 #include <nerduino.h>
-#include "battbox.h"
 #include "driverio.h"
 #include "gpio.h"
 #include "pedals.h"
@@ -10,7 +14,6 @@
 class MPU
 {
     private:
-        BATTBOX battbox;
         DRIVERIO driverio;
         GPIO gpio;
         PEDALS pedals;
@@ -22,7 +25,7 @@ class MPU
         MPU();
 
         ~MPU();
-        
+
         /**
          * @brief Handles all DriverIO Processes
          * 

@@ -58,7 +58,6 @@ void PEDALS::readAccel()
 		}
 
 		motorController->changeTorque(appliedTorque);
-
 		Serial.println(appliedTorque / 10); // prints out applied torque
 
 		pedalReading_wait.startTimer(50);

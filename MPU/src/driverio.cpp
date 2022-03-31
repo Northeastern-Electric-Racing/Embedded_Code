@@ -53,7 +53,7 @@ void DRIVERIO::handleSSButton()
             motorController->toggleOn(isOn);    //Writes the power state of the motor to the MC message to be sent
 
             powerToggle_wait.startTimer(1000);
-            Serial.println("Start/Stop Button Pressed!");
+            Serial.println("***********************Toggling Power**********************");
         }
     }
 }
@@ -61,14 +61,17 @@ void DRIVERIO::handleSSButton()
 
 void DRIVERIO::handleReverseSwitch()
 {
-    if((bool)digitalRead(REVERSE_SW_PIN) != isForward)
+    Serial.print("Switch State:\t");
+    Serial.println(isForward);
+    if(digitalRead(REVERSE_SW_PIN) != isForward)
     {
         isForward = (bool)digitalRead(REVERSE_SW_PIN);
 
         motorController->toggleDirection(isForward);    //writes the direction of the motor to the MC message to be sent
+        Serial.println("~~~~~~~~~~~~~Switching Direction~~~~~~~~~~");
 
-        Serial.println(isForward ? "Forward" : "Reverse");
     }
+    Serial.println(isForward ? "Forward" : "Reverse");
 }
 
 

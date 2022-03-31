@@ -17,6 +17,7 @@ void MPU::driverioProcess()
 {
     if(ioRead_wait.isTimerExpired())
     {
+        Serial.println("DriverIO process...");
         driverio.handleSSButton();
         driverio.handleReverseSwitch();
         ioRead_wait.startTimer(100);
@@ -26,6 +27,7 @@ void MPU::driverioProcess()
 
 void MPU::pedalsProcess()
 {
+    Serial.println("Pedals process...");
     pedals.readBrake();
     pedals.readAccel();
 }

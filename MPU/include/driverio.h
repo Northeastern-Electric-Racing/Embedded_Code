@@ -26,7 +26,7 @@
 class DRIVERIO
 {
     private:
-        bool isForward = true;
+        bool isForward = false;
         bool isOn = false;
         uint8_t accelTorqueLow = 0;
         uint8_t accelTorqueHigh = 0;

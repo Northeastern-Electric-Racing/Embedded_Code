@@ -1,6 +1,9 @@
 #include <nerduino.h>
 #include "mpu.h"
 
+
+Timer mainTimer;
+
 void setup()
 {
     NERduino.begin();
@@ -15,4 +18,6 @@ void loop()
     mpu.driverioProcess();
     mpu.pedalsProcess();
     mpu.sendMCMsg();
-}
+    Serial.println("cycle");
+    delay(500);
+}  

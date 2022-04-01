@@ -5,7 +5,8 @@ PEDALS::PEDALS(){}
 
 PEDALS::PEDALS(CASCADIAMC *p_motorController)
 {
-    pinMode(BRAKE_PIN, INPUT_PULLUP);
+    pinMode(BRAKE_PIN, INPUT_PULLDOWN);
+	pinMode(BRAKELIGHT_PIN, OUTPUT);
 
 	brakeReading_wait.cancelTimer();
 	pedalReading_wait.cancelTimer();
@@ -58,6 +59,7 @@ void PEDALS::readAccel()
 		}
 
 		motorController->changeTorque(appliedTorque);
+		Serial.print("Acceleration:\t");
 		Serial.println(appliedTorque / 10); // prints out applied torque
 
 		pedalReading_wait.startTimer(50);
@@ -70,9 +72,10 @@ void PEDALS::readBrake()
 	if(brakeReading_wait.isTimerExpired())
 	{
 		int brakeVal = digitalRead(BRAKE_PIN);
+		Serial.println(brakeVal);
 
 		// if the brake is being pressed
-		if (brakeVal == LOW) {
+		if (brakeVal == HIGH) {
 			if (!brakePressed)
 			{ // if brake was not already being pressed, set new press time
 				timeBrake = millis();
@@ -85,4 +88,7 @@ void PEDALS::readBrake()
 		}
 		brakeReading_wait.startTimer(50);
 	}
+	digitalWrite(BRAKELIGHT_PIN, LOW);
+	Serial.print("Brake:\t\t");
+	Serial.println(brakePressed);
 }

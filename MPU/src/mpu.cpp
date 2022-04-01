@@ -40,7 +40,7 @@ void MPU::sendMCMsg()
 /**
  * @brief CAN Message Handler for MC Message 1
  * 
- * @param msg 
+ * @param msg
  */
 void canHandler_CANMSG_MOTORTEMP1(const CAN_message_t &msg)
 {

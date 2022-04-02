@@ -21,7 +21,7 @@ class CASCADIAMC
 
             struct
             {
-                uint16_t accelTorque    :16;    //bitfield might not be necessary, but I wanted to be explicit
+                int16_t accelTorque     :16;    //bitfield might not be necessary, but I wanted to be explicit
                 uint16_t reserved1      :16;
                 bool isForward          :8;
                 bool isOn               :8;

@@ -63,3 +63,13 @@ void canHandler_CANMSG_MOTORTEMP1(const CAN_message_t &msg)
     Serial.print(msg.buf[i], HEX); Serial.print(" ");
     } Serial.println();
 }
+
+/**
+ * @brief Handler for MC faults
+ * 
+ * @param msg 
+ */
+void canHandler_CANMSG_ERR_MCFAULT(const CAN_message_t &msg)
+{
+    Serial.println("!!!!!!!!!!!!!!!!!!!!!!! MC ERROR !!!!!!!!!!!!!!!!!!!!");
+}

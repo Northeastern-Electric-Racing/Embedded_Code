@@ -1,5 +1,6 @@
 #include "driverio.h"
 #include <nerduino.h>
+// howdy feller
 
 DRIVERIO::DRIVERIO(){}
 
@@ -10,7 +11,7 @@ DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController)
 
     pinMode(SS_BUTT_PIN, INPUT_PULLUP);
     pinMode(SS_LED_PIN, OUTPUT);
-    digitalWrite(SS_LED_PIN, HIGH);
+    digitalWrite(SS_LED_PIN, LOW);
 
     pinMode(LED4_PIN, OUTPUT);
     digitalWrite(LED4_PIN, LOW);
@@ -19,11 +20,12 @@ DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController)
     digitalWrite(LED5_PIN, LOW);
 
     pinMode(SPEAKER_PIN, OUTPUT);
-    digitalWrite(SPEAKER_PIN, LOW);
+    digitalWrite(SPEAKER_PIN, HIGH);
     
 
     powerToggle_wait.cancelTimer();
     ssButton_debounce.cancelTimer();
+    speaker_wait.cancelTimer();
 
     motorController = p_motorController;
 }
@@ -37,7 +39,7 @@ void DRIVERIO::handleSSButton()
     if(digitalRead(SS_BUTT_PIN) && powerToggle_wait.isTimerExpired())
     {
         ssButton_debounce.startTimer(50);
-        
+
         //if the button is still being held during and after the timer runs out, then toggle power
         while(!ssButton_debounce.isTimerExpired())
         {
@@ -52,10 +54,18 @@ void DRIVERIO::handleSSButton()
             digitalWrite(SS_LED_PIN, isOn);     //Writes SS LED to the power state of the motor
 
             motorController->toggleOn(isOn);    //Writes the power state of the motor to the MC message to be sent
-
+            if(isOn)
+            {
+                digitalWrite(SPEAKER_PIN, LOW);
+                speaker_wait.startTimer(1500);
+            }
             powerToggle_wait.startTimer(1000);
             Serial.println("***********************Toggling Power**********************");
         }
+    }
+    if(speaker_wait.isTimerExpired())
+    {
+        digitalWrite(SPEAKER_PIN, HIGH);
     }
 }
 
@@ -69,7 +79,7 @@ void DRIVERIO::handleReverseSwitch()
         isForward = (bool)digitalRead(REVERSE_SW_PIN);
 
         motorController->toggleDirection(isForward);    //writes the direction of the motor to the MC message to be sent
-        Serial.println("~~~~~~~~~~~~~~~~~~~~~~~Switching Direction~~~~~~~~~~~~~~~~~~~~~~~~");
+        Serial.println("~~~~~~~~~~~~~~~~~~~~Switching Direction~~~~~~~~~~~~~~~~~~~~~~~~");
     }
     Serial.println(isForward ? "Forward" : "Reverse");
 }

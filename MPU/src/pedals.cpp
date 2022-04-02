@@ -1,5 +1,6 @@
 #include "pedals.h"
 
+
 PEDALS::PEDALS(){}
 
 
@@ -7,6 +8,7 @@ PEDALS::PEDALS(CASCADIAMC *p_motorController)
 {
     pinMode(BRAKE_PIN, INPUT_PULLDOWN);
 	pinMode(BRAKELIGHT_PIN, OUTPUT);
+	digitalWrite(BRAKELIGHT_PIN, HIGH);
 
 	brakeReading_wait.cancelTimer();
 	pedalReading_wait.cancelTimer();
@@ -88,7 +90,7 @@ void PEDALS::readBrake()
 		}
 		brakeReading_wait.startTimer(50);
 	}
-	digitalWrite(BRAKELIGHT_PIN, LOW);
+	digitalWrite(BRAKELIGHT_PIN, brakePressed);
 	Serial.print("Brake:\t\t");
 	Serial.println(brakePressed);
 }

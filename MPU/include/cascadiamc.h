@@ -31,6 +31,8 @@ class CASCADIAMC
 
         Timer motorCommand_wait;
 
+        bool isMCMsgLoaded = false;
+
         /**
          * @brief disables Motor Controller Lockout by sending motor controller off message
          * 

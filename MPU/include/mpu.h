@@ -53,4 +53,6 @@ class MPU
         void sendMCMsg();      
 };
 
+extern MPU mpu;
+
 #endif

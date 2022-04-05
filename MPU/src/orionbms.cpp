@@ -24,6 +24,11 @@ bool ORIONBMS::isSoCCritical()
     return (SoC / 255) < CRITICAL_SOC;
 }
 
+uint8_t ORIONBMS::getAvgTemp()
+{
+    return avgTemp;
+}
+
 bool ORIONBMS::isAvgTempCritical()
 {
     return avgTemp > CRITICAL_CELLTEMP;

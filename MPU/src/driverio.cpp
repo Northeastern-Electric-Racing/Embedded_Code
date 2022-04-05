@@ -5,7 +5,7 @@
 DRIVERIO::DRIVERIO(){}
 
 
-DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController)
+DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 {
     pinMode(REVERSE_SW_PIN, INPUT_PULLUP);
 
@@ -28,6 +28,7 @@ DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController)
     speaker_wait.cancelTimer();
 
     motorController = p_motorController;
+    bms = p_bms;
 }
 
 
@@ -60,7 +61,9 @@ void DRIVERIO::handleSSButton()
                 speaker_wait.startTimer(1500);
             }
             powerToggle_wait.startTimer(1000);
+#ifdef DEBUG
             Serial.println("***********************Toggling Power**********************");
+#endif
         }
     }
     if(speaker_wait.isTimerExpired())
@@ -79,9 +82,13 @@ void DRIVERIO::handleReverseSwitch()
         isForward = (bool)digitalRead(REVERSE_SW_PIN);
 
         motorController->toggleDirection(isForward);    //writes the direction of the motor to the MC message to be sent
+#ifdef DEBUG
         Serial.println("~~~~~~~~~~~~~~~~~~~~Switching Direction~~~~~~~~~~~~~~~~~~~~~~~~");
+#endif
     }
+#ifdef DEBUG
     Serial.println(isForward ? "Forward" : "Reverse");
+#endif
 }
 
 

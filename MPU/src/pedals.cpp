@@ -4,7 +4,7 @@
 PEDALS::PEDALS(){}
 
 
-PEDALS::PEDALS(CASCADIAMC *p_motorController)
+PEDALS::PEDALS(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 {
     pinMode(BRAKE1_PIN, INPUT_PULLDOWN);
 	pinMode(BRAKE2_PIN, INPUT_PULLDOWN);
@@ -15,6 +15,7 @@ PEDALS::PEDALS(CASCADIAMC *p_motorController)
 	pedalReading_wait.cancelTimer();
 
 	motorController = p_motorController;
+	bms = p_bms;
 }
 
 
@@ -71,6 +72,9 @@ void PEDALS::readAccel()
 			double multiplier = (double)flippedVal / 950; // torque multiplier from 0 to 1;
 
 			appliedTorque = (multiplier * MAXIMUM_TORQUE) - 100;
+
+			//scale torque based on factor between 1 and 0 based on the temperature of the cells
+			appliedTorque = (int16_t)(-1* appliedTorque * fastSigmoid(bms->getAvgTemp() - CRITICAL_CELLTEMP));
 		}
 
 		motorController->changeTorque(appliedTorque);

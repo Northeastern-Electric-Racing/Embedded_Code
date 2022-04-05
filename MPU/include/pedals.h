@@ -9,6 +9,7 @@
 
 #include <nerduino.h>
 #include "cascadiamc.h"
+#include "orionbms.h"
 
 //Pins
 #define ACCEL1_PIN          A0
@@ -37,6 +38,7 @@ class PEDALS
         uint32_t timeBrake = 0;     // the time at which the brake was last pressed
 
         CASCADIAMC *motorController;
+        ORIONBMS *bms;
 
         Timer brakeReading_wait;
         Timer pedalReading_wait;
@@ -48,7 +50,7 @@ class PEDALS
     public:
         PEDALS();
 
-        PEDALS(CASCADIAMC *p_motorController);
+        PEDALS(CASCADIAMC *p_motorController, ORIONBMS *p_bms);
 
         ~PEDALS();
 

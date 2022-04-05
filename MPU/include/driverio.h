@@ -10,6 +10,7 @@
 
 #include <nerduino.h>
 #include "cascadiamc.h"
+#include "orionbms.h"
 
 //Pins
 #define LED4_PIN        3
@@ -32,6 +33,7 @@ class DRIVERIO
         uint8_t accelTorqueHigh = 0;
 
         CASCADIAMC *motorController;
+        ORIONBMS *bms;
 
         Timer ssButton_debounce;
         Timer powerToggle_wait;
@@ -40,7 +42,7 @@ class DRIVERIO
     public:
         DRIVERIO();
 
-        DRIVERIO(CASCADIAMC *motorController);
+        DRIVERIO(CASCADIAMC *motorController, ORIONBMS *p_bms);
 
         ~DRIVERIO();
 

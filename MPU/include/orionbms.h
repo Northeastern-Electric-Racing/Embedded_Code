@@ -18,7 +18,6 @@ class ORIONBMS
         uint8_t SoC;
         uint8_t avgTemp;
 
-        bool isFault = false;
         uint8_t failsafeCode;
 
     public:
@@ -26,14 +25,48 @@ class ORIONBMS
 
         ~ORIONBMS();
 
+        /**
+         * @brief Sets the current state of charge
+         * 
+         * @param p_SoC 
+         */
         void setSoC(uint8_t p_SoC);
 
+        /**
+         * @brief Set the current average temperature
+         * 
+         * @param p_avgTemp 
+         */
         void setAvgTemp(uint8_t p_avgTemp);
 
+        /**
+         * @brief Set the current failsafe code (Code not processed, only saved)
+         * 
+         * @param p_failsafeCode 
+         */
         void setFailsafeCode(uint8_t p_failsafeCode);
 
+        /**
+         * @brief Returns whether the SoC is critically low
+         * 
+         * @return true 
+         * @return false 
+         */
         bool isSoCCritical();
 
+        /**
+         * @brief Gets the current average temperature
+         * 
+         * @return uint8_t 
+         */
+        uint8_t getAvgTemp();
+
+        /**
+         * @brief Returns whether the average temperature is critically high
+         * 
+         * @return true 
+         * @return false 
+         */
         bool isAvgTempCritical();
 };
 

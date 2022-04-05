@@ -10,6 +10,7 @@
 #include "driverio.h"
 #include "gpio.h"
 #include "pedals.h"
+#include "orionbms.h"
 
 class MPU
 {
@@ -18,7 +19,8 @@ class MPU
         GPIO gpio;
         PEDALS pedals;
         CASCADIAMC motorController;
-
+        ORIONBMS bms;
+        
         Timer ioRead_wait;
 
     public:
@@ -48,9 +50,7 @@ class MPU
          * @brief Sends the message that was loaded into the MC
          * 
          */
-        void sendMCMsg();
-
-        
+        void sendMCMsg();      
 };
 
 #endif

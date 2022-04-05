@@ -22,10 +22,19 @@ void CASCADIAMC::disableMCLockout()
 
 void CASCADIAMC::writeMCState()
 {
-    if(isMCMsgLoaded)
+    if(isMCLocked)
     {
         disableMCLockout();
+        while(!motorCommand_wait.isTimerExpired()){}
     }
+    if(isChangingDirection)
+    {
+        mcMsg.config.isOn = false;
+        writeMCState();
+        while(!motorCommand_wait.isTimerExpired()){}
+        mcMsg.config.isOn = true;
+    }
+
     while(!motorCommand_wait.isTimerExpired()){}
 
 #ifdef DEBUG
@@ -46,19 +55,24 @@ void CASCADIAMC::writeMCState()
 void CASCADIAMC::toggleDirection(bool p_isForward)
 {
     mcMsg.config.isForward = p_isForward;
-    isMCMsgLoaded = true;
+    isMCLocked = true;
+    isChangingDirection = true;
 }
 
 
 void CASCADIAMC::toggleOn(bool p_isOn)
 {
     mcMsg.config.isOn = p_isOn;
-    isMCMsgLoaded = true;
+    isMCLocked = true;
 }
 
 
 void CASCADIAMC::changeTorque(uint16_t p_accelTorque)
 {
     mcMsg.config.accelTorque = p_accelTorque;
-    isMCMsgLoaded = true;
+}
+
+void CASCADIAMC::clearFault()
+{
+    sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
 }

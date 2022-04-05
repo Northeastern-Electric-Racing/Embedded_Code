@@ -55,9 +55,9 @@ void PEDALS::readAccel()
 			flippedVal = 0;
 			}
 
-			double multiplier = (double)flippedVal / 1023; // torque multiplier from 0 to 1;
+			double multiplier = (double)flippedVal / 950; // torque multiplier from 0 to 1;
 
-			appliedTorque = multiplier * MAXIMUM_TORQUE;
+			appliedTorque = (multiplier * MAXIMUM_TORQUE) - 100;
 		}
 
 		motorController->changeTorque(appliedTorque);

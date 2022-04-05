@@ -14,6 +14,7 @@ class CASCADIAMC
     private:
 
         const unsigned char mcOff[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+        const unsigned char FAULT_CLEAR[8] = {20, 0, 1, 0, 0, 0, 0, 0};
         
         union
         {
@@ -31,7 +32,8 @@ class CASCADIAMC
 
         Timer motorCommand_wait;
 
-        bool isMCMsgLoaded = false;
+        bool isMCLocked = false;
+        bool isChangingDirection = false;
 
         /**
          * @brief disables Motor Controller Lockout by sending motor controller off message
@@ -70,6 +72,12 @@ class CASCADIAMC
          * @param p_accelTorque 
          */
         void changeTorque(uint16_t p_accelTorque);
+
+        /**
+         * @brief Clears the Fault for Failing to Generate High Voltage
+         * 
+         */
+        void clearFault();
 };
 
 #endif

@@ -7,10 +7,26 @@
 #define GPIO_H
 
 #include <nerduino.h>
+#include "cascadiamc.h"
+
+#define SS_READY_SEN 6
 
 class GPIO
 {
+    private:
+        bool isMCFault = true;
+        CASCADIAMC *motorController;
 
+    public:
+        GPIO(CASCADIAMC *p_motorController);
+
+        ~GPIO();
+
+        /**
+         * @brief Handles the high voltage motor controller fault from when it initially boots
+         * 
+         */
+        void handleMCHVFault();
 };
 
 #endif

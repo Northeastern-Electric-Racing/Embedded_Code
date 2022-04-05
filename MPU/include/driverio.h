@@ -12,12 +12,12 @@
 #include "cascadiamc.h"
 
 //Pins
-#define LED4_PIN 3
-#define LED5_PIN 5
-#define SS_BUTT_PIN 29
-#define SS_LED_PIN 33
-#define SPEAKER_PIN 7
-#define REVERSE_SW_PIN 9
+#define LED4_PIN        3
+#define LED5_PIN        5
+#define SS_BUTT_PIN     29
+#define SS_LED_PIN      33
+#define SPEAKER_PIN     7
+#define REVERSE_SW_PIN  9
 
 /**
  * @brief Class for handling all Driver IO functionality

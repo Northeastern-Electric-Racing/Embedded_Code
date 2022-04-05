@@ -37,12 +37,20 @@ class MPU
          * 
          */
         void pedalsProcess();
+        
+        /**
+         * @brief Handles all GPIO Processes
+         * 
+         */
+        void gpioProcess();
 
         /**
          * @brief Sends the message that was loaded into the MC
          * 
          */
         void sendMCMsg();
+
+        
 };
 
 #endif

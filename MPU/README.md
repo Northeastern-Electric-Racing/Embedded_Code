@@ -1,8 +1,9 @@
 ### Pedals
-1. Two sensors for brake and accelerator (error checking)
-2. ~Sending MC messages~
-3. Brakelight
-4. Take in temp and rerate maximum torque based on temp
+1. ~Two sensors for brake and accelerator (error checking)~
+2. Do something with accelerator and brake faults
+3. ~Sending MC messages~
+4. Brakelight
+5. Take in temp and rerate maximum torque based on temp
 
 ### DriverIO
 1. ~SS Button(Turn on car by sending MC message)~
@@ -13,7 +14,7 @@
 
 ### GPIO
 1. PWM Out?
-2. SS Sensor (Clear interrupt)
+2. ~SS Sensor (Clear fault)~
 3. CAN network
 
 ### BMS

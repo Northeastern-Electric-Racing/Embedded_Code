@@ -15,6 +15,7 @@ MPU mpu;
 void loop()
 {
     myCan.events();
+    mpu.gpioProcess();
     mpu.driverioProcess();
     mpu.pedalsProcess();
     mpu.sendMCMsg();

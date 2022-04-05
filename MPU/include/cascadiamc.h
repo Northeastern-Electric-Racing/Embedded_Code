@@ -15,7 +15,7 @@ class CASCADIAMC
 
         const unsigned char mcOff[8] = {0, 0, 0, 0, 0, 0, 0, 0};
         const unsigned char FAULT_CLEAR[8] = {20, 0, 1, 0, 0, 0, 0, 0};
-        
+
         union
         {
             uint8_t canMsg[8] = {0,0,0,0,0,0,0,0};

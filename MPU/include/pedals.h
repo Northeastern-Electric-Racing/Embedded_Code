@@ -11,32 +11,39 @@
 #include "cascadiamc.h"
 
 //Pins
-#define ACCEL1_PIN A0
-#define ACCEL2_PIN A1
-#define BRAKE_PIN 35
-#define BRAKELIGHT_PIN 4
+#define ACCEL1_PIN          A0
+#define ACCEL2_PIN          A1
+#define BRAKE1_PIN          34
+#define BRAKE2_PIN          35
+#define BRAKELIGHT_PIN      4
 
 // motor torque constants
-#define MAXIMUM_TORQUE 2400 // in Nm x 10 (ex: 123 = 12.3Nm)
-#define POT_LOWER_BOUND 35 // a pot value from 0 to 1023
-#define POT_UPPER_BOUND 1023 // a pot value from 0 to 1023
+#define MAXIMUM_TORQUE      2400    // in Nm x 10 (ex: 123 = 12.3Nm)
+#define POT_LOWER_BOUND     35      // a pot value from 0 to 1023
+#define POT_UPPER_BOUND     1023    // a pot value from 0 to 1023
 
 // regen braking constants
-#define START_TIME 0   // delay from when brake is pressed to when regen starts
-#define MAX_REGEN_TORQUE -250 // maximum regen torque value
-#define RAMP_TIME  10  // time until the maximum regen torque is reached (in seconds)
+#define START_TIME          0       // delay from when brake is pressed to when regen starts
+#define MAX_REGEN_TORQUE    -250    // maximum regen torque value
+#define RAMP_TIME           10      // time until the maximum regen torque is reached (in seconds)
+
+#define MAX_BRAKE_ERRORS    5
 
 class PEDALS
 {
     private:
         // message to turn motor off
         bool brakePressed = false;
-        uint32_t timeBrake = 0;   // the time at which the brake was last pressed
+        uint32_t timeBrake = 0;     // the time at which the brake was last pressed
 
         CASCADIAMC *motorController;
 
         Timer brakeReading_wait;
         Timer pedalReading_wait;
+
+        uint8_t brakeErrors = 0;
+        bool brakeFault = false;
+        bool accelFault = false;
 
     public:
         PEDALS();

@@ -14,10 +14,13 @@
 class GPIO
 {
     private:
-        bool isMCFault = true;
+        bool isSSPowerCycle = true;
+
         CASCADIAMC *motorController;
 
     public:
+        GPIO();
+
         GPIO(CASCADIAMC *p_motorController);
 
         ~GPIO();

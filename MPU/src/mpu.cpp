@@ -5,6 +5,7 @@ MPU::MPU()
 {
     pedals = PEDALS(&motorController);
     driverio = DRIVERIO(&motorController);
+    gpio = GPIO(&motorController);
 
     ioRead_wait.cancelTimer();
 }
@@ -32,10 +33,20 @@ void MPU::pedalsProcess()
     pedals.readAccel();
 }
 
+void MPU::gpioProcess()
+{
+    gpio.handleMCHVFault();
+}
+
 void MPU::sendMCMsg()
 {
     motorController.writeMCState();
 }
+
+/********************************************************************/
+/**
+ * CAN Handlers specific to MPU
+ */
 
 /**
  * @brief CAN Message Handler for MC Message 1
@@ -67,9 +78,10 @@ void canHandler_CANMSG_MOTORTEMP1(const CAN_message_t &msg)
 /**
  * @brief Handler for MC faults
  * 
- * @param msg 
+ * @param msg
  */
 void canHandler_CANMSG_ERR_MCFAULT(const CAN_message_t &msg)
 {
     Serial.println("!!!!!!!!!!!!!!!!!!!!!!! MC ERROR !!!!!!!!!!!!!!!!!!!!");
 }
+

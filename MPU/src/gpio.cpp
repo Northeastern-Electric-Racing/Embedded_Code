@@ -1,5 +1,7 @@
 #include "gpio.h"
 
+GPIO::GPIO(){}
+
 GPIO::GPIO(CASCADIAMC *p_motorController)
 {
     pinMode(SS_READY_SEN, INPUT);
@@ -11,8 +13,14 @@ GPIO::~GPIO(){}
 
 void GPIO::handleMCHVFault()
 {
-    if (isMCFault && digitalRead(SS_READY_SEN) == HIGH) {
+    if(!digitalRead(SS_READY_SEN))
+    {
+        isSSPowerCycle = true;
+        return;
+    }
+    if (isSSPowerCycle && digitalRead(SS_READY_SEN) == HIGH)
+    {
         motorController->clearFault();
-        isMCFault = false;
-  }
+        isSSPowerCycle = false;
+    }
 }

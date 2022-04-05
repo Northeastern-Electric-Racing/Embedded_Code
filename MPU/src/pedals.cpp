@@ -6,7 +6,8 @@ PEDALS::PEDALS(){}
 
 PEDALS::PEDALS(CASCADIAMC *p_motorController)
 {
-    pinMode(BRAKE_PIN, INPUT_PULLDOWN);
+    pinMode(BRAKE1_PIN, INPUT_PULLDOWN);
+	pinMode(BRAKE2_PIN, INPUT_PULLDOWN);
 	pinMode(BRAKELIGHT_PIN, OUTPUT);
 	digitalWrite(BRAKELIGHT_PIN, HIGH);
 
@@ -47,9 +48,21 @@ void PEDALS::readAccel()
 		}
 		else
 		{
-			int reading = analogRead(ACCEL1_PIN); // value from 0 to 1023 (need to reverse)
-			int16_t flippedVal = (reading * -1) + 1023; // reverse it so 0 is when pedal not pressed, and 1023 is at full press
+			int accelPin1Val = analogRead(ACCEL1_PIN); 
+  			int accelPin2Val = analogRead(ACCEL2_PIN);
 
+			//if brake "bottoms out" or if there is a large discrepancy between readings, flag an accelerator fault
+			if (accelPin1Val == 0 ||
+				accelPin2Val == 0 ||
+				accelPin1Val == 1023 ||
+				accelPin2Val == 1023 ||
+				(abs(accelPin1Val - accelPin2Val) > (1023 * 0.05))) 
+			{
+				accelFault = true;
+  			}
+
+			int16_t avgVal = (accelPin1Val + accelPin2Val) / 2;
+			int16_t flippedVal = (avgVal * -1) + 1023; // reverse it so 0 is when pedal not pressed, and 1023 is at full press
 			if (flippedVal < POT_LOWER_BOUND)
 			{ // Set low point to prevent a positive torque in the resting pedal position
 			flippedVal = 0;
@@ -73,11 +86,20 @@ void PEDALS::readBrake()
 {
 	if(brakeReading_wait.isTimerExpired())
 	{
-		int brakeVal = digitalRead(BRAKE_PIN);
-		Serial.println(brakeVal);
+		int brake1Val = digitalRead(BRAKE1_PIN);
+		int brake2Val = digitalRead(BRAKE2_PIN);
+		if(brake1Val != brake2Val)
+		{
+			brakeErrors++;
+			if(brakeErrors >= MAX_BRAKE_ERRORS)
+			{
+				brakeFault = true;
+			}
+		}
+		Serial.println(brake2Val);
 
 		// if the brake is being pressed
-		if (brakeVal == HIGH) {
+		if (brake2Val == HIGH) {
 			if (!brakePressed)
 			{ // if brake was not already being pressed, set new press time
 				timeBrake = millis();

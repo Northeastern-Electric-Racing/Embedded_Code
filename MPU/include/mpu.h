@@ -50,7 +50,19 @@ class MPU
          * @brief Sends the message that was loaded into the MC
          * 
          */
-        void sendMCMsg();      
+        void sendMCMsg();
+
+        /**
+         * @brief Passes loaded temp into private BMS object
+         * 
+         */
+        void setBMSAvgTemp(uint8_t p_avgTemp);
+
+        /**
+         * @brief Passes Loaded SoC into private BMS object
+         * 
+         */
+        void setBMSSoC(uint8_t p_soc);
 };
 
 extern MPU mpu;

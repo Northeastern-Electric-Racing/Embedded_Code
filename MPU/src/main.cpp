@@ -13,9 +13,10 @@ void setup()
 void loop()
 {
     myCan.events();
-    mpu.gpioProcess();
-    mpu.driverioProcess();
-    mpu.pedalsProcess();
-    mpu.sendMCMsg();
+    //mpu.gpioProcess();
+    //mpu.driverioProcess();
+    //mpu.pedalsProcess();
+    //mpu.sendMCMsg();
     Serial.println("cycle");
+    digitalWrite(BRAKELIGHT_PIN,HIGH);
 }

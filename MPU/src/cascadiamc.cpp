@@ -29,12 +29,15 @@ void CASCADIAMC::writeMCState()
     }
     if(isChangingDirection)
     {
-        mcMsg.config.isOn = false;
-        writeMCState();
-        while(!motorCommand_wait.isTimerExpired()){}
-        mcMsg.config.isOn = true;
+        isChangingDirection = false;
+        if(mcMsg.config.isOn)
+        {
+            mcMsg.config.isOn = false;
+            writeMCState();
+            while(!motorCommand_wait.isTimerExpired()){}
+            mcMsg.config.isOn = true;
+        }   
     }
-
     while(!motorCommand_wait.isTimerExpired()){}
 
 #ifdef DEBUG

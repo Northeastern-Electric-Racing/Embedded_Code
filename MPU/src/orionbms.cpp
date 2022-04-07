@@ -19,6 +19,11 @@ void ORIONBMS::setFailsafeCode(uint8_t p_failsafeCode)
     failsafeCode = p_failsafeCode;
 }
 
+uint8_t ORIONBMS::getSoC()
+{
+    return SoC;
+}
+
 bool ORIONBMS::isSoCCritical()
 {
     return (SoC / 255) < CRITICAL_SOC;

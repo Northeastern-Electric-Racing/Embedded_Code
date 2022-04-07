@@ -89,6 +89,8 @@ void DRIVERIO::handleReverseSwitch()
 #ifdef DEBUG
     Serial.println(isForward ? "Forward" : "Reverse");
 #endif
+    Serial.print("BMS SOC:\t");
+    Serial.println(bms->getSoC());
 }
 
 

@@ -71,10 +71,10 @@ void PEDALS::readAccel()
 
 			double multiplier = (double)flippedVal / 950; // torque multiplier from 0 to 1;
 
-			appliedTorque = (multiplier * MAXIMUM_TORQUE) - 100;
+			appliedTorque = (multiplier * MAXIMUM_TORQUE);
 
 			//scale torque based on factor between 1 and 0 based on the temperature of the cells
-			appliedTorque = (int16_t)(-1* appliedTorque * fastSigmoid(bms->getAvgTemp() - CRITICAL_CELLTEMP));
+			//appliedTorque = (int16_t)(-1* appliedTorque * fastSigmoid(bms->getAvgTemp() - CRITICAL_CELLTEMP));
 		}
 
 		motorController->changeTorque(appliedTorque);
@@ -100,10 +100,9 @@ void PEDALS::readBrake()
 				brakeFault = true;
 			}
 		}
-		Serial.println(brake2Val);
 
 		// if the brake is being pressed
-		if (brake2Val == HIGH) {
+		if (brake1Val == HIGH) {
 			if (!brakePressed)
 			{ // if brake was not already being pressed, set new press time
 				timeBrake = millis();

@@ -1,9 +1,15 @@
+/**
+ * @file mpuCanHandlers.cpp
+ * @author Nick DePatie
+ * @date 2022-04-05
+ */
 #include "mpu.h"
 
 /***************************************************************************/
 /**
  * CAN Handlers specific to MPU
  */
+/***************************************************************************/
 
 /**
  * @brief CAN Message Handler for MC Message 1
@@ -52,6 +58,8 @@ void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
         Serial.print(",");
     }
     Serial.println("");
+
+    mpu.setBMSSoC(msg.buf[6]);
 }
 
 void canhandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)

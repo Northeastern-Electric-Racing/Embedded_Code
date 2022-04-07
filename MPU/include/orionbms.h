@@ -12,6 +12,9 @@
 #define CRITICAL_CELLTEMP   45  //degrees celcius
 #define CRITICAL_SOC        10  //percentage
 
+
+
+
 class ORIONBMS
 {
     private:
@@ -45,6 +48,12 @@ class ORIONBMS
          * @param p_failsafeCode 
          */
         void setFailsafeCode(uint8_t p_failsafeCode);
+
+        /**
+         * @brief Retrieves the current SoC of the batteries
+         * 
+         */
+        uint8_t getSoC();
 
         /**
          * @brief Returns whether the SoC is critically low

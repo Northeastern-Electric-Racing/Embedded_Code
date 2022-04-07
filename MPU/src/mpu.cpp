@@ -43,3 +43,13 @@ void MPU::sendMCMsg()
 {
     motorController.writeMCState();
 }
+
+void MPU::setBMSAvgTemp(uint8_t p_avgTemp)
+{
+    bms.setAvgTemp(p_avgTemp);
+}
+
+void MPU::setBMSSoC(uint8_t p_soc)
+{
+    bms.setSoC(p_soc);
+}

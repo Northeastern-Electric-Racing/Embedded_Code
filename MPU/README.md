@@ -3,7 +3,7 @@
 2. Do something with accelerator and brake faults
 3. ~Sending MC messages~
 4. Brakelight
-5. Take in temp and rerate maximum torque based on temp
+5. Take in temp and derate maximum torque based on temp
 
 ### DriverIO
 1. ~SS Button(Turn on car by sending MC message)~
@@ -18,5 +18,5 @@
 3. CAN network
 
 ### BMS
-1. Get SOC via accumulator message
+1. ~Get SOC via accumulator message~
 2. Get AVG Temp via BMS Status

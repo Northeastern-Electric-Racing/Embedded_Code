@@ -9,11 +9,10 @@
 
 #include <nerduino.h>
 
-#define CRITICAL_CELLTEMP   45  //degrees celcius
-#define CRITICAL_SOC        10  //percentage
+#define CRITICAL_CELLTEMP           45  //degrees celcius
+#define SHUTDOWN_CELLTEMP           55  //degrees celcius
 
-
-
+#define CRITICAL_SOC                10  //percentage
 
 class ORIONBMS
 {
@@ -22,6 +21,7 @@ class ORIONBMS
         uint8_t avgTemp;
 
         uint8_t failsafeCode;
+        bool isCharging;
 
     public:
         ORIONBMS();
@@ -48,6 +48,13 @@ class ORIONBMS
          * @param p_failsafeCode 
          */
         void setFailsafeCode(uint8_t p_failsafeCode);
+
+        /**
+         * @brief Set whether the BMS is charging
+         * 
+         * @param p_isCharging
+         */
+        void setIsCharging(bool p_isCharging);
 
         /**
          * @brief Retrieves the current SoC of the batteries
@@ -77,6 +84,14 @@ class ORIONBMS
          * @return false 
          */
         bool isAvgTempCritical();
+
+        /**
+         * @brief Returns if the BMS is currently charging
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool getIsCharging();
 };
 
 #endif

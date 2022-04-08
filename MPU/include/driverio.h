@@ -59,6 +59,12 @@ class DRIVERIO
         void handleReverseSwitch();
 
         /**
+         * @brief Uses the current BMS state and lights the LEDs up accordingly
+         * 
+         */
+        void handleErrorLights();
+
+        /**
          * @brief Writes LED4 to a specific state
          * 
          * @param state 

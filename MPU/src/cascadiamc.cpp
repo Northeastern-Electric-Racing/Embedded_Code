@@ -12,11 +12,13 @@ CASCADIAMC::~CASCADIAMC(){}
 
 void CASCADIAMC::disableMCLockout()
 {
+    Serial.println("############################DISBALING LOCKOUT########################");
     while(!motorCommand_wait.isTimerExpired()){}
 
     sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcOff); // release lockout / OFF
 
     motorCommand_wait.startTimer(50);
+    isMCLocked = false;
 }
 
 
@@ -32,10 +34,11 @@ void CASCADIAMC::writeMCState()
         isChangingDirection = false;
         if(mcMsg.config.isOn)
         {
-            mcMsg.config.isOn = false;
+            toggleOn(false);
             writeMCState();
             while(!motorCommand_wait.isTimerExpired()){}
-            mcMsg.config.isOn = true;
+            toggleOn(true);
+            disableMCLockout();
         }   
     }
     while(!motorCommand_wait.isTimerExpired()){}

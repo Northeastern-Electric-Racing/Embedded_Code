@@ -62,9 +62,20 @@ void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
     mpu.setBMSSoC(msg.buf[6]);
 }
 
-void canhandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
+void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
 {
     Serial.print("BMSDTCSTATUS:\t");
+    for(uint8_t i=0; i<8; i++)
+    {
+        Serial.print(msg.buf[i]);
+        Serial.print(",");
+    }
+    Serial.println("");
+}
+
+void canHandler_CANMSG_MC_SETPARAMETER(const CAN_message_t &msg)
+{
+    Serial.print("MC SET PARAMETERS:\t");
     for(uint8_t i=0; i<8; i++)
     {
         Serial.print(msg.buf[i]);

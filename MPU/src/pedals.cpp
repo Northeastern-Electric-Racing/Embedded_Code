@@ -13,6 +13,7 @@ PEDALS::PEDALS(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 
 	brakeReading_wait.cancelTimer();
 	pedalReading_wait.cancelTimer();
+	pedalReading_debounce.cancelTimer();
 
 	motorController = p_motorController;
 	bms = p_bms;
@@ -45,24 +46,35 @@ void PEDALS::readAccel()
 			{
 			// do nothing
 			}
-
 		}
 		else
 		{
-			int accelPin1Val = analogRead(ACCEL1_PIN); 
-  			int accelPin2Val = analogRead(ACCEL2_PIN);
-
-			//if brake "bottoms out" or if there is a large discrepancy between readings, flag an accelerator fault
-			if (accelPin1Val == 0 ||
-				accelPin2Val == 0 ||
-				accelPin1Val == 1023 ||
-				accelPin2Val == 1023 ||
-				(abs(accelPin1Val - accelPin2Val) > (1023 * 0.05))) 
+			
+			uint16_t pedalDiff = MAXIMUM_TORQUE;
+			int16_t avgVal;
+			
+			pedalReading_debounce.startTimer(50);
+			while(!pedalReading_debounce.isTimerExpired())
 			{
-				accelFault = true;
-  			}
+				int accelPin1Val = analogRead(ACCEL1_PIN);
+  				int accelPin2Val = analogRead(ACCEL2_PIN);
+				
+				if(pedalDiff > abs(accelPin1Val-accelPin2Val))
+				{
+					pedalDiff = abs(accelPin1Val-accelPin2Val);
+					avgVal = (accelPin1Val + accelPin2Val) / 2;
+				}
 
-			int16_t avgVal = (accelPin1Val + accelPin2Val) / 2;
+				if (accelPin1Val == 0 ||
+					accelPin2Val == 0 ||
+					accelPin1Val == 1023 ||
+					accelPin2Val == 1023 ||
+					(abs(accelPin1Val - accelPin2Val) > (1023 * ACCELERATOR_ERROR_PER))) 
+				{
+					accelFault = true;
+				}
+			}
+
 			int16_t flippedVal = (avgVal * -1) + 1023; // reverse it so 0 is when pedal not pressed, and 1023 is at full press
 			if (flippedVal < POT_LOWER_BOUND)
 			{ // Set low point to prevent a positive torque in the resting pedal position
@@ -74,12 +86,26 @@ void PEDALS::readAccel()
 			appliedTorque = (multiplier * MAXIMUM_TORQUE);
 
 			//scale torque based on factor between 1 and 0 based on the temperature of the cells
-			//appliedTorque = (int16_t)(-1* appliedTorque * fastSigmoid(bms->getAvgTemp() - CRITICAL_CELLTEMP));
+			if(bms->isAvgTempCritical())
+			{
+				Serial.println("BMS Temp Critical!, scaling torque...");
+				int16_t torqueScalingVal = .1 * (SHUTDOWN_CELLTEMP - bms->getAvgTemp()) + 1;
+				appliedTorque = appliedTorque * torqueScalingVal;
+			}
+		}
+
+		if(appliedTorque<0)
+		{
+			appliedTorque = 0;
 		}
 
 		motorController->changeTorque(appliedTorque);
 		Serial.print("Acceleration:\t");
 		Serial.println(appliedTorque / 10); // prints out applied torque
+		if(accelFault)
+		{
+			Serial.println("&&&&&&&&&&&&FAULT&&&&&&&&&&&&&&&&&");
+		}
 
 		pedalReading_wait.startTimer(50);
 	}

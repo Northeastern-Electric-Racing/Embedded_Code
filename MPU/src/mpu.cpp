@@ -6,7 +6,7 @@ MPU::MPU()
 {
     pedals = PEDALS(&motorController, &bms);
     driverio = DRIVERIO(&motorController, &bms);
-    gpio = GPIO(&motorController);
+    gpio = GPIO(&motorController, &bms);
 
     ioRead_wait.cancelTimer();
 }
@@ -37,6 +37,8 @@ void MPU::pedalsProcess()
 void MPU::gpioProcess()
 {
     gpio.handleMCHVFault();
+    Serial.print("BMS SOC:\t");
+    Serial.println(bms.getSoC());
 }
 
 void MPU::sendMCMsg()

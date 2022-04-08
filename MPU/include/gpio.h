@@ -8,6 +8,7 @@
 
 #include <nerduino.h>
 #include "cascadiamc.h"
+#include "orionbms.h"
 
 #define SS_READY_SEN 6
 
@@ -17,11 +18,12 @@ class GPIO
         bool isSSPowerCycle = true;
 
         CASCADIAMC *motorController;
+        ORIONBMS *bms;
 
     public:
         GPIO();
 
-        GPIO(CASCADIAMC *p_motorController);
+        GPIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms);
 
         ~GPIO();
 

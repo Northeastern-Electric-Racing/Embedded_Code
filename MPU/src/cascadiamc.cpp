@@ -12,7 +12,6 @@ CASCADIAMC::~CASCADIAMC(){}
 
 void CASCADIAMC::disableMCLockout()
 {
-    Serial.println("############################DISBALING LOCKOUT########################");
     while(!motorCommand_wait.isTimerExpired()){}
 
     sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcOff); // release lockout / OFF
@@ -28,18 +27,6 @@ void CASCADIAMC::writeMCState()
     {
         disableMCLockout();
         while(!motorCommand_wait.isTimerExpired()){}
-    }
-    if(isChangingDirection)
-    {
-        isChangingDirection = false;
-        if(mcMsg.config.isOn)
-        {
-            toggleOn(false);
-            writeMCState();
-            while(!motorCommand_wait.isTimerExpired()){}
-            toggleOn(true);
-            disableMCLockout();
-        }   
     }
     while(!motorCommand_wait.isTimerExpired()){}
 
@@ -72,6 +59,11 @@ void CASCADIAMC::toggleOn(bool p_isOn)
     isMCLocked = true;
 }
 
+bool CASCADIAMC::getIsOn()
+{
+    return mcMsg.config.isOn;
+}
+
 
 void CASCADIAMC::changeTorque(uint16_t p_accelTorque)
 {
@@ -81,4 +73,15 @@ void CASCADIAMC::changeTorque(uint16_t p_accelTorque)
 void CASCADIAMC::clearFault()
 {
     sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
+    isFaulted = false;
+}
+
+void CASCADIAMC::raiseFault()
+{
+    isFaulted = true;
+}
+
+bool CASCADIAMC::checkFault()
+{
+    return isFaulted;
 }

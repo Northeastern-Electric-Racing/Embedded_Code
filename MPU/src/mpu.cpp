@@ -37,6 +37,7 @@ void MPU::pedalsProcess()
 void MPU::gpioProcess()
 {
     gpio.handleMCHVFault();
+    gpio.handlePump();
     Serial.print("BMS SOC:\t");
     Serial.println(bms.getSoC());
 }

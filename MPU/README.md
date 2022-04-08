@@ -13,7 +13,7 @@
 5. ~Speaker (Buzzes when car turns on)~
 6. SS button controls charging
 7. While charging, turn SS button green
-8. **SS sen must be high to turn on motor controller (Still can turn on)** 
+8. ~SS sen must be high to turn on motor controller (Still can turn on)~ 
 
 ### GPIO
 1. PWM Out?
@@ -23,3 +23,4 @@
 ### BMS
 1. ~Get SOC via accumulator message~
 2. Get AVG Temp via BMS Status
+3. Pump control?

@@ -18,6 +18,7 @@ void GPIO::handleMCHVFault()
     {
         Serial.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         isSSPowerCycle = true;
+        motorController->raiseFault();
         return;
     }
     if (isSSPowerCycle && digitalRead(SS_READY_SEN) == HIGH)
@@ -26,4 +27,9 @@ void GPIO::handleMCHVFault()
         motorController->clearFault();
         isSSPowerCycle = false;
     }
+}
+
+void GPIO::handlePump()
+{
+    digitalWrite(PUMP_PIN, !motorController->getIsOn());
 }

@@ -49,7 +49,7 @@ void DRIVERIO::handleSSButton()
                 break;
             }
         }
-        if(digitalRead(SS_BUTT_PIN))
+        if(digitalRead(SS_BUTT_PIN) && (isOn || (!isOn && !motorController->checkFault())))
         {
             isOn = !isOn;
             digitalWrite(SS_LED_PIN, isOn);     //Writes SS LED to the power state of the motor
@@ -82,6 +82,9 @@ void DRIVERIO::handleReverseSwitch()
         isForward = (bool)digitalRead(REVERSE_SW_PIN);
 
         motorController->toggleDirection(isForward);    //writes the direction of the motor to the MC message to be sent
+        motorController->toggleOn(false);
+        digitalWrite(SS_LED_PIN, LOW);
+        isOn = false;
 #ifdef DEBUG
         Serial.println("~~~~~~~~~~~~~~~~~~~~Switching Direction~~~~~~~~~~~~~~~~~~~~~~~~");
 #endif

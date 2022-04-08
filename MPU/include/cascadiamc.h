@@ -34,6 +34,7 @@ class CASCADIAMC
 
         bool isMCLocked = false;
         bool isChangingDirection = false;
+        bool isFaulted = false;
 
         /**
          * @brief disables Motor Controller Lockout by sending motor controller off message
@@ -67,6 +68,12 @@ class CASCADIAMC
         void toggleOn(bool p_isOn);
 
         /**
+         * @brief Get if the MC is on
+         * 
+         */
+        bool getIsOn();
+
+        /**
          * @brief Loads the desired acceleration torque into the MC message
          * 
          * @param p_accelTorque 
@@ -78,6 +85,18 @@ class CASCADIAMC
          * 
          */
         void clearFault();
+
+        /**
+         * @brief Raises the Fault for Failing to Generate High Voltage
+         * 
+         */
+        void raiseFault();
+
+        /**
+         * @brief Checks for the Fault for Failing to Generate High Voltage
+         * 
+         */
+        bool checkFault();
 };
 
 #endif

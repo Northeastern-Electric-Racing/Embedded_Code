@@ -12,12 +12,11 @@ CASCADIAMC::~CASCADIAMC(){}
 
 void CASCADIAMC::disableMCLockout()
 {
-    Serial.println("############################DISBALING LOCKOUT########################");
     while(!motorCommand_wait.isTimerExpired()){}
 
     sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcOff); // release lockout / OFF
 
-    motorCommand_wait.startTimer(50);
+    motorCommand_wait.startTimer(CAN_CMD_DELAY);
     isMCLocked = false;
 }
 
@@ -28,18 +27,6 @@ void CASCADIAMC::writeMCState()
     {
         disableMCLockout();
         while(!motorCommand_wait.isTimerExpired()){}
-    }
-    if(isChangingDirection)
-    {
-        isChangingDirection = false;
-        if(mcMsg.config.isOn)
-        {
-            toggleOn(false);
-            writeMCState();
-            while(!motorCommand_wait.isTimerExpired()){}
-            toggleOn(true);
-            disableMCLockout();
-        }   
     }
     while(!motorCommand_wait.isTimerExpired()){}
 
@@ -54,24 +41,34 @@ void CASCADIAMC::writeMCState()
 
     sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcMsg.canMsg);
 
-    motorCommand_wait.startTimer(50);
+    motorCommand_wait.startTimer(CAN_CMD_DELAY);
 }
 
 
-void CASCADIAMC::toggleDirection(bool p_isForward)
+void CASCADIAMC::toggleDirection()
 {
-    mcMsg.config.isForward = p_isForward;
-    isMCLocked = true;
-    isChangingDirection = true;
+    if (mcMsg.config.isOn) {
+        togglePower();
+    }
+    mcMsg.config.isForward = !mcMsg.config.isForward;
 }
 
 
-void CASCADIAMC::toggleOn(bool p_isOn)
+void CASCADIAMC::togglePower()
 {
-    mcMsg.config.isOn = p_isOn;
+    mcMsg.config.isOn = !mcMsg.config.isOn;
     isMCLocked = true;
 }
 
+bool CASCADIAMC::getIsOn()
+{
+    return mcMsg.config.isOn;
+}
+
+bool CASCADIAMC::getDirection()
+{
+    return mcMsg.config.isForward;
+}
 
 void CASCADIAMC::changeTorque(uint16_t p_accelTorque)
 {
@@ -81,4 +78,15 @@ void CASCADIAMC::changeTorque(uint16_t p_accelTorque)
 void CASCADIAMC::clearFault()
 {
     sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
+    isFaulted = false;
+}
+
+void CASCADIAMC::raiseFault()
+{
+    isFaulted = true;
+}
+
+bool CASCADIAMC::checkFault()
+{
+    return isFaulted;
 }

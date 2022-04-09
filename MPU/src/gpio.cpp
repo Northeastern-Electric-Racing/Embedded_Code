@@ -2,15 +2,19 @@
 
 GPIO::GPIO(){}
 
+
 GPIO::GPIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 {
     pinMode(SS_READY_SEN, INPUT);
+    pinMode(PUMP_PIN, OUTPUT);
 
     motorController = p_motorController;
     bms = p_bms;
 }
 
+
 GPIO::~GPIO(){}
+
 
 void GPIO::handleMCHVFault()
 {
@@ -18,6 +22,7 @@ void GPIO::handleMCHVFault()
     {
         Serial.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         isSSPowerCycle = true;
+        motorController->raiseFault();
         return;
     }
     if (isSSPowerCycle && digitalRead(SS_READY_SEN) == HIGH)
@@ -26,4 +31,10 @@ void GPIO::handleMCHVFault()
         motorController->clearFault();
         isSSPowerCycle = false;
     }
+}
+
+
+void GPIO::handlePump()
+{
+    //digitalWrite(PUMP_PIN, !motorController->getIsOn());
 }

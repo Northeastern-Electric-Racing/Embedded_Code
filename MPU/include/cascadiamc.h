@@ -6,6 +6,8 @@
 #ifndef CASCADIAMC_H
 #define CASCADIAMC_H
 
+#define CAN_CMD_DELAY 10 // ms
+
 #include <nerduino.h>
 
 
@@ -34,6 +36,7 @@ class CASCADIAMC
 
         bool isMCLocked = false;
         bool isChangingDirection = false;
+        bool isFaulted = false;
 
         /**
          * @brief disables Motor Controller Lockout by sending motor controller off message
@@ -57,14 +60,26 @@ class CASCADIAMC
          * 
          * @param p_isForward 
          */
-        void toggleDirection(bool p_isForward);
+        void toggleDirection();
 
         /**
          * @brief Loads the desired power state into the MC message
          * 
          * @param p_isOn 
          */
-        void toggleOn(bool p_isOn);
+        void togglePower();
+
+        /**
+         * @brief Get if the MC is on
+         * 
+         */
+        bool getIsOn();
+
+        /**
+         * @brief Get if the MC is forward
+         * 
+         */
+        bool getDirection();
 
         /**
          * @brief Loads the desired acceleration torque into the MC message
@@ -78,6 +93,18 @@ class CASCADIAMC
          * 
          */
         void clearFault();
+
+        /**
+         * @brief Raises the Fault for Failing to Generate High Voltage
+         * 
+         */
+        void raiseFault();
+
+        /**
+         * @brief Checks for the Fault for Failing to Generate High Voltage
+         * 
+         */
+        bool checkFault();
 };
 
 #endif

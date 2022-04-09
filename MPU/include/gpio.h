@@ -10,7 +10,8 @@
 #include "cascadiamc.h"
 #include "orionbms.h"
 
-#define SS_READY_SEN 6
+#define SS_READY_SEN    6
+#define PUMP_PIN        2
 
 class GPIO
 {
@@ -32,6 +33,12 @@ class GPIO
          * 
          */
         void handleMCHVFault();
+
+        /**
+         * @brief Handles the logic behind starting/stopping the pump
+         * 
+         */
+        void handlePump();
 };
 
 #endif

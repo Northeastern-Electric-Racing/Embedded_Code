@@ -49,7 +49,6 @@ void CASCADIAMC::toggleDirection(bool p_isForward)
 {
     mcMsg.config.isForward = p_isForward;
     isMCLocked = true;
-    isChangingDirection = true;
 }
 
 
@@ -63,7 +62,6 @@ bool CASCADIAMC::getIsOn()
 {
     return mcMsg.config.isOn;
 }
-
 
 void CASCADIAMC::changeTorque(uint16_t p_accelTorque)
 {

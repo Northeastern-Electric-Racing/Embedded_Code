@@ -85,6 +85,11 @@ void PEDALS::readAccel()
 
 			appliedTorque = (multiplier * MAXIMUM_TORQUE);
 
+			if(appliedTorque >= MAXIMUM_TORQUE)
+			{
+				appliedTorque = MAXIMUM_TORQUE;
+			}
+
 			//scale torque based on factor between 1 and 0 based on the temperature of the cells
 			if(bms->isAvgTempCritical())
 			{

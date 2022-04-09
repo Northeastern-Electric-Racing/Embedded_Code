@@ -71,6 +71,7 @@ void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
         Serial.print(",");
     }
     Serial.println("");
+    mpu.setBMSAvgTemp(msg.buf[6]);
 }
 
 void canHandler_CANMSG_MC_SETPARAMETER(const CAN_message_t &msg)

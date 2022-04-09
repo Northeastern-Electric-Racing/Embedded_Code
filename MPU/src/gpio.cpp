@@ -5,6 +5,7 @@ GPIO::GPIO(){}
 GPIO::GPIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 {
     pinMode(SS_READY_SEN, INPUT);
+    pinMode(PUMP_PIN, OUTPUT);
 
     motorController = p_motorController;
     bms = p_bms;
@@ -31,5 +32,5 @@ void GPIO::handleMCHVFault()
 
 void GPIO::handlePump()
 {
-    digitalWrite(PUMP_PIN, !motorController->getIsOn());
+    //digitalWrite(PUMP_PIN, !motorController->getIsOn());
 }

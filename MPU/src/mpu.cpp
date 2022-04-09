@@ -20,6 +20,8 @@ void MPU::driverioProcess()
     if(ioRead_wait.isTimerExpired())
     {
         Serial.println("DriverIO process...");
+        driverio.syncMC_IO();
+        driverio.handleSSButton();
         driverio.handleSSButton();
         driverio.handleReverseSwitch();
         ioRead_wait.startTimer(100);
@@ -40,6 +42,8 @@ void MPU::gpioProcess()
     gpio.handlePump();
     Serial.print("BMS SOC:\t");
     Serial.println(bms.getSoC());
+    Serial.print("BMS Temp:\t");
+    Serial.println(bms.getAvgTemp());
 }
 
 void MPU::sendMCMsg()

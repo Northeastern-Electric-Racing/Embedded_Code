@@ -21,7 +21,6 @@ DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 
     pinMode(SPEAKER_PIN, OUTPUT);
     digitalWrite(SPEAKER_PIN, HIGH);
-    
 
     powerToggle_wait.cancelTimer();
     ssButton_debounce.cancelTimer();
@@ -34,6 +33,10 @@ DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 
 DRIVERIO::~DRIVERIO(){}
 
+void DRIVERIO::syncMC_IO()
+{
+    isOn = motorController->getIsOn();
+}
 
 void DRIVERIO::handleSSButton()
 {
@@ -52,7 +55,6 @@ void DRIVERIO::handleSSButton()
         if(digitalRead(SS_BUTT_PIN) && (isOn || (!isOn && !motorController->checkFault())))
         {
             isOn = !isOn;
-            digitalWrite(SS_LED_PIN, isOn);     //Writes SS LED to the power state of the motor
 
             motorController->toggleOn(isOn);    //Writes the power state of the motor to the MC message to be sent
             if(isOn)
@@ -72,6 +74,10 @@ void DRIVERIO::handleSSButton()
     }
 }
 
+void DRIVERIO::handleSSLED()
+{
+    digitalWrite(SS_LED_PIN,motorController->getIsOn());
+}
 
 void DRIVERIO::handleReverseSwitch()
 {
@@ -83,8 +89,7 @@ void DRIVERIO::handleReverseSwitch()
 
         motorController->toggleDirection(isForward);    //writes the direction of the motor to the MC message to be sent
         motorController->toggleOn(false);
-        digitalWrite(SS_LED_PIN, LOW);
-        isOn = false;
+
 #ifdef DEBUG
         Serial.println("~~~~~~~~~~~~~~~~~~~~Switching Direction~~~~~~~~~~~~~~~~~~~~~~~~");
 #endif

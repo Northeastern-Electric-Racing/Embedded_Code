@@ -23,4 +23,4 @@
 ### BMS
 1. ~Get SOC via accumulator message~
 2. Get AVG Temp via BMS Status
-3. Pump control?
+3. ~Pump control?~

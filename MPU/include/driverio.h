@@ -46,11 +46,19 @@ class DRIVERIO
 
         ~DRIVERIO();
 
+        void syncMC_IO();
+
         /**
          * @brief Debounces the Start/Stop button and toggles the power depending on if the button was pushed
          * 
          */
         void handleSSButton();
+
+        /**
+         * @brief Handles the state of the Start/Stop LED
+         * 
+         */
+        void handleSSLED();
 
         /**
          * @brief Detects a change in the direction of the forward/reverse switch

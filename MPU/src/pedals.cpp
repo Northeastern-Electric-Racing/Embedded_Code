@@ -109,7 +109,7 @@ void PEDALS::readAccel()
 		Serial.println(appliedTorque / 10); // prints out applied torque
 		if(accelFault)
 		{
-			Serial.println("&&&&&&&&&&&&FAULT&&&&&&&&&&&&&&&&&");
+			Serial.println("&&&&&&&&&&&&ACCELERATOR FAULT&&&&&&&&&&&&&&&&&");
 		}
 
 		pedalReading_wait.startTimer(50);

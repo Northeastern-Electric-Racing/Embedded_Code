@@ -27,10 +27,6 @@
 class DRIVERIO
 {
     private:
-        bool isForward = false;
-        bool isOn = false;
-        uint8_t accelTorqueLow = 0;
-        uint8_t accelTorqueHigh = 0;
 
         CASCADIAMC *motorController;
         ORIONBMS *bms;
@@ -38,6 +34,7 @@ class DRIVERIO
         Timer ssButton_debounce;
         Timer powerToggle_wait;
         Timer speaker_wait;
+        Timer tempWarningBlink_wait;
 
     public:
         DRIVERIO();
@@ -45,8 +42,6 @@ class DRIVERIO
         DRIVERIO(CASCADIAMC *motorController, ORIONBMS *p_bms);
 
         ~DRIVERIO();
-
-        void syncMC_IO();
 
         /**
          * @brief Debounces the Start/Stop button and toggles the power depending on if the button was pushed

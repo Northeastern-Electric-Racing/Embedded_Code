@@ -82,12 +82,6 @@ class CASCADIAMC
         bool getDirection();
 
         /**
-         * @brief Get if the MC is on
-         * 
-         */
-        bool getIsOn();
-
-        /**
          * @brief Loads the desired acceleration torque into the MC message
          * 
          * @param p_accelTorque 

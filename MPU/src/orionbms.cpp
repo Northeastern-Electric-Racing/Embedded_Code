@@ -53,6 +53,11 @@ bool ORIONBMS::isAvgTempCritical()
     return avgTemp > CRITICAL_CELLTEMP;
 }
 
+bool ORIONBMS::isAvgTempShutdown()
+{
+    return avgTemp > SHUTDOWN_CELLTEMP;
+}
+
 
 bool ORIONBMS::getIsCharging()
 {

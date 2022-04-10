@@ -25,6 +25,7 @@ DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
     powerToggle_wait.cancelTimer();
     ssButton_debounce.cancelTimer();
     speaker_wait.cancelTimer();
+    tempWarningBlink_wait.cancelTimer();
 
     motorController = p_motorController;
     bms = p_bms;
@@ -33,10 +34,6 @@ DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 
 DRIVERIO::~DRIVERIO(){}
 
-void DRIVERIO::syncMC_IO()
-{
-    isOn = motorController->getIsOn();
-}
 
 void DRIVERIO::handleSSButton()
 {
@@ -78,11 +75,6 @@ void DRIVERIO::handleSSLED()
     digitalWrite(SS_LED_PIN,motorController->getIsOn());
 }
 
-void DRIVERIO::handleSSLED()
-{
-    digitalWrite(SS_LED_PIN, motorController->getIsOn());
-}
-
 
 void DRIVERIO::handleReverseSwitch()
 {
@@ -97,7 +89,7 @@ void DRIVERIO::handleReverseSwitch()
 #endif
     }
 #ifdef DEBUG
-    Serial.println(isForward ? "Forward" : "Reverse");
+    Serial.println(motorController->getDirection() ? "Forward" : "Reverse");
 #endif
 }
 
@@ -105,6 +97,23 @@ void DRIVERIO::handleReverseSwitch()
 void DRIVERIO::handleErrorLights()
 {
     writeLED4(bms->isSoCCritical());
+
+    if(tempWarningBlink_wait.isTimerExpired())
+    {
+        writeLED5(LOW);
+    }
+
+    if(bms->isAvgTempCritical())
+    {
+        if(bms->isAvgTempShutdown())
+        {
+            writeLED5(HIGH);
+            return;
+        }
+        writeLED5(HIGH);
+        tempWarningBlink_wait.startTimer(500);
+    }
+
 }
 
 

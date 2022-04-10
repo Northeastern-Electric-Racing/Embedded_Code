@@ -86,6 +86,14 @@ class ORIONBMS
         bool isAvgTempCritical();
 
         /**
+         * @brief Returns if the average temperature has reached the set shutdown temp
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool isAvgTempShutdown();
+
+        /**
          * @brief Returns if the BMS is currently charging
          * 
          * @return true 

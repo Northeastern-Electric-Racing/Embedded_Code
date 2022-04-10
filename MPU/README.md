@@ -9,7 +9,7 @@
 1. ~SS Button(Turn on car by sending MC message)~
 2. ~Direction Switch (switch direction by sending MC message)~
 3. ~SS Button LED (On when car on)~
-4. ~Two programmable LEDs (Low Battery and Noncritical fault __blink code__)~
+4. ~Two programmable LEDs (Low Battery and Noncritical fault blink code)~
 5. ~Speaker (Buzzes when car turns on)~
 6. SS button controls charging
 7. While charging, turn SS button green
@@ -22,5 +22,5 @@
 
 ### BMS
 1. ~Get SOC via accumulator message~
-2. Get AVG Temp via BMS Status
+2. ~Get AVG Temp via BMS Status~
 3. ~Pump control?~

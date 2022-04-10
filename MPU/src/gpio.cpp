@@ -2,6 +2,7 @@
 
 GPIO::GPIO(){}
 
+
 GPIO::GPIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 {
     pinMode(SS_READY_SEN, INPUT);
@@ -11,7 +12,9 @@ GPIO::GPIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
     bms = p_bms;
 }
 
+
 GPIO::~GPIO(){}
+
 
 void GPIO::handleMCHVFault()
 {

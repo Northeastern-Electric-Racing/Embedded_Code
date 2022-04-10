@@ -90,6 +90,11 @@ void PEDALS::readAccel()
 				appliedTorque = MAXIMUM_TORQUE;
 			}
 
+			if(appliedTorque<0)
+			{
+				appliedTorque = 0;
+			}
+
 			//scale torque based on factor between 1 and 0 based on the temperature of the cells
 			if(bms->isAvgTempCritical())
 			{
@@ -97,11 +102,6 @@ void PEDALS::readAccel()
 				int16_t torqueScalingVal = .1 * (SHUTDOWN_CELLTEMP - bms->getAvgTemp()) + 1;
 				appliedTorque = appliedTorque * torqueScalingVal;
 			}
-		}
-
-		if(appliedTorque<0)
-		{
-			appliedTorque = 0;
 		}
 
 		motorController->changeTorque(appliedTorque);

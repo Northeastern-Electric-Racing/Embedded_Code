@@ -6,6 +6,8 @@
 #ifndef CASCADIAMC_H
 #define CASCADIAMC_H
 
+#define CAN_CMD_DELAY 10 // ms
+
 #include <nerduino.h>
 
 
@@ -58,14 +60,26 @@ class CASCADIAMC
          * 
          * @param p_isForward 
          */
-        void toggleDirection(bool p_isForward);
+        void toggleDirection();
 
         /**
          * @brief Loads the desired power state into the MC message
          * 
          * @param p_isOn 
          */
-        void toggleOn(bool p_isOn);
+        void togglePower();
+
+        /**
+         * @brief Get if the MC is on
+         * 
+         */
+        bool getIsOn();
+
+        /**
+         * @brief Get if the MC is forward
+         * 
+         */
+        bool getDirection();
 
         /**
          * @brief Get if the MC is on

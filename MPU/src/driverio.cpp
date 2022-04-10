@@ -40,26 +40,24 @@ void DRIVERIO::syncMC_IO()
 
 void DRIVERIO::handleSSButton()
 {
-    if(digitalRead(SS_BUTT_PIN) && powerToggle_wait.isTimerExpired())
+    if(digitalRead(SS_BUTT_PIN) && powerToggle_wait.isTimerExpired()) // If pressed and no timer
     {
         ssButton_debounce.startTimer(50);
 
         //if the button is still being held during and after the timer runs out, then toggle power
         while(!ssButton_debounce.isTimerExpired())
         {
-            if(!digitalRead(SS_BUTT_PIN))
+            if(!digitalRead(SS_BUTT_PIN)) // If released
             {
                 break;
             }
         }
-        if(digitalRead(SS_BUTT_PIN) && (isOn || (!isOn && !motorController->checkFault())))
+        if(digitalRead(SS_BUTT_PIN) && (motorController->getIsOn() || (!motorController->getIsOn() && !motorController->checkFault())))
         {
-            isOn = !isOn;
-
-            motorController->toggleOn(isOn);    //Writes the power state of the motor to the MC message to be sent
-            if(isOn)
+            motorController->togglePower();    //Writes the power state of the motor to the MC message to be sent
+            if(motorController->getIsOn())
             {
-                digitalWrite(SPEAKER_PIN, LOW);
+                writeSpeaker(HIGH);
                 speaker_wait.startTimer(1500);
             }
             powerToggle_wait.startTimer(1000);
@@ -68,9 +66,10 @@ void DRIVERIO::handleSSButton()
 #endif
         }
     }
+
     if(speaker_wait.isTimerExpired())
     {
-        digitalWrite(SPEAKER_PIN, HIGH);
+        writeSpeaker(LOW);
     }
 }
 
@@ -79,16 +78,19 @@ void DRIVERIO::handleSSLED()
     digitalWrite(SS_LED_PIN,motorController->getIsOn());
 }
 
+void DRIVERIO::handleSSLED()
+{
+    digitalWrite(SS_LED_PIN, motorController->getIsOn());
+}
+
+
 void DRIVERIO::handleReverseSwitch()
 {
     Serial.print("Switch State:\t");
-    Serial.println(isForward);
-    if(digitalRead(REVERSE_SW_PIN) != isForward)
+    Serial.println(motorController->getDirection());
+    if(digitalRead(REVERSE_SW_PIN) != motorController->getDirection())
     {
-        isForward = (bool)digitalRead(REVERSE_SW_PIN);
-
-        motorController->toggleDirection(isForward);    //writes the direction of the motor to the MC message to be sent
-        motorController->toggleOn(false);
+        motorController->toggleDirection();    //writes the direction of the motor to the MC message to be sent
 
 #ifdef DEBUG
         Serial.println("~~~~~~~~~~~~~~~~~~~~Switching Direction~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -98,6 +100,7 @@ void DRIVERIO::handleReverseSwitch()
     Serial.println(isForward ? "Forward" : "Reverse");
 #endif
 }
+
 
 void DRIVERIO::handleErrorLights()
 {
@@ -119,5 +122,5 @@ void DRIVERIO::writeLED5(bool state)
 
 void DRIVERIO::writeSpeaker(bool state)
 {
-    digitalWrite(SPEAKER_PIN, state);
+    digitalWrite(SPEAKER_PIN, !state);
 }

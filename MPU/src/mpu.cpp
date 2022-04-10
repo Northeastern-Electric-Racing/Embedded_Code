@@ -23,6 +23,7 @@ void MPU::driverioProcess()
         driverio.syncMC_IO();
         driverio.handleSSButton();
         driverio.handleSSButton();
+        driverio.handleSSLED();
         driverio.handleReverseSwitch();
         ioRead_wait.startTimer(100);
     }
@@ -36,6 +37,7 @@ void MPU::pedalsProcess()
     pedals.readAccel();
 }
 
+
 void MPU::gpioProcess()
 {
     gpio.handleMCHVFault();
@@ -46,15 +48,18 @@ void MPU::gpioProcess()
     Serial.println(bms.getAvgTemp());
 }
 
+
 void MPU::sendMCMsg()
 {
     motorController.writeMCState();
 }
 
+
 void MPU::setBMSAvgTemp(uint8_t p_avgTemp)
 {
     bms.setAvgTemp(p_avgTemp);
 }
+
 
 void MPU::setBMSSoC(uint8_t p_soc)
 {

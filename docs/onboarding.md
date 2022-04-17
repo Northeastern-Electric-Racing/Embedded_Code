@@ -9,9 +9,14 @@ at your own discretion, but each step is pretty important.
 
 i.e. if I want to clone the ```Embedded_Code``` repo, I'd go to the green "Code" button above the file structure in the repository and copy the link, so it would be
 
-```git clone git@github.com:Northeastern-Electric-Racing/Embedded_Code.git``` 
+```git clone git@github.com:Northeastern-Electric-Racing/Embedded_Code.git```
 
-4. Learn some coding basics
+4. Remember to update the submodules within the repo (Might not be needed for all cases, but best to do it anyways)
+
+Run: ```git submodule update --init --recursive```
+
+
+5. Learn some coding basics
 
 Now that may seem kinda stupid, but there's always tricks and wyas of formatting code that you can learn. For the code on the car, we use C++ for everything, and
 we use an object-oriented framework to organize all the code into header ```.h``` files and source ```.cpp``` files. As of now, we use Python for most telemetry
@@ -21,10 +26,12 @@ applications and scripts, and we use objects in them too. Below are a few tutori
 
 ### If you're interested in learning Python and coding higher level applications...
 ***[try to walk through this tutorial](https://www.w3schools.com/python/default.asp)***
+
 If you do all the exercises you'll get a pretty good understanding of Python
 
 
 ### If you're interested in learning C++ and lower level embedded code...
 ***[try to walk through this tutorial](https://www.w3schools.com/cpp/default.asp)***
+
 This should lay the groundwork for coding with objects, constructors, pointers, etc, especially if you do the exercises for the stuff you don't know. The code really
 resembles Arduino code at a base level

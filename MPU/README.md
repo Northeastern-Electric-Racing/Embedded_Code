@@ -17,6 +17,8 @@ The grouping of functionality into multiple objects was a design choice made to 
 
 ***USEFUL TIP*** The code is organized so that it gets less abstract as you go into each function, so start in ```main.cpp``` for the highest level of what the code does, and then go into the ```gpioProcess()```, ```driverioProcess()```, and ```pedalsProcess()``` to see what they do, and then go into their respective functions.
 
+***USEFUL TIP*** If you are looking for documentation on what each function does in the code, the header files (```.h``` files in the ```/include``` directory) contain a lot of comments and an overview of what is in each class 
+
 
 ## TODO:
 ### Pedals

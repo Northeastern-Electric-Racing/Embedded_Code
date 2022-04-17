@@ -26,11 +26,3 @@ If you're new here, make sure to complete all the steps from [this onboarding do
 A simple diagram of the system can be seen in the UML diagram below. [Here is a more in-depth explanation of how everything works](https://github.com/Northeastern-Electric-Racing/Embedded_Code/blob/ndepatie-dev/docs/carchitecture.md).
 
 ![Testpic](https://github.com/Northeastern-Electric-Racing/Embedded_Code/blob/ndepatie-dev/system.drawio.svg)
-
-
-### Master Processing Unit (MPU)
-Handles all essential processes for normal car functionality
-
-__Found in ```MPU``` directory__
-
-### Telemetry Control Unit (TCU)

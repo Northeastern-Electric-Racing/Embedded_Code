@@ -3,6 +3,9 @@ Handles all essential processes for normal car functionality
 
 
 ### Overview of Architecture
+
+![TestPic](https://github.com/Northeastern-Electric-Racing/Embedded_Code/blob/ndepatie-dev/MPU/mpu.drawio.xml)
+
 ```main.cpp``` is the entry point for the program. From here, the ```gpioProcess()```, ```driverioProcess()```, and ```pedalsProcess()``` is called to handle each respective group of 
 functionalities of the car. Inside the ```mpu``` object, there is a ```bms``` and ```motorController``` object that is defined and then passed to the ```pedals```, ```gpio```, and ```driverio```
 objects. This means that all the functions of the car can modify and retrieve the current state of the motor controller and bms (i.e. all parts of the car can retrieve if the car is moving forward

@@ -39,3 +39,8 @@ If you do all the exercises you'll get a pretty good understanding of Python
 
 This should lay the groundwork for coding with objects, constructors, pointers, etc, especially if you do the exercises for the stuff you don't know. The code really
 resembles Arduino code at a base level
+
+
+6. [Install Visual Studio Code](https://code.visualstudio.com/download)
+
+7. Once installed, open VSCode and install the extension ```PlatformIO```

@@ -3,6 +3,10 @@ By the end of this list, you should be in a place where you are more than ready 
 or don't need to do if you've dabbled in software development before, but if you're fresh out of cornerstone you might need to go step by step. Go through
 at your own discretion, but each step is pretty important.
 
+
+***USEFUL TIP*** ```Ctrl+click``` to open these links in a new tab
+
+
 1. [Create a GitHub account](https://github.com/join)
 2. [Follow this tutorial on the basics of using Git in the CLI](https://www.freecodecamp.org/news/learn-the-basics-of-git-in-under-10-minutes-da548267cc91/)
 3. Clone whatever repository you're going to be working in

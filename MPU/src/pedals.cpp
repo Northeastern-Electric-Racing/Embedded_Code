@@ -146,7 +146,7 @@ void PEDALS::readBrake()
 		}
 		brakeReading_wait.startTimer(50);
 	}
-	digitalWrite(BRAKELIGHT_PIN, brakePressed);
+	//digitalWrite(BRAKELIGHT_PIN, brakePressed);
 	Serial.print("Brake:\t\t");
 	Serial.println(brakePressed);
 }

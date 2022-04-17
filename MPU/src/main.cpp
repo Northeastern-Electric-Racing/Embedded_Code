@@ -13,6 +13,8 @@ void setup()
     digitalWrite(PUMP_PIN,LOW);
 }
 
+bool brakeLight = true;
+
 void loop()
 {
     myCan.events();
@@ -22,4 +24,8 @@ void loop()
     mpu.sendMCMsg();
     Serial.println("cycle");
     digitalWrite(RELAY_PIN,HIGH);
+    brakeLight = !brakeLight;
+    digitalWrite(PUMP_PIN, brakeLight);
+    Serial.println(brakeLight);
+    delay(3000);
 }

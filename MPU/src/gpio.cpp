@@ -35,5 +35,5 @@ void GPIO::handleMCHVFault()
 
 void GPIO::handlePump()
 {
-    digitalWrite(PUMP_PIN, !motorController->getIsOn());
+    //digitalWrite(PUMP_PIN, !motorController->getIsOn());
 }

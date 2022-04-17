@@ -19,12 +19,12 @@ applications and scripts, and we use objects in them too. Below are a few tutori
 (don't feel too pressured to finish it all in one night, but they are really good resources, especially if you only need to focus on the later class based stuff)
 
 
-#### If you're interested in learning Python and coding higher level applications...
+### If you're interested in learning Python and coding higher level applications...
 ***[try to walk through this tutorial](https://www.w3schools.com/python/default.asp)***
 If you do all the exercises you'll get a pretty good understanding of Python
 
 
-#### If you're interested in learning C++ and lower level embedded code...
+### If you're interested in learning C++ and lower level embedded code...
 ***[try to walk through this tutorial](https://www.w3schools.com/cpp/default.asp)***
 This should lay the groundwork for coding with objects, constructors, pointers, etc, especially if you do the exercises for the stuff you don't know. The code really
 resembles Arduino code at a base level

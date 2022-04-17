@@ -1,8 +1,6 @@
 #include <nerduino.h>
 #include "mpu.h"
 
-#define PIN1 1
-
 void setup()
 {
     NERduino.begin();

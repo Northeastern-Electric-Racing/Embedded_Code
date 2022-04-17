@@ -23,9 +23,8 @@ Built off of the [NERduino](https://github.com/Northeastern-Electric-Racing/NERd
 ```
 
 ### Master Processing Unit (MPU)
+Handles all essential processes for normal car functionality
 
+___Found in ```MPU``` directory___
 
 ### Telemetry Control Unit (TCU)
-
-
-### Watchdog

@@ -6,14 +6,14 @@ at your own discretion, but each step is pretty important.
 1. [Create a GitHub account](https://github.com/join)
 2. [Follow this tutorial on the basics of using Git in the CLI](https://www.freecodecamp.org/news/learn-the-basics-of-git-in-under-10-minutes-da548267cc91/)
 3. Clone whatever repository you're going to be working in
-
-i.e. if I want to clone the ```Embedded_Code``` repo, I'd go to the green "Code" button above the file structure in the repository and copy the link, so it would be
-
-```git clone git@github.com:Northeastern-Electric-Racing/Embedded_Code.git```
-
+|
+| i.e. if I want to clone the ```Embedded_Code``` repo, I'd go to the green "Code" button above the file structure in the repository and copy the link, so it would be
+|
+| ```git clone git@github.com:Northeastern-Electric-Racing/Embedded_Code.git```
+|
 4. Remember to update the submodules within the repo (Might not be needed for all cases, but best to do it anyways)
-
-Run: ```git submodule update --init --recursive```
+|
+| Run: ```git submodule update --init --recursive```
 
 
 5. Learn some coding basics

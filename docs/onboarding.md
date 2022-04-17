@@ -18,7 +18,7 @@ at your own discretion, but each step is pretty important.
 
 5. Learn some coding basics
 
-Now that may seem kinda stupid, but there's always tricks and wyas of formatting code that you can learn. For the code on the car, we use C++ for everything, and
+Now that may seem kinda stupid, but there's always tricks and ways of formatting code that you can learn. For the code on the car, we use C++ for everything, and
 we use an object-oriented framework to organize all the code into header ```.h``` files and source ```.cpp``` files. As of now, we use Python for most telemetry
 applications and scripts, and we use objects in them too. Below are a few tutorials based on what you're going to be doing in the club to work through at your own leisure
 (don't feel too pressured to finish it all in one night, but they are really good resources, especially if you only need to focus on the later class based stuff)

@@ -9,7 +9,6 @@ Built off of the [NERduino](https://github.com/Northeastern-Electric-Racing/NERd
 |
 |───MPU (Master Processing Unit)
 |───TCU (Telemetry Control Unit)
-|───Watchdog
 |
 |───Legacy Code
 |   |───Brakelight

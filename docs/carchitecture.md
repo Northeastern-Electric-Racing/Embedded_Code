@@ -4,7 +4,7 @@ The computer architecture of the car consists of 4 "nodes", and each node commun
 ![Testpic](https://github.com/Northeastern-Electric-Racing/Embedded_Code/blob/ndepatie-dev/system.drawio.svg)
 
 ### Master Processing Unit (MPU)
-Handles all essential processes for normal car functionality, from handling button presses to monitoring the integrity of the CAN line
+Handles all essential processes for normal car functionality, from handling button presses to monitoring the integrity of the CAN line. There is a lot of logic and states for this, so it might be best to just jump straight into the code for how it works on a basic level.
 
 ### Telemetry Control Unit (TCU)
 Handles logging and offboarding of all CAN data, is being improved to connect wirelessly, giving wireless access to the CAN network

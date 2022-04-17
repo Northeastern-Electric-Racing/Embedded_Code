@@ -8,3 +8,11 @@ Handles all essential processes for normal car functionality, from handling butt
 
 ### Telemetry Control Unit (TCU)
 Handles logging and offboarding of all CAN data, is being improved to connect wirelessly, giving wireless access to the CAN network
+
+### Accumulator (BMS, Thermistors, Charger)
+Handles the power supply for the motor and motor controller. The BMS, in particular, has a very important purpose in regulating cell voltages, monitoring cell temperatures, and limiting current draw. [Here is a great video on what a BMS does and how it protects / optimizes the voltage output](https://www.youtube.com/watch?v=k1N2LyXtK-k). The thermistors are what actually sense the temperatures of the cells, which is then reported back to the BMS.
+
+NER has a custom BMS we are designing, called Sheperd BMS, that uses segment boards, a compute board, and our in-house Teensy IO board, the NERduino.
+
+### Motor Controller
+Handles the communication with the BMS, motor cooling, and motor torque. Basically requests how much voltage the motor needs to run at the desired speed.

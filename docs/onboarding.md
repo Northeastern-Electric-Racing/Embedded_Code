@@ -5,7 +5,13 @@ at your own discretion, but each step is pretty important.
 
 1. [Create a GitHub account](https://github.com/join)
 2. [Follow this tutorial on the basics of using Git in the CLI](https://www.freecodecamp.org/news/learn-the-basics-of-git-in-under-10-minutes-da548267cc91/)
-3. Learn some coding basics
+3. Clone whatever repository you're going to be working in
+
+i.e. if I want to clone the ```Embedded_Code``` repo, I'd go to the green "Code" button above the file structure in the repository and copy the link, so it would be
+
+```git clone git@github.com:Northeastern-Electric-Racing/Embedded_Code.git``` 
+
+4. Learn some coding basics
 
 Now that may seem kinda stupid, but there's always tricks and wyas of formatting code that you can learn. For the code on the car, we use C++ for everything, and
 we use an object-oriented framework to organize all the code into header ```.h``` files and source ```.cpp``` files. As of now, we use Python for most telemetry
@@ -22,9 +28,3 @@ If you do all the exercises you'll get a pretty good understanding of Python
 ***[try to walk through this tutorial](https://www.w3schools.com/cpp/default.asp)***
 This should lay the groundwork for coding with objects, constructors, pointers, etc, especially if you do the exercises for the stuff you don't know. The code really
 resembles Arduino code at a base level
-
-4. Clone whatever repository you're going to be working in
-
-i.e. if I want to clone the ```Embedded_Code``` repo, I'd go to the green "Code" button above the file structure in the repository and copy the link, so it would be
-
-```git clone git@github.com:Northeastern-Electric-Racing/Embedded_Code.git``` 

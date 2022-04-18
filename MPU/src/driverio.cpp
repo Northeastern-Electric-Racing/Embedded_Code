@@ -46,6 +46,7 @@ void DRIVERIO::handleSSButton()
         {
             if(!digitalRead(SS_BUTT_PIN)) // If released
             {
+                ssButton_debounce.cancelTimer();
                 break;
             }
         }

@@ -71,7 +71,11 @@ void PEDALS::readAccel()
 					accelPin2Val == 1023 ||
 					(abs(accelPin1Val - accelPin2Val) > (1023 * ACCELERATOR_ERROR_PER))) 
 				{
-					accelFault = true;
+					accelErrors++;
+					if(accelErrors >= MAX_ACCEL_ERRORS)
+					{
+						accelFault = true;
+					}
 				}
 			}
 
@@ -123,30 +127,49 @@ void PEDALS::readBrake()
 	{
 		int brake1Val = digitalRead(BRAKE1_PIN);
 		int brake2Val = digitalRead(BRAKE2_PIN);
-		if(brake1Val != brake2Val)
-		{
-			brakeErrors++;
-			if(brakeErrors >= MAX_BRAKE_ERRORS)
-			{
-				brakeFault = true;
-			}
-		}
 
 		// if the brake is being pressed
-		if (brake1Val == HIGH) {
-			if (!brakePressed)
-			{ // if brake was not already being pressed, set new press time
-				timeBrake = millis();
+		if (brake1Val || brake2Val)
+		{
+			brakeReading_debounce.startTimer(50);
+			while (!brakeReading_debounce.isTimerExpired())
+			{
+				if((digitalRead(BRAKE1_PIN) != brake1Val) || (digitalRead(BRAKE2_PIN) != brake2Val))
+				{
+					brakeReading_debounce.cancelTimer();
+					break;
+				}
 			}
-			brakePressed = true;
+			if(brake1Val != brake2Val)
+			{
+				brakeErrors++;
+				if(brakeErrors >= MAX_BRAKE_ERRORS)
+				{
+					brakeFault = true;
+				}
+			}
+			else if(brake1Val && brake2Val)
+			{
+				if (!brakePressed)
+				{ // if brake was not already being pressed, set new press time
+					timeBrake = millis();
+				}
+				brakePressed = true;
+			}
+
 		}
 		// if brake is not being pressed, toggle brakePressed variable
-		else {
-		brakePressed = false;
+		else
+		{
+			brakePressed = false;
 		}
 		brakeReading_wait.startTimer(50);
 	}
-	//digitalWrite(BRAKELIGHT_PIN, brakePressed);
+	if(brakeFault)
+	{
+		Serial.println("?????????????BRAKE FAULT???????????????");
+	}
+	digitalWrite(BRAKELIGHT_PIN, brakePressed);
 	Serial.print("Brake:\t\t");
 	Serial.println(brakePressed);
 }

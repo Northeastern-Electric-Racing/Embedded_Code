@@ -36,6 +36,27 @@ class DRIVERIO
         Timer speaker_wait;
         Timer tempWarningBlink_wait;
 
+        /**
+         * @brief Writes LED4 to a specific state
+         * 
+         * @param state 
+         */
+        void writeLED4(bool state);
+
+        /**
+         * @brief Writes LED5 to a specific state
+         * 
+         * @param state 
+         */
+        void writeLED5(bool state);
+
+        /**
+         * @brief Writes the speaker to a specific state
+         * 
+         * @param state 
+         */
+        void writeSpeaker(bool state);
+
     public:
         DRIVERIO();
 
@@ -66,27 +87,6 @@ class DRIVERIO
          * 
          */
         void handleErrorLights();
-
-        /**
-         * @brief Writes LED4 to a specific state
-         * 
-         * @param state 
-         */
-        void writeLED4(bool state);
-
-        /**
-         * @brief Writes LED5 to a specific state
-         * 
-         * @param state 
-         */
-        void writeLED5(bool state);
-
-        /**
-         * @brief Writes the speaker to a specific state
-         * 
-         * @param state 
-         */
-        void writeSpeaker(bool state);
 };
 
 #endif

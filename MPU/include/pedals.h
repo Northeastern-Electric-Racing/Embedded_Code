@@ -29,6 +29,7 @@
 #define RAMP_TIME               10      // time until the maximum regen torque is reached (in seconds)
 
 #define MAX_BRAKE_ERRORS        5
+#define MAX_ACCEL_ERRORS        5
 
 #define ACCELERATOR_ERROR_PER   0.05
 
@@ -43,10 +44,12 @@ class PEDALS
         ORIONBMS *bms;
 
         Timer brakeReading_wait;
+        Timer brakeReading_debounce;
         Timer pedalReading_wait;
         Timer pedalReading_debounce;
 
         uint8_t brakeErrors = 0;
+        uint8_t accelErrors = 0;
         bool brakeFault = false;
         bool accelFault = false;
 

@@ -24,6 +24,9 @@ The grouping of functionality into multiple objects was a design choice made to 
 
 
 ## TODO:
+1. Simplify nested code
+2. Update Documentation
+
 ### Pedals
 1. ~Two sensors for brake and accelerator (error checking)~
 2. Do something with accelerator and brake faults

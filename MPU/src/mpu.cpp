@@ -17,15 +17,14 @@ MPU::~MPU(){}
 
 void MPU::driverioProcess()
 {
-    if(ioRead_wait.isTimerExpired())
-    {
-        Serial.println("DriverIO process...");
-        driverio.handleSSButton();
-        driverio.handleSSLED();
-        driverio.handleReverseSwitch();
-        driverio.handleErrorLights();
-        ioRead_wait.startTimer(100);
-    }
+    if(!ioRead_wait.isTimerExpired()){return;}
+    
+    Serial.println("DriverIO process...");
+    driverio.handleSSButton();
+    driverio.handleSSLED();
+    driverio.handleReverseSwitch();
+    driverio.handleErrorLights();
+    ioRead_wait.startTimer(100);
 }
 
 

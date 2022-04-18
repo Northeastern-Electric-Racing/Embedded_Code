@@ -19,5 +19,4 @@ void loop()
     mpu.sendMCMsg();
     Serial.println("cycle");
     digitalWrite(RELAY_PIN,HIGH);
-    delay(3000);
 }

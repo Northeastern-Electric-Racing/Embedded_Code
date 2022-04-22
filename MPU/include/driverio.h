@@ -15,6 +15,7 @@
 //Pins
 #define LED4_PIN        3
 #define LED5_PIN        5
+#define YLED_PIN        2
 #define SS_BUTT_PIN     29
 #define SS_LED_PIN      33
 #define SPEAKER_PIN     7

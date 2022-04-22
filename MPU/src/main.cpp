@@ -8,8 +8,6 @@ void setup()
     initializeCAN(1);           //The "1" parameter is useless for now, in the future the parameter is which CAN line to initialize
 }
 
-bool brakeLight = true;
-
 void loop()
 {
     myCan.events();
@@ -18,5 +16,5 @@ void loop()
     mpu.pedalsProcess();
     mpu.sendMCMsg();
     Serial.println("cycle");
-    digitalWrite(RELAY_PIN,HIGH);
+    mpu.checkShutdownStatus();
 }

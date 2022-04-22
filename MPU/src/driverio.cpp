@@ -1,6 +1,5 @@
 #include "driverio.h"
 #include <nerduino.h>
-// howdy feller
 
 DRIVERIO::DRIVERIO(){}
 

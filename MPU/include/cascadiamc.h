@@ -105,6 +105,12 @@ class CASCADIAMC
          * 
          */
         bool checkFault();
+
+        /**
+         * @brief Sets MC to off and Sends 0 torque command
+         * 
+         */
+        void emergencyShutdown();
 };
 
 #endif

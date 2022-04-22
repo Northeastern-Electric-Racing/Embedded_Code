@@ -84,3 +84,8 @@ void canHandler_CANMSG_MC_SETPARAMETER(const CAN_message_t &msg)
     }
     Serial.println("");
 }
+
+void canHandler_CANMSG_MC_BMS_INTEGRATION(const CAN_message_t &msg)
+{
+    mpu.CANLineVerified();
+}

@@ -48,9 +48,7 @@ class PEDALS
         Timer pedalReading_wait;
         Timer pedalReading_debounce;
 
-        uint8_t brakeErrors = 0;
         uint8_t accelErrors = 0;
-        bool brakeFault = false;
         bool accelFault = false;
 
     public:
@@ -70,8 +68,9 @@ class PEDALS
          * @brief Handles the sending of acceleration commands
          * @note Handles Regen Braking and Acceleration by using negative and positive torque commands, respectively
          * 
+         * @return If the accelerators are not faulted
          */
-        void readAccel();
+        bool readAccel();
 };
 
 #endif

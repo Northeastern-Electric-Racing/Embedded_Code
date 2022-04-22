@@ -37,3 +37,8 @@ void GPIO::handlePump()
 {
     digitalWrite(PUMP_PIN, !motorController->getIsOn());
 }
+
+void GPIO::handleRadiatorFan()
+{
+    digitalWrite(RADIATOR_RELAY_PIN, !motorController->getIsOn());
+}

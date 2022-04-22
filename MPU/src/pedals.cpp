@@ -23,9 +23,9 @@ PEDALS::PEDALS(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 PEDALS::~PEDALS(){}
 
 
-void PEDALS::readAccel()
+bool PEDALS::readAccel()
 {
-	if(!pedalReading_wait.isTimerExpired()){return;}
+	if(pedalReading_wait.isTimerExpired()){return !accelFault;}
 	int16_t appliedTorque = 0; // applied motor torque
 
 	// send a regen torque if the brake button is pressed, otherwise send a normal torque
@@ -110,12 +110,10 @@ void PEDALS::readAccel()
 	motorController->changeTorque(appliedTorque);
 	Serial.print("Acceleration:\t");
 	Serial.println(appliedTorque / 10); // prints out applied torque
-	if(accelFault)
-	{
-		Serial.println("&&&&&&&&&&&&ACCELERATOR FAULT&&&&&&&&&&&&&&&&&");
-	}
 
 	pedalReading_wait.startTimer(50);
+
+	return !accelFault;
 }
 
 
@@ -129,7 +127,7 @@ void PEDALS::readBrake()
 	// if the brake is being pressed
 	if (brake1Val || brake2Val)
 	{
-		brakeReading_debounce.startTimer(50);
+		brakeReading_debounce.startTimer(25);
 		while (!brakeReading_debounce.isTimerExpired())
 		{
 			if((digitalRead(BRAKE1_PIN) != brake1Val) || (digitalRead(BRAKE2_PIN) != brake2Val))
@@ -138,15 +136,7 @@ void PEDALS::readBrake()
 				break;
 			}
 		}
-		if(brake1Val != brake2Val)
-		{
-			brakeErrors++;
-			if(brakeErrors >= MAX_BRAKE_ERRORS)
-			{
-				brakeFault = true;
-			}
-		}
-		else if(brake1Val && brake2Val)
+		if(brake1Val || brake2Val)
 		{
 			if (!brakePressed)
 			{ // if brake was not already being pressed, set new press time
@@ -154,7 +144,6 @@ void PEDALS::readBrake()
 			}
 			brakePressed = true;
 		}
-
 	}
 	// if brake is not being pressed, toggle brakePressed variable
 	else
@@ -163,10 +152,6 @@ void PEDALS::readBrake()
 	}
 	brakeReading_wait.startTimer(50);
 
-	if(brakeFault)
-	{
-		Serial.println("?????????????BRAKE FAULT???????????????");
-	}
 	digitalWrite(BRAKELIGHT_PIN, brakePressed);
 	Serial.print("Brake:\t\t");
 	Serial.println(brakePressed);

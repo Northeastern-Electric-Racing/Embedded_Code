@@ -9,6 +9,7 @@ MPU::MPU()
     gpio = GPIO(&motorController, &bms);
 
     ioRead_wait.cancelTimer();
+    pinMode(RELAY_PIN, OUTPUT);
 }
 
 
@@ -32,7 +33,7 @@ void MPU::pedalsProcess()
 {
     Serial.println("Pedals process...");
     pedals.readBrake();
-    pedals.readAccel();
+    isShutdown = pedals.readAccel();
 }
 
 
@@ -40,10 +41,8 @@ void MPU::gpioProcess()
 {
     gpio.handleMCHVFault();
     gpio.handlePump();
-    Serial.print("BMS SOC:\t");
-    Serial.println(bms.getSoC());
-    Serial.print("BMS Temp:\t");
-    Serial.println(bms.getAvgTemp());
+    gpio.handleRadiatorFan();
+    isShutdown = isCANLineOK();
 }
 
 
@@ -62,4 +61,40 @@ void MPU::setBMSAvgTemp(uint8_t p_avgTemp)
 void MPU::setBMSSoC(uint8_t p_soc)
 {
     bms.setSoC(p_soc);
+}
+
+
+bool MPU::isCANLineOK()
+{
+    return !canTest_wait.isTimerExpired();
+}
+
+
+void MPU::CANLineVerified()
+{
+    canTest_wait.startTimer(500);
+}
+
+void MPU::checkShutdownStatus()
+{
+    if(isShutdown)
+    {
+        shutOffCar();
+    }
+    else
+    {
+        writeFaultLatch(FAULT_OK);
+    }
+}
+
+void MPU::shutOffCar()
+{
+    writeFaultLatch(TRIGGER_FAULT);
+    motorController.emergencyShutdown();
+    while(1){};
+}
+
+void MPU::writeFaultLatch(bool status)
+{
+    digitalWrite(RELAY_PIN, status);
 }

@@ -90,3 +90,10 @@ bool CASCADIAMC::checkFault()
 {
     return isFaulted;
 }
+
+void CASCADIAMC::emergencyShutdown()
+{
+    mcMsg.config.isOn = false;
+    mcMsg.config.accelTorque - 0;
+    writeMCState();
+}

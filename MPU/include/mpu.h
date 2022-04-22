@@ -21,7 +21,18 @@ class MPU
         CASCADIAMC motorController;
         ORIONBMS bms;
         
+        bool isShutdown = false;
+
         Timer ioRead_wait;
+        Timer canTest_wait;
+
+        enum
+        {
+            TRIGGER_FAULT,
+            FAULT_OK
+        };
+        
+        void writeFaultLatch(bool status);
 
     public:
         MPU();
@@ -63,6 +74,31 @@ class MPU
          * 
          */
         void setBMSSoC(uint8_t p_soc);
+
+        /**
+         * @brief Checks if the CAN line is intact
+         * 
+         */
+        bool isCANLineOK();
+
+        /**
+         * @brief Sets the canLineOK to true
+         * 
+         */
+        void CANLineVerified();
+
+        /**
+         * @brief Shuts down the car if the isShutdown boolean is false
+         * 
+         */
+        void checkShutdownStatus();
+
+        /**
+        * @brief Shuts off the car in the event of an error
+        * @note ****Code stays here until power cycle for safety****
+        * 
+        */
+        void shutOffCar();
 };
 
 extern MPU mpu;

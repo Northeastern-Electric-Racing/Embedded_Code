@@ -20,7 +20,7 @@ void GPIO::handleMCHVFault()
 {
     if(!digitalRead(SS_READY_SEN))
     {
-        Serial.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        // Serial.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         isSSPowerCycle = true;
         motorController->raiseFault();
         return;
@@ -35,7 +35,7 @@ void GPIO::handleMCHVFault()
 
 void GPIO::handlePump()
 {
-    digitalWrite(PUMP_PIN, !motorController->getIsOn());
+    digitalWrite(PUMP_PIN, motorController->getIsOn());
 }
 
 void GPIO::handleRadiatorFan()

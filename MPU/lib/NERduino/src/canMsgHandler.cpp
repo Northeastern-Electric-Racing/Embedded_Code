@@ -102,8 +102,8 @@ void incomingCANCallback(const CAN_message_t &msg)
             canHandler_CANMSG_MC_BMS_INTEGRATION(msg);
             break;
         default:
-            Serial.print("! CAN ID Invalid:\t");
-            Serial.println(msg.id, HEX);
+            //Serial.print("! CAN ID Invalid:\t");
+            //Serial.println(msg.id, HEX);
             break;
     }
 }

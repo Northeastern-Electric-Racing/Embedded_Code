@@ -15,6 +15,6 @@ void loop()
     mpu.driverioProcess();
     mpu.pedalsProcess();
     mpu.sendMCMsg();
-    Serial.println("cycle");
-    mpu.checkShutdownStatus();
+    // Serial.println("cycle");
+    // mpu.checkShutdownStatus();
 }

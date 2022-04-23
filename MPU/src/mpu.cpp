@@ -10,6 +10,7 @@ MPU::MPU()
 
     ioRead_wait.cancelTimer();
     pinMode(RELAY_PIN, OUTPUT);
+    digitalWrite(RELAY_PIN, HIGH);
 }
 
 
@@ -20,7 +21,7 @@ void MPU::driverioProcess()
 {
     if(!ioRead_wait.isTimerExpired()){return;}
     
-    Serial.println("DriverIO process...");
+    // Serial.println("DriverIO process...");
     driverio.handleSSButton();
     driverio.handleSSLED();
     driverio.handleReverseSwitch();
@@ -31,7 +32,7 @@ void MPU::driverioProcess()
 
 void MPU::pedalsProcess()
 {
-    Serial.println("Pedals process...");
+    // Serial.println("Pedals process...");
     pedals.readBrake();
     isShutdown = pedals.readAccel();
 }
@@ -91,10 +92,11 @@ void MPU::shutOffCar()
 {
     writeFaultLatch(TRIGGER_FAULT);
     motorController.emergencyShutdown();
-    while(1){};
+    delay(5000);
+    writeFaultLatch(FAULT_OK);
 }
 
 void MPU::writeFaultLatch(bool status)
 {
-    digitalWrite(RELAY_PIN, status);
+    digitalWrite(RELAY_PIN, !status);
 }

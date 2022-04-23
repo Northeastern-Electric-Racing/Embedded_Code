@@ -25,7 +25,10 @@ PEDALS::~PEDALS(){}
 
 bool PEDALS::readAccel()
 {
-	if(pedalReading_wait.isTimerExpired()){return !accelFault;}
+	/*if(pedalReading_wait.isTimerExpired()){
+		Serial.println("ACCEL FAULT");
+		return !accelFault;
+	}*/
 	int16_t appliedTorque = 0; // applied motor torque
 
 	// send a regen torque if the brake button is pressed, otherwise send a normal torque
@@ -113,7 +116,7 @@ bool PEDALS::readAccel()
 
 	pedalReading_wait.startTimer(50);
 
-	return !accelFault;
+	return accelFault;
 }
 
 
@@ -153,6 +156,6 @@ void PEDALS::readBrake()
 	brakeReading_wait.startTimer(50);
 
 	digitalWrite(BRAKELIGHT_PIN, brakePressed);
-	Serial.print("Brake:\t\t");
-	Serial.println(brakePressed);
+	// Serial.print("Brake:\t\t");
+	// Serial.println(brakePressed);
 }

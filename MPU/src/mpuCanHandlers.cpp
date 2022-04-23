@@ -51,26 +51,26 @@ void canHandler_CANMSG_ERR_MCFAULT(const CAN_message_t &msg)
 
 void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
 {
-    Serial.print("BMSACCUMULATORSTATUS:\t");
+    /*Serial.print("BMSACCUMULATORSTATUS:\t");
     for(uint8_t i=0; i<8; i++)
     {
         Serial.print(msg.buf[i]);
         Serial.print(",");
     }
-    Serial.println("");
+    Serial.println("");*/
 
     mpu.setBMSSoC(msg.buf[6]);
 }
 
 void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
 {
-    Serial.print("BMSDTCSTATUS:\t");
+    /*Serial.print("BMSDTCSTATUS:\t");
     for(uint8_t i=0; i<8; i++)
     {
         Serial.print(msg.buf[i]);
         Serial.print(",");
     }
-    Serial.println("");
+    Serial.println("");*/
     mpu.setBMSAvgTemp(msg.buf[6]);
 }
 

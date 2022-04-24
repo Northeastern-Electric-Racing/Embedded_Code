@@ -32,7 +32,19 @@ class MPU
             FAULT_OK
         };
         
+        /**
+         * @brief Writes the fault latch whichever condition you pass (see above enumerator)
+         * 
+         * @param status 
+         */
         void writeFaultLatch(bool status);
+
+        /**
+        * @brief Shuts off the car in the event of an error
+        * @note ****Code stays here until power cycle for safety****
+        * 
+        */
+        void shutOffCar();
 
     public:
         MPU();
@@ -94,11 +106,16 @@ class MPU
         void checkShutdownStatus();
 
         /**
-        * @brief Shuts off the car in the event of an error
-        * @note ****Code stays here until power cycle for safety****
-        * 
-        */
-        void shutOffCar();
+         * @brief sets the current draw limit for the BMS
+         * 
+         */
+        void setCurrentLimit(int16_t currentLimit);
+
+        /**
+         * @brief 
+         * 
+         */
+        void bmsCurrentProcess(int16_t currentDraw);
 };
 
 extern MPU mpu;

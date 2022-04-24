@@ -9,19 +9,25 @@
 
 #include <nerduino.h>
 
-#define CRITICAL_CELLTEMP           45  //degrees celcius
-#define SHUTDOWN_CELLTEMP           55  //degrees celcius
+#define CRITICAL_CELLTEMP           45      //degrees celcius
+#define SHUTDOWN_CELLTEMP           55      //degrees celcius
 
-#define CRITICAL_SOC                10  //percentage
+#define CRITICAL_SOC                10      //percentage
+
+#define BOOSTING_TIME_LIMIT         1000    //milliseconds
+#define BOOSTING_EXIT_TIME          100     //milliseconds (Time for system to adjust to leaving boost state)
 
 class ORIONBMS
 {
     private:
         uint8_t SoC;
         uint8_t avgTemp;
+        int16_t currentLimit;
+        int16_t currentDraw;
 
         uint8_t failsafeCode;
-        bool isCharging;
+        Timer boosting_time;
+        Timer boosting_warningTime;
 
     public:
         ORIONBMS();
@@ -100,6 +106,55 @@ class ORIONBMS
          * @return false 
          */
         bool getIsCharging();
+
+        /**
+         * @brief Indicates the BMS is going into the "Boost" state
+         *      where the BMS sends out more current than it's set current limit
+         */
+        void setBoosting();
+
+        /**
+         * @brief Gets whether or not the BMS is boosting
+         * 
+         */
+        bool isBoosting();
+
+        /**
+         * @brief Gets if the BMS is about to leave the boosting state
+         * @note this is important, as it gives the MC enough time to realize that we are limiting the current again
+         * 
+         */
+        bool isLeavingBoosting();
+
+        /**
+         * @brief sets the current limit of the BMS
+         * 
+         */
+        void setCurrentLimit(int16_t p_currentLimit);
+
+        /**
+         * @brief Set the current draw
+         * 
+         * @param p_currentDraw 
+         */
+        void setCurrentDraw(int16_t p_currentDraw);
+
+        /**
+         * @brief Checks if the passed current draw is greater than the set current limit
+         * 
+         * @param currentDraw 
+         * @return true 
+         * @return false 
+         */
+        bool isCurrentPastLimit();
+
+        /**
+         * @brief Checks if the car is charging/regen'ing by seeing if current draw is negative
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool isCharging();
 };
 
 #endif

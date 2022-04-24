@@ -100,3 +100,21 @@ void MPU::writeFaultLatch(bool status)
 {
     digitalWrite(RELAY_PIN, !status);
 }
+
+
+void MPU::setCurrentLimit(int16_t currentLimit)
+{
+    bms.setCurrentLimit(currentLimit);
+}
+
+void MPU::bmsCurrentProcess(int16_t currentDraw)
+{
+    bms.setCurrentDraw(currentDraw);
+
+    if(bms.isCurrentPastLimit())
+    {
+        bms.setBoosting();
+    }
+}
+
+

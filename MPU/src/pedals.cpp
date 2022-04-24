@@ -25,10 +25,7 @@ PEDALS::~PEDALS(){}
 
 bool PEDALS::readAccel()
 {
-	/*if(pedalReading_wait.isTimerExpired()){
-		Serial.println("ACCEL FAULT");
-		return !accelFault;
-	}*/
+	if(!pedalReading_wait.isTimerExpired()){return accelFault;}
 	int16_t appliedTorque = 0; // applied motor torque
 
 	// send a regen torque if the brake button is pressed, otherwise send a normal torque
@@ -91,11 +88,11 @@ bool PEDALS::readAccel()
 
 		appliedTorque = (multiplier * MAXIMUM_TORQUE);
 
+		//Cleansing Value
 		if(appliedTorque >= MAXIMUM_TORQUE)
 		{
 			appliedTorque = MAXIMUM_TORQUE;
 		}
-
 		if(appliedTorque<0)
 		{
 			appliedTorque = 0;
@@ -107,6 +104,12 @@ bool PEDALS::readAccel()
 			Serial.println("BMS Temp Critical!, scaling torque...");
 			int16_t torqueScalingVal = .1 * (SHUTDOWN_CELLTEMP - bms->getAvgTemp()) + 1;
 			appliedTorque = appliedTorque * torqueScalingVal;
+		}
+
+		//scale torque if the BMS is leaving the boosting state
+		if(bms->isLeavingBoosting())
+		{
+			appliedTorque = appliedTorque * LEAVING_BOOST_TORQUE_SCALE;
 		}
 	}
 

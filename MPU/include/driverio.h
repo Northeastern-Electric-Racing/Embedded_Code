@@ -58,6 +58,13 @@ class DRIVERIO
          */
         void writeSpeaker(bool state);
 
+        /**
+         * @brief Writes the Yellow LED to a specific state
+         * 
+         * @param state 
+         */
+        void writeYLED(bool state);
+
     public:
         DRIVERIO();
 

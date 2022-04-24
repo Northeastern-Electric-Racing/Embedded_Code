@@ -98,6 +98,8 @@ void DRIVERIO::handleErrorLights()
 {
     writeLED4(bms->isSoCCritical());
 
+    writeYLED(bms->isCharging());
+
     if(tempWarningBlink_wait.isTimerExpired())
     {
         writeLED5(LOW);
@@ -132,4 +134,10 @@ void DRIVERIO::writeLED5(bool state)
 void DRIVERIO::writeSpeaker(bool state)
 {
     digitalWrite(SPEAKER_PIN, !state);
+}
+
+
+void DRIVERIO::writeYLED(bool state)
+{
+    digitalWrite(YLED_PIN, state);
 }

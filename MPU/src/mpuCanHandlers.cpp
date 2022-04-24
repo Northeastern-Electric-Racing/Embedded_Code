@@ -60,6 +60,10 @@ void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
     Serial.println("");*/
 
     mpu.setBMSSoC(msg.buf[6]);
+
+    int16_t currentDraw = (msg.buf[2] << 8) | msg.buf[3];
+
+    mpu.bmsCurrentProcess(currentDraw);
 }
 
 void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)

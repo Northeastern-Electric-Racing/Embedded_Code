@@ -60,20 +60,24 @@ void CASCADIAMC::togglePower()
     isMCLocked = true;
 }
 
+
 bool CASCADIAMC::getIsOn()
 {
     return mcMsg.config.isOn;
 }
+
 
 bool CASCADIAMC::getDirection()
 {
     return mcMsg.config.isForward;
 }
 
+
 void CASCADIAMC::changeTorque(uint16_t p_accelTorque)
 {
     mcMsg.config.accelTorque = p_accelTorque;
 }
+
 
 void CASCADIAMC::clearFault()
 {
@@ -81,19 +85,33 @@ void CASCADIAMC::clearFault()
     isFaulted = false;
 }
 
+
 void CASCADIAMC::raiseFault()
 {
     isFaulted = true;
 }
+
 
 bool CASCADIAMC::checkFault()
 {
     return isFaulted;
 }
 
+
 void CASCADIAMC::emergencyShutdown()
 {
     mcMsg.config.isOn = false;
     mcMsg.config.accelTorque - 0;
     writeMCState();
+}
+
+
+void CASCADIAMC::setMotorSpeed(int16_t p_motorSpeed)
+{
+    motorSpeed = p_motorSpeed;
+}
+
+bool CASCADIAMC::isMotorMoving()
+{
+    return abs(motorSpeed) > 0;
 }

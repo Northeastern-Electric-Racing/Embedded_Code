@@ -32,6 +32,8 @@ class CASCADIAMC
             } config;
         }mcMsg;
 
+        int16_t motorSpeed = 0;
+
         Timer motorCommand_wait;
 
         bool isMCLocked = false;
@@ -111,6 +113,20 @@ class CASCADIAMC
          * 
          */
         void emergencyShutdown();
+
+        /**
+         * @brief Sets the angular motor speed
+         * 
+         */
+        void setMotorSpeed(int16_t p_motorSpeed);
+
+        /**
+         * @brief Checks if the motor is moving
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool isMotorMoving();
 };
 
 #endif

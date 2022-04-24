@@ -51,7 +51,7 @@ bool PEDALS::readAccel()
 		
 		uint16_t pedalDiff = MAXIMUM_TORQUE;
 		int16_t avgVal;
-		
+
 		pedalReading_debounce.startTimer(50);
 		while(!pedalReading_debounce.isTimerExpired())
 		{
@@ -81,7 +81,7 @@ bool PEDALS::readAccel()
 		int16_t flippedVal = (avgVal * -1) + 1023; // reverse it so 0 is when pedal not pressed, and 1023 is at full press
 		if (flippedVal < POT_LOWER_BOUND)
 		{ // Set low point to prevent a positive torque in the resting pedal position
-		flippedVal = 0;
+			flippedVal = 0;
 		}
 
 		double multiplier = (double)flippedVal / 950; // torque multiplier from 0 to 1;

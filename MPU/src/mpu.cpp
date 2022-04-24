@@ -76,6 +76,7 @@ void MPU::CANLineVerified()
     canTest_wait.startTimer(500);
 }
 
+
 void MPU::checkShutdownStatus()
 {
     if(isShutdown)
@@ -88,6 +89,7 @@ void MPU::checkShutdownStatus()
     }
 }
 
+
 void MPU::shutOffCar()
 {
     writeFaultLatch(TRIGGER_FAULT);
@@ -95,6 +97,7 @@ void MPU::shutOffCar()
     delay(5000);
     writeFaultLatch(FAULT_OK);
 }
+
 
 void MPU::writeFaultLatch(bool status)
 {
@@ -107,6 +110,7 @@ void MPU::setCurrentLimit(int16_t currentLimit)
     bms.setCurrentLimit(currentLimit);
 }
 
+
 void MPU::bmsCurrentProcess(int16_t currentDraw)
 {
     bms.setCurrentDraw(currentDraw);
@@ -115,6 +119,12 @@ void MPU::bmsCurrentProcess(int16_t currentDraw)
     {
         bms.setBoosting();
     }
+}
+
+
+void MPU::setMotorSpeed(int16_t motorSpeed)
+{
+    motorController.setMotorSpeed(motorSpeed);
 }
 
 

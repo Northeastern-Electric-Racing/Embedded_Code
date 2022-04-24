@@ -51,14 +51,6 @@ void canHandler_CANMSG_ERR_MCFAULT(const CAN_message_t &msg)
 
 void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
 {
-    /*Serial.print("BMSACCUMULATORSTATUS:\t");
-    for(uint8_t i=0; i<8; i++)
-    {
-        Serial.print(msg.buf[i]);
-        Serial.print(",");
-    }
-    Serial.println("");*/
-
     mpu.setBMSSoC(msg.buf[6]);
 
     int16_t currentDraw = (msg.buf[2] << 8) | msg.buf[3];
@@ -68,13 +60,6 @@ void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
 
 void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
 {
-    /*Serial.print("BMSDTCSTATUS:\t");
-    for(uint8_t i=0; i<8; i++)
-    {
-        Serial.print(msg.buf[i]);
-        Serial.print(",");
-    }
-    Serial.println("");*/
     mpu.setBMSAvgTemp(msg.buf[6]);
 }
 
@@ -92,4 +77,11 @@ void canHandler_CANMSG_MC_SETPARAMETER(const CAN_message_t &msg)
 void canHandler_CANMSG_MC_BMS_INTEGRATION(const CAN_message_t &msg)
 {
     mpu.CANLineVerified();
+}
+
+void canHandler_CANMSG_MOTORMOTION(const CAN_message_t &msg)
+{
+    //angular motor speed is found at bytes 2 and 3
+    int16_t motorSpeed = (msg.buf[2] << 8) | msg.buf[3];
+    mpu.setMotorSpeed(motorSpeed);
 }

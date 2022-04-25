@@ -53,13 +53,6 @@ bool ORIONBMS::isAvgTempShutdown()
     return avgTemp > SHUTDOWN_CELLTEMP;
 }
 
-
-bool ORIONBMS::getIsCharging()
-{
-    return isCharging;
-}
-
-
 void ORIONBMS::setBoosting()
 {
     boosting_time.startTimer(BOOSTING_TIME_LIMIT);

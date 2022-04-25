@@ -95,15 +95,15 @@ void incomingCANCallback(const CAN_message_t &msg)
         case CANMSG_BMSCELLDATA:
             canHandler_CANMSG_BMSCELLDATA(msg);
             break;
+        case CANMSG_BMSCURRENTLIMITS:
+            canHandler_CANMSG_BMSCURRENTLIMITS(msg);
+            break;
         case CANMSG_MC_SETPARAMETER:
             canHandler_CANMSG_MC_SETPARAMETER(msg);
             break;
-        case CANMSG_MC_BMS_INTEGRATION:
-            canHandler_CANMSG_MC_BMS_INTEGRATION(msg);
-            break;
         default:
-            //Serial.print("! CAN ID Invalid:\t");
-            //Serial.println(msg.id, HEX);
+            Serial.print("! CAN ID Invalid:\t");
+            Serial.println(msg.id, HEX);
             break;
     }
 }

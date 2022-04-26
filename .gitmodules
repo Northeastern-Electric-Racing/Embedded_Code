@@ -1,6 +1,6 @@
 [submodule "MPU/lib/NERduino"]
 	path = MPU/lib/NERduino
-	url = git@github.com:Northeastern-Electric-Racing/NERduino.git
+	url = https://github.com/Northeastern-Electric-Racing/NERduino.git
 [submodule "MPU/NERduino"]
 	path = MPU/NERduino
 	url = git@github.com:Northeastern-Electric-Racing/NERduino.git

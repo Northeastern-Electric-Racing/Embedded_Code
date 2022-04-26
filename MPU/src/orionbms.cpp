@@ -102,7 +102,7 @@ bool ORIONBMS::isCharging()
 
 void ORIONBMS::enableChargingMode()
 {
-    isInChargeMode.startTimer(200);
+    isInChargeMode.startTimer(1000);
 }
 
 

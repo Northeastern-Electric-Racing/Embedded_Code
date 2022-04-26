@@ -49,6 +49,10 @@ void MPU::gpioProcess()
     {
         Serial.println("CHARGING!!!!!!!!!!!!!");
     }
+    if(!bms.getChargeMode())
+    {
+        Serial.println("NOT CHARGING***************");
+    }
 }
 
 

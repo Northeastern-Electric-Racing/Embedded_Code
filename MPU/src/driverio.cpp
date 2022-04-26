@@ -79,7 +79,7 @@ void DRIVERIO::handleSSLED()
 {
     if(bms->getChargeMode())
     {
-        digitalWrite(SS_LED_PIN,bms->isAIROpen());
+        digitalWrite(SS_LED_PIN,!(bms->isAIROpen()));
     }
     else
     {

@@ -17,17 +17,29 @@
 #define BOOSTING_TIME_LIMIT         1000    //milliseconds
 #define BOOSTING_EXIT_TIME          100     //milliseconds (Time for system to adjust to leaving boost state)
 
+enum
+{
+    AIR_CLOSED,
+    AIR_OPEN
+};
+
 class ORIONBMS
 {
     private:
         uint8_t SoC;
         uint8_t avgTemp;
-        int16_t currentLimit;
+        uint16_t currentLimit;
         int16_t currentDraw;
 
         uint8_t failsafeCode;
         Timer boosting_time;
         Timer boosting_warningTime;
+
+        Timer isInChargeMode;
+
+        bool airOpen = 0;
+        uint8_t CLOSE_AIR_MSG[8] = {0x00,0x01,0x01,0x00,0x55,0x02,0x00,0x00};
+        uint8_t OPEN_AIR_MSG[8] = {0x00,0x01,0x01,0x00,0xAA,0x00,0x00,0x00};
 
     public:
         ORIONBMS();
@@ -99,13 +111,6 @@ class ORIONBMS
          */
         bool isAvgTempShutdown();
 
-        /**
-         * @brief Returns if the BMS is currently charging
-         * 
-         * @return true 
-         * @return false 
-         */
-        bool getIsCharging();
 
         /**
          * @brief Indicates the BMS is going into the "Boost" state
@@ -130,7 +135,7 @@ class ORIONBMS
          * @brief sets the current limit of the BMS
          * 
          */
-        void setCurrentLimit(int16_t p_currentLimit);
+        void setCurrentLimit(uint16_t p_currentLimit);
 
         /**
          * @brief Set the current draw
@@ -155,6 +160,32 @@ class ORIONBMS
          * @return false 
          */
         bool isCharging();
+
+        /**
+         * @brief Set the Charge Mode object
+         * 
+         */
+        void enableChargingMode();
+
+        /**
+         * @brief Get the Charge Mode state
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool getChargeMode();
+
+        /**
+         * @brief Toggles AIR status
+         * 
+         */
+        void toggleAIR();
+
+        /**
+         * @brief Get AIR status
+         * 
+         */
+        bool isAIROpen();
 };
 
 #endif

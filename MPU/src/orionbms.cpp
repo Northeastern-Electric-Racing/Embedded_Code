@@ -1,6 +1,10 @@
 #include "orionbms.h"
 
-ORIONBMS::ORIONBMS(){}
+ORIONBMS::ORIONBMS()
+{
+    boosting_time.cancelTimer();
+    boosting_warningTime.cancelTimer();
+}
 
 
 ORIONBMS::~ORIONBMS(){}
@@ -72,7 +76,7 @@ bool ORIONBMS::isLeavingBoosting()
 }
 
 
-void ORIONBMS::setCurrentLimit(int16_t p_currentLimit)
+void ORIONBMS::setCurrentLimit(uint16_t p_currentLimit)
 {
     currentLimit = p_currentLimit;
 }
@@ -93,4 +97,34 @@ bool ORIONBMS::isCurrentPastLimit()
 bool ORIONBMS::isCharging()
 {
     return currentDraw < 0;
+}
+
+
+void ORIONBMS::enableChargingMode()
+{
+    isInChargeMode.startTimer(200);
+}
+
+
+bool ORIONBMS::getChargeMode()
+{
+    if(isInChargeMode.isTimerExpired())
+    {
+        airOpen = 1;
+        sendMessage(CANMSG_MC_SETPARAMETER, 8, OPEN_AIR_MSG);
+    }
+    return !isInChargeMode.isTimerExpired();
+}
+
+
+void ORIONBMS::toggleAIR()
+{
+    airOpen = !airOpen;
+    sendMessage(CANMSG_MC_SETPARAMETER, 8, airOpen ? OPEN_AIR_MSG : CLOSE_AIR_MSG);
+}
+
+
+bool ORIONBMS::isAIROpen()
+{
+    return airOpen;
 }

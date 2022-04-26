@@ -49,6 +49,11 @@ void DRIVERIO::handleSSButton()
                 break;
             }
         }
+        if(bms->getChargeMode() && digitalRead(SS_BUTT_PIN))
+        {
+            bms->toggleAIR();
+            return;
+        }
         if(digitalRead(SS_BUTT_PIN) && (motorController->getIsOn() || (!motorController->getIsOn() && !motorController->checkFault())))
         {
             motorController->togglePower();    //Writes the power state of the motor to the MC message to be sent
@@ -72,7 +77,14 @@ void DRIVERIO::handleSSButton()
 
 void DRIVERIO::handleSSLED()
 {
-    digitalWrite(SS_LED_PIN,motorController->getIsOn());
+    if(bms->getChargeMode())
+    {
+        digitalWrite(SS_LED_PIN,bms->isAIROpen());
+    }
+    else
+    {
+        digitalWrite(SS_LED_PIN,motorController->getIsOn());
+    }
 }
 
 

@@ -65,18 +65,13 @@ void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
 
 void canHandler_CANMSG_MC_SETPARAMETER(const CAN_message_t &msg)
 {
-    Serial.print("MC SET PARAMETERS:\t");
-    for(uint8_t i=0; i<8; i++)
-    {
-        Serial.print(msg.buf[i]);
-        Serial.print(",");
-    }
-    Serial.println("");
 }
 
 void canHandler_CANMSG_MC_BMS_INTEGRATION(const CAN_message_t &msg)
 {
     mpu.CANLineVerified();
+    uint16_t dischargeCurrentLimit = (msg.buf[0] << 8) | msg.buf[1];
+    mpu.setCurrentLimit(dischargeCurrentLimit);
 }
 
 void canHandler_CANMSG_MOTORMOTION(const CAN_message_t &msg)
@@ -84,4 +79,9 @@ void canHandler_CANMSG_MOTORMOTION(const CAN_message_t &msg)
     //angular motor speed is found at bytes 2 and 3
     int16_t motorSpeed = (msg.buf[2] << 8) | msg.buf[3];
     mpu.setMotorSpeed(motorSpeed);
+}
+
+void canHandler_CANMSG_BMSCHARGINGSTATE(const CAN_message_t &msg)
+{
+    mpu.enableBMSChargingMode();
 }

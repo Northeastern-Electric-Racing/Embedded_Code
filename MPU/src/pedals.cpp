@@ -68,7 +68,7 @@ bool PEDALS::readAccel()
 				accelPin2Val == 0 ||
 				accelPin1Val == 1023 ||
 				accelPin2Val == 1023 ||
-				(abs(accelPin1Val - accelPin2Val) > (1023 * ACCELERATOR_ERROR_PER))) 
+				(abs(accelPin1Val - accelPin2Val) > (1023 * ACCELERATOR_ERROR_PER)))
 			{
 				accelErrors++;
 				if(accelErrors >= MAX_ACCEL_ERRORS)

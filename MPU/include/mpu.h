@@ -109,7 +109,7 @@ class MPU
          * @brief sets the current draw limit for the BMS
          * 
          */
-        void setCurrentLimit(int16_t currentLimit);
+        void setCurrentLimit(uint16_t currentLimit);
 
         /**
          * @brief Sets the current draw and also puts the BMS into boost mode if the current exceeds the current limit
@@ -123,6 +123,12 @@ class MPU
          * @param motorSpeed 
          */
         void setMotorSpeed(int16_t motorSpeed);
+
+        /**
+         * @brief Enables the BMS to stay in Charging Mode
+         * 
+         */
+        void enableBMSChargingMode();
 };
 
 extern MPU mpu;

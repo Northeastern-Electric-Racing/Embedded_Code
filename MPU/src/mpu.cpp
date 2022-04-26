@@ -9,6 +9,7 @@ MPU::MPU()
     gpio = GPIO(&motorController, &bms);
 
     ioRead_wait.cancelTimer();
+    canTest_wait.cancelTimer();
     pinMode(RELAY_PIN, OUTPUT);
     digitalWrite(RELAY_PIN, HIGH);
 }
@@ -44,6 +45,10 @@ void MPU::gpioProcess()
     gpio.handlePump();
     gpio.handleRadiatorFan();
     isShutdown = isCANLineOK();
+    if(bms.getChargeMode())
+    {
+        Serial.println("CHARGING!!!!!!!!!!!!!");
+    }
 }
 
 
@@ -105,7 +110,7 @@ void MPU::writeFaultLatch(bool status)
 }
 
 
-void MPU::setCurrentLimit(int16_t currentLimit)
+void MPU::setCurrentLimit(uint16_t currentLimit)
 {
     bms.setCurrentLimit(currentLimit);
 }
@@ -127,4 +132,9 @@ void MPU::setMotorSpeed(int16_t motorSpeed)
     motorController.setMotorSpeed(motorSpeed);
 }
 
+
+void MPU::enableBMSChargingMode()
+{
+    bms.enableChargingMode();
+}
 

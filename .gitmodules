@@ -7,3 +7,6 @@
 [submodule "MPU/lib/MPU/lib/NERduino"]
 	path = MPU/lib/MPU/lib/NERduino
 	url = https://github.com/Northeastern-Electric-Racing/NERduino.git
+[submodule "MPU/lib/WDT_T4"]
+	path = MPU/lib/WDT_T4
+	url = git@github.com:tonton81/WDT_T4.git

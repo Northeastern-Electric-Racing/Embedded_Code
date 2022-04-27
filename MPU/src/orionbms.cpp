@@ -4,6 +4,8 @@ ORIONBMS::ORIONBMS()
 {
     boosting_time.cancelTimer();
     boosting_warningTime.cancelTimer();
+    boostRecharge_wait.cancelTimer();
+    isInChargeMode.cancelTimer();
 }
 
 
@@ -61,6 +63,7 @@ void ORIONBMS::setBoosting()
 {
     boosting_time.startTimer(BOOSTING_TIME_LIMIT);
     boosting_warningTime.startTimer(BOOSTING_TIME_LIMIT - BOOSTING_EXIT_TIME);
+    boostRecharge_wait.startTimer(BOOSTING_TIME_LIMIT + BOOSTING_RECHARGE_TIME);
 }
 
 
@@ -76,9 +79,21 @@ bool ORIONBMS::isLeavingBoosting()
 }
 
 
+bool ORIONBMS::isBoostReady()
+{
+    return boostRecharge_wait.isTimerExpired();
+}
+
+
 void ORIONBMS::setCurrentLimit(uint16_t p_currentLimit)
 {
     currentLimit = p_currentLimit;
+}
+
+
+uint16_t ORIONBMS::getCurrentLimit()
+{
+    return currentLimit;
 }
 
 
@@ -97,6 +112,18 @@ bool ORIONBMS::isCurrentPastLimit()
 bool ORIONBMS::isCharging()
 {
     return currentDraw < 0;
+}
+
+
+void ORIONBMS::setLiveVoltage(int16_t p_voltage)
+{
+    liveVoltage = p_voltage;
+}
+
+
+int16_t ORIONBMS::getLiveVoltage()
+{
+    return liveVoltage;
 }
 
 

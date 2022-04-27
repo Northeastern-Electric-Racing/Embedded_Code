@@ -12,7 +12,7 @@
 
 #define SS_READY_SEN        6
 #define PUMP_PIN            8
-#define RADIATOR_RELAY_PIN  18
+#define RADIATORFAN_PIN     18
 
 class GPIO
 {
@@ -43,7 +43,6 @@ class GPIO
 
         /**
          * @brief Handles the logic behind starting/stopping the radiator fan
-         * @note Needs to be switched to PWM eventually
          * 
          */
         void handleRadiatorFan();

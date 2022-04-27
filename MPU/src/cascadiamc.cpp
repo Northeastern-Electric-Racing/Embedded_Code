@@ -115,3 +115,9 @@ bool CASCADIAMC::isMotorMoving()
 {
     return abs(motorSpeed) > 0;
 }
+
+
+int16_t CASCADIAMC::getMotorSpeed()
+{
+    return motorSpeed;
+}

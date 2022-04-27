@@ -16,6 +16,7 @@
 
 #define BOOSTING_TIME_LIMIT         1000    //milliseconds
 #define BOOSTING_EXIT_TIME          100     //milliseconds (Time for system to adjust to leaving boost state)
+#define BOOSTING_RECHARGE_TIME      60000   //milliseconds (Time for the BMS to be allowed into a boost state again)
 
 enum
 {
@@ -30,10 +31,12 @@ class ORIONBMS
         uint8_t avgTemp;
         uint16_t currentLimit;
         int16_t currentDraw;
+        int16_t liveVoltage;
 
         uint8_t failsafeCode;
         Timer boosting_time;
         Timer boosting_warningTime;
+        Timer boostRecharge_wait;
 
         Timer isInChargeMode;
 
@@ -45,6 +48,10 @@ class ORIONBMS
         ORIONBMS();
 
         ~ORIONBMS();
+
+/***************************************************************
+ * Functions for Handling Errors and Warnings
+****************************************************************/
 
         /**
          * @brief Sets the current state of charge
@@ -66,13 +73,6 @@ class ORIONBMS
          * @param p_failsafeCode 
          */
         void setFailsafeCode(uint8_t p_failsafeCode);
-
-        /**
-         * @brief Set whether the BMS is charging
-         * 
-         * @param p_isCharging
-         */
-        void setIsCharging(bool p_isCharging);
 
         /**
          * @brief Retrieves the current SoC of the batteries
@@ -111,6 +111,9 @@ class ORIONBMS
          */
         bool isAvgTempShutdown();
 
+/***************************************************************
+ * Functions for Current and Voltage Handling
+****************************************************************/
 
         /**
          * @brief Indicates the BMS is going into the "Boost" state
@@ -132,10 +135,23 @@ class ORIONBMS
         bool isLeavingBoosting();
 
         /**
+         * @brief Checks if the boost is ready again
+         * 
+         */
+        bool isBoostReady();
+
+        /**
          * @brief sets the current limit of the BMS
          * 
          */
         void setCurrentLimit(uint16_t p_currentLimit);
+
+        /**
+         * @brief Get the Current Limit of the BMS
+         * 
+         * @return uint16_t 
+         */
+        uint16_t getCurrentLimit();
 
         /**
          * @brief Set the current draw
@@ -160,6 +176,23 @@ class ORIONBMS
          * @return false 
          */
         bool isCharging();
+
+        /**
+         * @brief Set the Live Voltage object
+         * 
+         */
+        void setLiveVoltage(int16_t p_voltage);
+
+        /**
+         * @brief Get the Live Voltage
+         * 
+         * @return int16_t 
+         */
+        int16_t getLiveVoltage();
+
+/***************************************************************
+ * Functions for Charging Mode/AIR control
+****************************************************************/
 
         /**
          * @brief Set the Charge Mode object

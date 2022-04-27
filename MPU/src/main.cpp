@@ -27,6 +27,6 @@ void loop()
     mpu.pedalsProcess();
     mpu.sendMCMsg();
     Serial.println("cycle");
-    // mpu.checkShutdownStatus();
+    //mpu.checkShutdownStatus();
     wdt.feed();
 }

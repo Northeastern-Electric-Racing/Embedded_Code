@@ -129,6 +129,12 @@ class MPU
          * 
          */
         void enableBMSChargingMode();
+
+        /**
+         * @brief Sets the Live BMS Voltage
+         * 
+         */
+        void setBMSVoltage(int16_t voltage);
 };
 
 extern MPU mpu;

@@ -48,10 +48,8 @@ bool PEDALS::readAccel()
 	}
 	else
 	{
-		
 		uint16_t pedalDiff = MAXIMUM_TORQUE;
 		int16_t avgVal;
-
 		pedalReading_debounce.startTimer(50);
 		while(!pedalReading_debounce.isTimerExpired())
 		{
@@ -86,31 +84,7 @@ bool PEDALS::readAccel()
 
 		double multiplier = (double)flippedVal / 950; // torque multiplier from 0 to 1;
 
-		appliedTorque = (multiplier * MAXIMUM_TORQUE);
-
-		//Cleansing Value
-		if(appliedTorque >= MAXIMUM_TORQUE)
-		{
-			appliedTorque = MAXIMUM_TORQUE;
-		}
-		if(appliedTorque<0)
-		{
-			appliedTorque = 0;
-		}
-
-		//scale torque based on factor between 1 and 0 based on the temperature of the cells
-		if(bms->isAvgTempCritical())
-		{
-			Serial.println("BMS Temp Critical!, scaling torque...");
-			int16_t torqueScalingVal = .1 * (SHUTDOWN_CELLTEMP - bms->getAvgTemp()) + 1;
-			appliedTorque = appliedTorque * torqueScalingVal;
-		}
-
-		//scale torque if the BMS is leaving the boosting state
-		if(bms->isLeavingBoosting())
-		{
-			appliedTorque = appliedTorque * LEAVING_BOOST_TORQUE_SCALE;
-		}
+		calcTorque(multiplier, appliedTorque);
 	}
 
 	motorController->changeTorque(appliedTorque);
@@ -120,6 +94,41 @@ bool PEDALS::readAccel()
 	pedalReading_wait.startTimer(50);
 
 	return accelFault;
+}
+
+
+void PEDALS::calcTorque(double torqueScale, int16_t &appliedTorque)
+{
+	//scale torque if the BMS is leaving the boosting state
+	if(bms->isLeavingBoosting() || !bms->isBoostReady())
+	{
+		appliedTorque = appliedTorque * calcCLTorqueLimit();
+		return;
+	}
+
+	appliedTorque = (torqueScale * MAXIMUM_TORQUE);
+
+	//Cleansing Value
+	if(appliedTorque >= MAXIMUM_TORQUE)
+	{
+		appliedTorque = MAXIMUM_TORQUE;
+		return;
+	}
+	if(appliedTorque<0)
+	{
+		appliedTorque = 0;
+		return;
+	}
+}
+
+
+int16_t PEDALS::calcCLTorqueLimit()
+{
+	int16_t dcVoltage = abs(bms->getLiveVoltage());
+	int16_t dcCurrent = bms->getCurrentLimit();
+	int16_t motorSpeed = abs(motorController->getMotorSpeed());
+
+	return (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / motorSpeed;
 }
 
 

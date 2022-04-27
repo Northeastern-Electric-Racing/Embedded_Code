@@ -45,14 +45,6 @@ void MPU::gpioProcess()
     gpio.handlePump();
     gpio.handleRadiatorFan();
     isShutdown = isCANLineOK();
-    if(bms.getChargeMode())
-    {
-        Serial.println("CHARGING!!!!!!!!!!!!!");
-    }
-    if(!bms.getChargeMode())
-    {
-        Serial.println("NOT CHARGING***************");
-    }
 }
 
 

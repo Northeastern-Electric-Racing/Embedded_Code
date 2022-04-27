@@ -33,6 +33,7 @@ class CASCADIAMC
         }mcMsg;
 
         int16_t motorSpeed = 0;
+        uint16_t radiatorTemp = 0;
 
         Timer motorCommand_wait;
 
@@ -127,6 +128,28 @@ class CASCADIAMC
          * @return false 
          */
         bool isMotorMoving();
+
+        /**
+         * @brief Get the Motor Speed
+         * 
+         * @return int16_t 
+         */
+        int16_t getMotorSpeed();
+
+        /**
+         * @brief Set the Radiator Temperature
+         * 
+         * @param temp 
+         */
+        void setRadiatorTemp(uint16_t temp);
+
+        /**
+         * @brief Get the Radiator Temperature
+         * 
+         * @return uint16_t 
+         */
+        uint16_t getRadiatorTemp();
+        
 };
 
 #endif

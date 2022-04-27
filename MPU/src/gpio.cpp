@@ -40,5 +40,10 @@ void GPIO::handlePump()
 
 void GPIO::handleRadiatorFan()
 {
-    digitalWrite(RADIATOR_RELAY_PIN, !motorController->getIsOn());
+    uint8_t fanSpeed = 0;
+    uint16_t temp = motorController->getRadiatorTemp();
+
+    //Convert temp to pwm speed
+
+    digitalWrite(RADIATORFAN_PIN, fanSpeed);
 }

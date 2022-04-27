@@ -109,6 +109,10 @@ void DRIVERIO::handleReverseSwitch()
 void DRIVERIO::handleErrorLights()
 {
     writeLED4(bms->isSoCCritical());
+    if(bms->isSoCCritical())
+    {
+        Serial.println("SOC Critical");
+    }
 
     writeYLED(bms->isCharging());
 

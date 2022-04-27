@@ -56,6 +56,10 @@ void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
     int16_t currentDraw = (msg.buf[2] << 8) | msg.buf[3];
 
     mpu.bmsCurrentProcess(currentDraw);
+
+    int16_t liveVoltage = (msg.buf[0] << 8) | msg.buf[1];
+
+    mpu.setBMSVoltage(liveVoltage);
 }
 
 void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)

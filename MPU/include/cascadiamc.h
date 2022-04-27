@@ -141,14 +141,14 @@ class CASCADIAMC
          * 
          * @param temp 
          */
-        void setRadiatorTemp(uint16_t temp);
+        void setRadiatorTemp(int16_t temp);
 
         /**
          * @brief Get the Radiator Temperature
          * 
          * @return uint16_t 
          */
-        uint16_t getRadiatorTemp();
+        int16_t getRadiatorTemp();
         
 };
 

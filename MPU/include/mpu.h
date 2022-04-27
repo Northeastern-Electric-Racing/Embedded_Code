@@ -135,6 +135,13 @@ class MPU
          * 
          */
         void setBMSVoltage(int16_t voltage);
+
+        /**
+         * @brief Set the Motor Temp
+         * 
+         * @param temp 
+         */
+        void setMotorTemp(int16_t temp);
 };
 
 extern MPU mpu;

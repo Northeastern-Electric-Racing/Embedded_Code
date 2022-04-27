@@ -140,3 +140,9 @@ void MPU::setBMSVoltage(int16_t voltage)
     bms.setLiveVoltage(voltage);
 }
 
+
+void MPU::setMotorTemp(int16_t temp)
+{
+    motorController.setRadiatorTemp(temp);
+}
+

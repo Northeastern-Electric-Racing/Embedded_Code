@@ -89,3 +89,9 @@ void canHandler_CANMSG_BMSCHARGINGSTATE(const CAN_message_t &msg)
 {
     mpu.enableBMSChargingMode();
 }
+
+void canHandler_CANMSG_MOTORETEMP3(const CAN_message_t &msg)
+{
+    int16_t motorTemp = (msg.buf[4] << 8) | msg.buf[5];
+    mpu.setMotorTemp(motorTemp);
+}

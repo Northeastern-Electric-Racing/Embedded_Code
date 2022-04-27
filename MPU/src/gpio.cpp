@@ -40,10 +40,10 @@ void GPIO::handlePump()
 
 void GPIO::handleRadiatorFan()
 {
-    uint8_t fanSpeed = 0;
-    uint16_t temp = motorController->getRadiatorTemp();
+    int16_t temp = motorController->getRadiatorTemp();
+    
+    //Convert temp to pwm speed with ceiling
+    uint8_t fanSpeed = fanSpeed > MAX_FANSPEED_TEMP ? 255 : 255 * (temp/MAX_FANSPEED_TEMP);
 
-    //Convert temp to pwm speed
-
-    digitalWrite(RADIATORFAN_PIN, fanSpeed);
+    analogWrite(RADIATORFAN_PIN, fanSpeed);
 }

@@ -101,7 +101,7 @@ bool CASCADIAMC::checkFault()
 void CASCADIAMC::emergencyShutdown()
 {
     mcMsg.config.isOn = false;
-    mcMsg.config.accelTorque - 0;
+    mcMsg.config.accelTorque = 0;
     writeMCState();
 }
 
@@ -122,7 +122,12 @@ int16_t CASCADIAMC::getMotorSpeed()
     return motorSpeed;
 }
 
-uint16_t CASCADIAMC::getRadiatorTemp()
+void CASCADIAMC::setRadiatorTemp(int16_t temp)
+{
+    radiatorTemp = temp;
+}
+
+int16_t CASCADIAMC::getRadiatorTemp()
 {
     return radiatorTemp;
 }

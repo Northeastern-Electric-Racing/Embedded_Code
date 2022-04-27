@@ -121,3 +121,8 @@ int16_t CASCADIAMC::getMotorSpeed()
 {
     return motorSpeed;
 }
+
+uint16_t CASCADIAMC::getRadiatorTemp()
+{
+    return radiatorTemp;
+}

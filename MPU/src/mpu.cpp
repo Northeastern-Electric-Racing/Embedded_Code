@@ -134,3 +134,9 @@ void MPU::enableBMSChargingMode()
     bms.enableChargingMode();
 }
 
+
+void MPU::setBMSVoltage(int16_t voltage)
+{
+    bms.setLiveVoltage(voltage);
+}
+

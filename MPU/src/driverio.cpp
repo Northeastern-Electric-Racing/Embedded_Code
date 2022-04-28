@@ -39,27 +39,25 @@ DRIVERIO::~DRIVERIO(){}
 
 void DRIVERIO::handleSSButton()
 {
-    if(powerToggle_wait.isTimerExpired()) // If pressed and no timer
+    if(digitalRead(SS_BUTT_PIN) && powerToggle_wait.isTimerExpired()) // If pressed and no timer
     {
         ssButton_debounce.startTimer(50);
 
         //if the button is still being held during and after the timer runs out, then toggle power
-        if(!ssButton_debounce.isTimerExpired())
+        while(!ssButton_debounce.isTimerExpired())
         {
-            Serial.println("PRESSED");
             if(!digitalRead(SS_BUTT_PIN)) // If released
             {
                 ssButton_debounce.cancelTimer();
-                Serial.println("CANCELLED");
+                break;
             }
         }
-        if(bms->getChargeMode() && digitalRead(SS_BUTT_PIN) && ssButton_debounce.isTimerExpired() && !ssButton_debounce.isTimerReset())
+        if(bms->getChargeMode() && digitalRead(SS_BUTT_PIN))
         {
             bms->toggleAIR();
             return;
         }
-        if((ssButton_debounce.isTimerExpired() && digitalRead(SS_BUTT_PIN) && !ssButton_debounce.isTimerReset())
-         && (motorController->getIsOn() || (!motorController->getIsOn() && !motorController->checkFault())))
+        if(digitalRead(SS_BUTT_PIN) && (motorController->getIsOn() || (!motorController->getIsOn() && !motorController->checkFault())))
         {
             motorController->togglePower();    //Writes the power state of the motor to the MC message to be sent
             if(motorController->getIsOn())

@@ -47,8 +47,10 @@ bool PEDALS::readAccel()
 	}
 	else
 	{
+		uint16_t pedalDiff = MAXIMUM_TORQUE;
+		int16_t avgVal;
 		pedalReading_debounce.startTimer(50);
-		if(!pedalReading_debounce.isTimerExpired())
+		while(!pedalReading_debounce.isTimerExpired())
 		{
 			int accelPin1Val = analogRead(ACCEL1_PIN);
 			int accelPin2Val = analogRead(ACCEL2_PIN);
@@ -72,19 +74,17 @@ bool PEDALS::readAccel()
 				}
 			}
 		}
-		if(pedalReading_debounce.isTimerExpired())
-		{
-			pedalDiff = MAXIMUM_TORQUE;
-			int16_t flippedVal = (avgVal * -1) + 1023; // reverse it so 0 is when pedal not pressed, and 1023 is at full press
-			if (flippedVal < POT_LOWER_BOUND)
-			{ // Set low point to prevent a positive torque in the resting pedal position
-				flippedVal = 0;
-			}
 
-			double multiplier = (double)flippedVal / 950; // torque multiplier from 0 to 1;
-
-			calcTorque(multiplier, appliedTorque);
+		int16_t flippedVal = (avgVal * -1) + 1023; // reverse it so 0 is when pedal not pressed, and 1023 is at full press
+		if (flippedVal < POT_LOWER_BOUND)
+		{ // Set low point to prevent a positive torque in the resting pedal position
+			flippedVal = 0;
 		}
+
+		double multiplier = (double)flippedVal / 950; // torque multiplier from 0 to 1;
+		Serial.println(multiplier);
+		appliedTorque = calcTorque(multiplier);
+		Serial.println(appliedTorque);
 	}
 
 	motorController->changeTorque(appliedTorque);
@@ -93,32 +93,41 @@ bool PEDALS::readAccel()
 
 	pedalReading_wait.startTimer(50);
 
+	if(accelFault)
+	{
+		Serial.println("ACCELFAULT");
+	}
+
 	return accelFault;
 }
 
 
-void PEDALS::calcTorque(double torqueScale, int16_t &appliedTorque)
+int16_t PEDALS::calcTorque(double torqueScale)
 {
+	int16_t pedalTorque = torqueScale * MAXIMUM_TORQUE;
+	int16_t torqueLim = 10 * calcCLTorqueLimit();
+
 	//scale torque if the BMS is leaving the boosting state
 	if(bms->isLeavingBoosting() || !bms->isBoostReady())
 	{
-		appliedTorque = appliedTorque * calcCLTorqueLimit();
-		return;
+		if (pedalTorque > torqueLim) {
+			pedalTorque = torqueLim;
+		}
 	}
-
-	appliedTorque = (torqueScale * MAXIMUM_TORQUE);
 
 	//Cleansing Value
-	if(appliedTorque >= MAXIMUM_TORQUE)
+	if(pedalTorque >= MAXIMUM_TORQUE)
 	{
-		appliedTorque = MAXIMUM_TORQUE;
-		return;
+		pedalTorque = MAXIMUM_TORQUE;
+		return pedalTorque;
 	}
-	if(appliedTorque<0)
+	if(pedalTorque < 0)
 	{
-		appliedTorque = 0;
-		return;
+		pedalTorque = 0;
+		return pedalTorque;
 	}
+
+	return pedalTorque;
 }
 
 
@@ -127,8 +136,17 @@ int16_t PEDALS::calcCLTorqueLimit()
 	int16_t dcVoltage = abs(bms->getLiveVoltage());
 	int16_t dcCurrent = bms->getCurrentLimit();
 	int16_t motorSpeed = abs(motorController->getMotorSpeed());
+	Serial.print("Vdc: ");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+	Serial.print(dcVoltage);
+	Serial.print(", Idc: ");
+	Serial.print(dcCurrent);
+	Serial.print(", wm: ");
+	Serial.println(motorSpeed);
 
-	return (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / motorSpeed;
+	Serial.print("CL Limit");
+	Serial.println((CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / (motorSpeed + 1));
+
+	return (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / (motorSpeed + 1);
 }
 
 
@@ -143,14 +161,15 @@ void PEDALS::readBrake()
 	if (brake1Val > ANALOG_BRAKE_THRESH || brake2Val > ANALOG_BRAKE_THRESH)
 	{
 		brakeReading_debounce.startTimer(50);
-		if(!brakeReading_debounce.isTimerExpired())
+		while (!brakeReading_debounce.isTimerExpired())
 		{
 			if((analogRead(BRAKE1_PIN) < ANALOG_BRAKE_THRESH) || (analogRead(BRAKE2_PIN) < ANALOG_BRAKE_THRESH))
 			{
 				brakeReading_debounce.cancelTimer();
+				break;
 			}
 		}
-		if(brakeReading_debounce.isTimerExpired() && ((analogRead(BRAKE1_PIN) > ANALOG_BRAKE_THRESH) || (analogRead(BRAKE2_PIN) > ANALOG_BRAKE_THRESH)))
+		if(brake1Val || brake2Val)
 		{
 			if (!brakePressed)
 			{ // if brake was not already being pressed, set new press time
@@ -175,8 +194,6 @@ void PEDALS::readBrake()
 	{
 		digitalWrite(BRAKELIGHT_PIN,LOW);
 	}
-
-	digitalWrite(BRAKELIGHT_PIN, brakePressed);
 	// Serial.print("Brake:\t\t");
 	// Serial.println(brakePressed);
 }

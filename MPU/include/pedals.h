@@ -37,7 +37,7 @@
 
 #define CL_TO_TOQRUE_CONST          7.84    //constant for calculating the current limited torque
 
-#define ANALOG_BRAKE_THRESH         182
+#define ANALOG_BRAKE_THRESH         185
 
 class PEDALS
 {
@@ -66,7 +66,7 @@ class PEDALS
          * @brief Calculates what torque to send to the motor controller
          * 
          */
-        void calcTorque(double torqueScale, int16_t &appliedTorque);
+        int16_t calcTorque(double torqueScale);
 
         /**
          * @brief Calculates the torque limit based on the BMS's calculated current limit

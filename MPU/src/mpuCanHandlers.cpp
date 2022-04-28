@@ -25,7 +25,6 @@ void canHandler_CANMSG_ERR_MCFAULT(const CAN_message_t &msg)
 
 void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
 {
-    Serial.println(msg.buf[6]);
     mpu.setBMSSoC(msg.buf[6]);
 
     int16_t currentDraw = (msg.buf[2] << 8) | msg.buf[3];
@@ -33,6 +32,7 @@ void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
     mpu.bmsCurrentProcess(currentDraw);
 
     int16_t liveVoltage = (msg.buf[0] << 8) | msg.buf[1];
+    liveVoltage = liveVoltage / 10;
 
     mpu.setBMSVoltage(liveVoltage);
 }
@@ -43,7 +43,7 @@ void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
 }
 
 
-void canHandler_CANMSG_MC_BMS_INTEGRATION(const CAN_message_t &msg)
+void canHandler_CANMSG_BMSCURRENTLIMITS(const CAN_message_t &msg)
 {
     mpu.CANLineVerified();
     uint16_t dischargeCurrentLimit = (msg.buf[0] << 8) | msg.buf[1];

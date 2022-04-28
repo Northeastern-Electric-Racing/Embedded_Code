@@ -117,6 +117,12 @@ bool CASCADIAMC::isMotorMoving()
 }
 
 
+bool CASCADIAMC::shouldMotorBeSpinning()
+{
+    return mcMsg.config.accelTorque > NOT_SPINNING_TORQUE_LIMIT;
+}
+
+
 int16_t CASCADIAMC::getMotorSpeed()
 {
     return motorSpeed;

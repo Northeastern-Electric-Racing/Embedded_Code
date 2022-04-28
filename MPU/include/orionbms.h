@@ -12,7 +12,7 @@
 #define CRITICAL_CELLTEMP           45      //degrees celcius
 #define SHUTDOWN_CELLTEMP           55      //degrees celcius
 
-#define CRITICAL_SOC                10      //percentage
+#define CRITICAL_SOC                20      //percentage
 
 #define BOOSTING_TIME_LIMIT         1000    //milliseconds
 #define BOOSTING_EXIT_TIME          100     //milliseconds (Time for system to adjust to leaving boost state)

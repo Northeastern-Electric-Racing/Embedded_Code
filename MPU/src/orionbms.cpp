@@ -38,7 +38,7 @@ uint8_t ORIONBMS::getSoC()
 
 bool ORIONBMS::isSoCCritical()
 {
-    return (SoC / 200) < CRITICAL_SOC;
+    return SoC < CRITICAL_SOC;
 }
 
 
@@ -61,6 +61,7 @@ bool ORIONBMS::isAvgTempShutdown()
 
 void ORIONBMS::setBoosting()
 {
+    if(!isBoostReady()){return;}
     boosting_time.startTimer(BOOSTING_TIME_LIMIT);
     boosting_warningTime.startTimer(BOOSTING_TIME_LIMIT - BOOSTING_EXIT_TIME);
     boostRecharge_wait.startTimer(BOOSTING_TIME_LIMIT + BOOSTING_RECHARGE_TIME);
@@ -129,7 +130,7 @@ int16_t ORIONBMS::getLiveVoltage()
 
 void ORIONBMS::enableChargingMode()
 {
-    isInChargeMode.startTimer(1000);
+    isInChargeMode.startTimer(2000);
 }
 
 

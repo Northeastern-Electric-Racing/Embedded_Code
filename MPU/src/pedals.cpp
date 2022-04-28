@@ -6,14 +6,13 @@ PEDALS::PEDALS(){}
 
 PEDALS::PEDALS(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 {
-    pinMode(BRAKE1_PIN, INPUT_PULLDOWN);
-	pinMode(BRAKE2_PIN, INPUT_PULLDOWN);
 	pinMode(BRAKELIGHT_PIN, OUTPUT);
 	digitalWrite(BRAKELIGHT_PIN, HIGH);
 
 	brakeReading_wait.cancelTimer();
 	pedalReading_wait.cancelTimer();
 	pedalReading_debounce.cancelTimer();
+	brakeLight_wait.cancelTimer();
 
 	motorController = p_motorController;
 	bms = p_bms;
@@ -48,10 +47,8 @@ bool PEDALS::readAccel()
 	}
 	else
 	{
-		uint16_t pedalDiff = MAXIMUM_TORQUE;
-		int16_t avgVal;
 		pedalReading_debounce.startTimer(50);
-		while(!pedalReading_debounce.isTimerExpired())
+		if(!pedalReading_debounce.isTimerExpired())
 		{
 			int accelPin1Val = analogRead(ACCEL1_PIN);
 			int accelPin2Val = analogRead(ACCEL2_PIN);
@@ -75,16 +72,19 @@ bool PEDALS::readAccel()
 				}
 			}
 		}
+		if(pedalReading_debounce.isTimerExpired())
+		{
+			pedalDiff = MAXIMUM_TORQUE;
+			int16_t flippedVal = (avgVal * -1) + 1023; // reverse it so 0 is when pedal not pressed, and 1023 is at full press
+			if (flippedVal < POT_LOWER_BOUND)
+			{ // Set low point to prevent a positive torque in the resting pedal position
+				flippedVal = 0;
+			}
 
-		int16_t flippedVal = (avgVal * -1) + 1023; // reverse it so 0 is when pedal not pressed, and 1023 is at full press
-		if (flippedVal < POT_LOWER_BOUND)
-		{ // Set low point to prevent a positive torque in the resting pedal position
-			flippedVal = 0;
+			double multiplier = (double)flippedVal / 950; // torque multiplier from 0 to 1;
+
+			calcTorque(multiplier, appliedTorque);
 		}
-
-		double multiplier = (double)flippedVal / 950; // torque multiplier from 0 to 1;
-
-		calcTorque(multiplier, appliedTorque);
 	}
 
 	motorController->changeTorque(appliedTorque);
@@ -92,6 +92,11 @@ bool PEDALS::readAccel()
 	Serial.println(appliedTorque / 10); // prints out applied torque
 
 	pedalReading_wait.startTimer(50);
+
+	if(accelFault)
+	{
+		Serial.println("ACCELFAULT");
+	}
 
 	return accelFault;
 }
@@ -136,22 +141,21 @@ void PEDALS::readBrake()
 {
 	if(!brakeReading_wait.isTimerExpired()){return;}
 
-	int brake1Val = digitalRead(BRAKE1_PIN);
-	int brake2Val = digitalRead(BRAKE2_PIN);
+	int brake1Val = analogRead(BRAKE1_PIN);
+	int brake2Val = analogRead(BRAKE2_PIN);
 
 	// if the brake is being pressed
-	if (brake1Val || brake2Val)
+	if (brake1Val > ANALOG_BRAKE_THRESH || brake2Val > ANALOG_BRAKE_THRESH)
 	{
-		brakeReading_debounce.startTimer(25);
-		while (!brakeReading_debounce.isTimerExpired())
+		brakeReading_debounce.startTimer(50);
+		if(!brakeReading_debounce.isTimerExpired())
 		{
-			if((digitalRead(BRAKE1_PIN) != brake1Val) || (digitalRead(BRAKE2_PIN) != brake2Val))
+			if((analogRead(BRAKE1_PIN) < ANALOG_BRAKE_THRESH) || (analogRead(BRAKE2_PIN) < ANALOG_BRAKE_THRESH))
 			{
 				brakeReading_debounce.cancelTimer();
-				break;
 			}
 		}
-		if(brake1Val || brake2Val)
+		if(brakeReading_debounce.isTimerExpired() && ((analogRead(BRAKE1_PIN) > ANALOG_BRAKE_THRESH) || (analogRead(BRAKE2_PIN) > ANALOG_BRAKE_THRESH)))
 		{
 			if (!brakePressed)
 			{ // if brake was not already being pressed, set new press time
@@ -166,6 +170,16 @@ void PEDALS::readBrake()
 		brakePressed = false;
 	}
 	brakeReading_wait.startTimer(50);
+
+	if(brakePressed)
+	{
+		digitalWrite(BRAKELIGHT_PIN, HIGH);
+		brakeLight_wait.startTimer(200);
+	}
+	if(brakeLight_wait.isTimerExpired())
+	{
+		digitalWrite(BRAKELIGHT_PIN,LOW);
+	}
 
 	digitalWrite(BRAKELIGHT_PIN, brakePressed);
 	// Serial.print("Brake:\t\t");

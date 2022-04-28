@@ -43,7 +43,7 @@ void GPIO::handleRadiatorFan()
     int16_t temp = motorController->getRadiatorTemp();
     
     //Convert temp to pwm speed with ceiling
-    uint8_t fanSpeed = fanSpeed > MAX_FANSPEED_TEMP ? 255 : 255 * (temp/MAX_FANSPEED_TEMP);
+    uint8_t fanSpeed = temp > MAX_FANSPEED_TEMP ? 255 : 255 * (temp/MAX_FANSPEED_TEMP);
 
     analogWrite(RADIATORFAN_PIN, fanSpeed);
 }

@@ -18,6 +18,9 @@ DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
     pinMode(LED5_PIN, OUTPUT);
     digitalWrite(LED5_PIN, LOW);
 
+    pinMode(YLED_PIN, OUTPUT);
+    digitalWrite(YLED_PIN, LOW);
+
     pinMode(SPEAKER_PIN, OUTPUT);
     digitalWrite(SPEAKER_PIN, HIGH);
 
@@ -41,20 +44,19 @@ void DRIVERIO::handleSSButton()
         ssButton_debounce.startTimer(50);
 
         //if the button is still being held during and after the timer runs out, then toggle power
-        while(!ssButton_debounce.isTimerExpired())
+        if(!ssButton_debounce.isTimerExpired())
         {
             if(!digitalRead(SS_BUTT_PIN)) // If released
             {
                 ssButton_debounce.cancelTimer();
-                break;
             }
         }
-        if(bms->getChargeMode() && digitalRead(SS_BUTT_PIN))
+        if(bms->getChargeMode() && digitalRead(SS_BUTT_PIN) && ssButton_debounce.isTimerExpired())
         {
             bms->toggleAIR();
             return;
         }
-        if(digitalRead(SS_BUTT_PIN) && (motorController->getIsOn() || (!motorController->getIsOn() && !motorController->checkFault())))
+        if(((digitalRead(SS_BUTT_PIN) && motorController->getIsOn()) || (!motorController->getIsOn() && !motorController->checkFault())) && ssButton_debounce.isTimerExpired())
         {
             motorController->togglePower();    //Writes the power state of the motor to the MC message to be sent
             if(motorController->getIsOn())

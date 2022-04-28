@@ -33,6 +33,7 @@ void MPU::driverioProcess()
 
 void MPU::pedalsProcess()
 {
+    isShutdown = verifyMotorSpinning();
     // Serial.println("Pedals process...");
     pedals.readBrake();
     isShutdown = pedals.readAccel();
@@ -44,7 +45,7 @@ void MPU::gpioProcess()
     gpio.handleMCHVFault();
     gpio.handlePump();
     gpio.handleRadiatorFan();
-    isShutdown = isCANLineOK();
+    //isShutdown = !isCANLineOK();
 }
 
 
@@ -68,13 +69,18 @@ void MPU::setBMSSoC(uint8_t p_soc)
 
 bool MPU::isCANLineOK()
 {
-    return !canTest_wait.isTimerExpired();
+    if(canTest_wait.isTimerExpired())
+    {
+        Serial.print("CAN FUCKED@$#^!$^@$#&");
+    }
+    return canTest_wait.isTimerExpired();
 }
 
 
 void MPU::CANLineVerified()
 {
     canTest_wait.startTimer(500);
+    Serial.println("CAN Line Verified&&&&&&&&&&&&");
 }
 
 
@@ -95,6 +101,7 @@ void MPU::shutOffCar()
 {
     writeFaultLatch(TRIGGER_FAULT);
     motorController.emergencyShutdown();
+    Serial.println("Shutting off Car!!!!!");
     delay(5000);
     writeFaultLatch(FAULT_OK);
 }
@@ -146,3 +153,11 @@ void MPU::setMotorTemp(int16_t temp)
     motorController.setRadiatorTemp(temp);
 }
 
+bool MPU::verifyMotorSpinning()
+{
+    if(motorController.shouldMotorBeSpinning())
+    {
+        return !motorController.isMotorMoving();
+    }
+    return false;
+}

@@ -10,6 +10,7 @@
 
 #include <nerduino.h>
 
+#define NOT_SPINNING_TORQUE_LIMIT   1500
 
 class CASCADIAMC
 {
@@ -128,6 +129,14 @@ class CASCADIAMC
          * @return false 
          */
         bool isMotorMoving();
+
+        /**
+         * @brief Sees if the commanded motor torque is 0
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool shouldMotorBeSpinning();
 
         /**
          * @brief Get the Motor Speed

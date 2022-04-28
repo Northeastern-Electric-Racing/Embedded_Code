@@ -142,6 +142,14 @@ class MPU
          * @param temp 
          */
         void setMotorTemp(int16_t temp);
+
+        /**
+         * @brief Make sure the motor is spinning if we send a motor torque command
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool verifyMotorSpinning();
 };
 
 extern MPU mpu;

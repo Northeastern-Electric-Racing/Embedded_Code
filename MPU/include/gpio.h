@@ -12,7 +12,7 @@
 
 #define SS_READY_SEN        6
 #define PUMP_PIN            8
-#define RADIATORFAN_PIN     18
+#define RADIATORFAN_PIN     28
 
 #define MAX_FANSPEED_TEMP   70   //degrees celcius
 

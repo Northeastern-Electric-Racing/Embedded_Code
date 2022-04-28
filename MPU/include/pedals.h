@@ -37,12 +37,16 @@
 
 #define CL_TO_TOQRUE_CONST          7.84    //constant for calculating the current limited torque
 
+#define ANALOG_BRAKE_THRESH         182
+
 class PEDALS
 {
     private:
         // message to turn motor off
         bool brakePressed = false;
         uint32_t timeBrake = 0;     // the time at which the brake was last pressed
+        uint16_t pedalDiff = MAXIMUM_TORQUE;
+		int16_t avgVal;
 
         CASCADIAMC *motorController;
         ORIONBMS *bms;
@@ -51,6 +55,7 @@ class PEDALS
         Timer brakeReading_debounce;
         Timer pedalReading_wait;
         Timer pedalReading_debounce;
+        Timer brakeLight_wait;
 
         int16_t clTorque; //Torque limit determined by current limit
 

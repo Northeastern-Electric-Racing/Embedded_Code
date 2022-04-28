@@ -93,11 +93,6 @@ bool PEDALS::readAccel()
 
 	pedalReading_wait.startTimer(50);
 
-	if(accelFault)
-	{
-		Serial.println("ACCELFAULT");
-	}
-
 	return accelFault;
 }
 

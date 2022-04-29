@@ -26,8 +26,6 @@ void loop()
     mpu.driverioProcess();
     mpu.pedalsProcess();
     mpu.sendMCMsg();
-    //mpu.checkShutdownStatus();
-    //Serial.println(analogRead(BRAKE1_PIN));
-    //Serial.println(analogRead(BRAKE2_PIN));
+    mpu.checkShutdownStatus();
     wdt.feed();
 }

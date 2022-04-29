@@ -91,10 +91,21 @@ void ORIONBMS::setCurrentLimit(uint16_t p_currentLimit)
     currentLimit = p_currentLimit;
 }
 
+void ORIONBMS::setChargeCurrentLimit(uint16_t p_chargeCurrentLimit)
+{
+    chargeCurrentLimit = p_chargeCurrentLimit;
+}
+
 
 uint16_t ORIONBMS::getCurrentLimit()
 {
     return currentLimit;
+}
+
+
+uint16_t ORIONBMS::getChargeCurrentLimit()
+{
+    return chargeCurrentLimit;
 }
 
 

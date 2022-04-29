@@ -11,7 +11,7 @@ MPU::MPU()
     ioRead_wait.cancelTimer();
     canTest_wait.cancelTimer();
     pinMode(RELAY_PIN, OUTPUT);
-    digitalWrite(RELAY_PIN, HIGH);
+    writeFaultLatch(FAULT_OK);
 }
 
 
@@ -45,7 +45,8 @@ void MPU::gpioProcess()
     gpio.handleMCHVFault();
     gpio.handlePump();
     gpio.handleRadiatorFan();
-    //isShutdown = !isCANLineOK();
+    isShutdown = !isCANLineOK();
+    Serial.println(!isCANLineOK());
 }
 
 
@@ -71,21 +72,22 @@ bool MPU::isCANLineOK()
 {
     if(canTest_wait.isTimerExpired())
     {
-        Serial.print("CAN FUCKED@$#^!$^@$#&");
+        Serial.println("CAN FUCKED@$#^!$^@$#&");
+        return false;
     }
-    return canTest_wait.isTimerExpired();
+    return true;
 }
 
 
 void MPU::CANLineVerified()
 {
     canTest_wait.startTimer(500);
-    Serial.println("CAN Line Verified&&&&&&&&&&&&");
 }
 
 
 void MPU::checkShutdownStatus()
 {
+    Serial.println(isShutdown);
     if(isShutdown)
     {
         shutOffCar();
@@ -102,20 +104,26 @@ void MPU::shutOffCar()
     writeFaultLatch(TRIGGER_FAULT);
     motorController.emergencyShutdown();
     Serial.println("Shutting off Car!!!!!");
-    delay(5000);
+    while(1){}
     writeFaultLatch(FAULT_OK);
 }
 
 
 void MPU::writeFaultLatch(bool status)
 {
-    digitalWrite(RELAY_PIN, !status);
+    digitalWrite(RELAY_PIN, status);
 }
 
 
 void MPU::setCurrentLimit(uint16_t currentLimit)
 {
     bms.setCurrentLimit(currentLimit);
+}
+
+
+void MPU::setChargeCurrentLimit(uint16_t currentLimit)
+{
+    bms.setChargeCurrentLimit(currentLimit);
 }
 
 

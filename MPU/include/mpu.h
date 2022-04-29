@@ -112,6 +112,13 @@ class MPU
         void setCurrentLimit(uint16_t currentLimit);
 
         /**
+         * @brief Set the Charge Current Limit for the BMS
+         * 
+         * @param currentLimit 
+         */
+        void setChargeCurrentLimit(uint16_t currentLimit);
+
+        /**
          * @brief Sets the current draw and also puts the BMS into boost mode if the current exceeds the current limit
          * 
          */

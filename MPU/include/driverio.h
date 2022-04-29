@@ -38,6 +38,12 @@ class DRIVERIO
         Timer tempWarningBlink_wait;
 
         /**
+         * @brief Checks if the button is being pressed and the timer isn't canceled and the timer isn't canceled
+         * 
+         */
+        bool ssButtonDebounced();
+
+        /**
          * @brief Writes LED4 to a specific state
          * 
          * @param state 

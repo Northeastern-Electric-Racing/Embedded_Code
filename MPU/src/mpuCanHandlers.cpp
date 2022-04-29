@@ -32,7 +32,7 @@ void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
     mpu.bmsCurrentProcess(currentDraw);
 
     int16_t liveVoltage = (msg.buf[0] << 8) | msg.buf[1];
-    liveVoltage = liveVoltage / 10;
+    liveVoltage = liveVoltage;
 
     mpu.setBMSVoltage(liveVoltage);
 }
@@ -46,14 +46,16 @@ void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
 void canHandler_CANMSG_BMSCURRENTLIMITS(const CAN_message_t &msg)
 {
     mpu.CANLineVerified();
-    uint16_t dischargeCurrentLimit = (msg.buf[0] << 8) | msg.buf[1];
+    uint16_t dischargeCurrentLimit = (msg.buf[1] << 8) | msg.buf[0];
     mpu.setCurrentLimit(dischargeCurrentLimit);
+    uint16_t chargeCurrentLimit = (msg.buf[3] << 8) | msg.buf[2];
+    mpu.setChargeCurrentLimit(chargeCurrentLimit);
 }
 
 void canHandler_CANMSG_MOTORMOTION(const CAN_message_t &msg)
 {
     //angular motor speed is found at bytes 2 and 3
-    int16_t motorSpeed = (msg.buf[3] << 8) | msg.buf[2];
+    int16_t motorSpeed = ((msg.buf[3] << 8) | msg.buf[2]) / 10;
     mpu.setMotorSpeed(motorSpeed);
 }
 

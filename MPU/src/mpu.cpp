@@ -140,11 +140,24 @@ void MPU::bmsCurrentProcess(int16_t currentDraw)
 {
     bms.setCurrentDraw(currentDraw);
 
-    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired())
+    if(!boosting_debounce.isTimerExpired())
+    {
+        if(!bms.isCurrentPastLimit())
+        {
+            boosting_debounce.cancelTimer();
+        }
+    }
+
+    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired() && !boosting_debounce.isTimerReset())
     {
         bms.setBoosting();
     }
-    
+
+    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired())
+    {
+        boosting_debounce.startTimer(100);
+    }
+
 }
 
 

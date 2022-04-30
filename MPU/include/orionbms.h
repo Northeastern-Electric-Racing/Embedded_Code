@@ -14,7 +14,7 @@
 
 #define CRITICAL_SOC                20      //percentage
 
-#define BOOSTING_TIME_LIMIT         1500    //milliseconds
+#define BOOSTING_TIME_LIMIT         950    //milliseconds
 #define BOOSTING_EXIT_TIME          100     //milliseconds (Time for system to adjust to leaving boost state)
 #define BOOSTING_RECHARGE_TIME      60000   //milliseconds (Time for the BMS to be allowed into a boost state again)
 

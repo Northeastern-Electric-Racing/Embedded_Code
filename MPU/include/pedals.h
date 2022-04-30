@@ -19,7 +19,7 @@
 #define BRAKELIGHT_PIN              4
 
 // motor torque constants
-#define MAXIMUM_TORQUE              2299    // in Nm x 10 (ex: 123 = 12.3Nm)
+#define MAXIMUM_TORQUE              2300    // in Nm x 10 (ex: 123 = 12.3Nm)
 #define POT_LOWER_BOUND             35      // a pot value from 0 to 1023
 #define POT_UPPER_BOUND             1023    // a pot value from 0 to 1023
 
@@ -68,6 +68,9 @@ class PEDALS
         int16_t avgBrakeVal;
 
         int16_t appliedTorque = 0; // applied motor torque
+
+        int16_t prev1 = 0;
+        int16_t prev2 = 0;
 
         /**
          * @brief Calculates what torque to send to the motor controller

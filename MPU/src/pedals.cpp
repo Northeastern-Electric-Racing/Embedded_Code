@@ -57,7 +57,8 @@ bool PEDALS::readAccel()
 		}
 		double multiplier = ((double)flippedVal - 250)  / 650; // torque multiplier from 0 to 1;
 		appliedTorque = calcTorque(multiplier);
-		//Serial.println(appliedTorque);
+		
+		Serial.println(appliedTorque);
 		pedalReading_debounce.startTimer(40);
 		pedalDiff = MAXIMUM_TORQUE;
 	}
@@ -77,7 +78,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	int16_t torqueLim = 10 * calcCLTorqueLimit();
 
 	//scale torque if the BMS is leaving the boosting state
-	if(bms->isLeavingBoosting() || !bms->isBoostReady())
+	if(!bms->isBoostReady())
 	{
 		if (pedalTorque > torqueLim) {
 			pedalTorque = torqueLim;
@@ -93,7 +94,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	if(pedalTorque < 0)
 	{
 		pedalTorque = 0;
-		return pedalTorque; 
+		return pedalTorque;
 	}
 
 	return pedalTorque;
@@ -105,7 +106,15 @@ int16_t PEDALS::calcCLTorqueLimit()
 	int16_t dcVoltage = abs(bms->getLiveVoltage());
 	int16_t dcCurrent = bms->getCurrentLimit();
 	int16_t motorSpeed = abs(motorController->getMotorSpeed());
-	/*
+
+	int16_t calculated = 230;
+
+	if (motorSpeed < 250) {
+		calculated = 210;
+	} else {
+		calculated = (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / motorSpeed;
+	}
+	
 	Serial.print("Vdc: ");                                               
 	Serial.print(dcVoltage);
 	Serial.print(", Idc: ");
@@ -113,11 +122,13 @@ int16_t PEDALS::calcCLTorqueLimit()
 	Serial.print(", wm: ");
 	Serial.println(motorSpeed);
 	
-	Serial.print("CL Limit");
-	Serial.println((CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / (motorSpeed + 1));
-	*/
+	Serial.print("CL Limit: ");
+	Serial.print(calculated);
 
-	return (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / (motorSpeed + 1);
+	Serial.print(", ");
+	Serial.println(calculated);
+
+	return calculated;
 }
 
 

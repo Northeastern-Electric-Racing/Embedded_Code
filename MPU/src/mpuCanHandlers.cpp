@@ -27,10 +27,6 @@ void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
 {
     mpu.setBMSSoC(msg.buf[6]);
 
-    int16_t currentDraw = (msg.buf[2] << 8) | msg.buf[3];
-
-    mpu.bmsCurrentProcess(currentDraw);
-
     int16_t liveVoltage = (msg.buf[0] << 8) | msg.buf[1];
     liveVoltage = liveVoltage;
 
@@ -46,11 +42,14 @@ void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
 void canHandler_CANMSG_BMSCURRENTLIMITS(const CAN_message_t &msg)
 {
     mpu.CANLineVerified();
+    /*
     uint16_t dischargeCurrentLimit = (msg.buf[1] << 8) | msg.buf[0];
     mpu.setCurrentLimit(dischargeCurrentLimit);
     uint16_t chargeCurrentLimit = (msg.buf[3] << 8) | msg.buf[2];
     mpu.setChargeCurrentLimit(chargeCurrentLimit);
+    */
 }
+
 
 void canHandler_CANMSG_MOTORMOTION(const CAN_message_t &msg)
 {
@@ -68,4 +67,17 @@ void canHandler_CANMSG_MOTORETEMP3(const CAN_message_t &msg)
 {
     int16_t motorTemp = (msg.buf[5] << 8) | msg.buf[4];
     mpu.setMotorTemp(motorTemp);
+}
+
+void canHandler_CANMSG_BMSCURRENTS(const CAN_message_t &msg)
+{
+    mpu.CANLineVerified();
+    uint16_t dischargeCurrentLimit = (msg.buf[0] << 8) | msg.buf[1];
+    mpu.setCurrentLimit(dischargeCurrentLimit);
+    uint16_t chargeCurrentLimit = (msg.buf[2] << 8) | msg.buf[3];
+    mpu.setChargeCurrentLimit(chargeCurrentLimit);
+    int16_t currentDraw = (msg.buf[4] << 8) | msg.buf[5];
+    mpu.bmsCurrentProcess(currentDraw);
+    Serial.println(dischargeCurrentLimit);
+    //6 and 7 are rolling avg current
 }

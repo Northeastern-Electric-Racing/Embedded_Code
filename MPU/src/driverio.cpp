@@ -113,7 +113,7 @@ void DRIVERIO::handleErrorLights()
 {
     writeLED4(bms->isSoCCritical());
 
-    writeYLED(bms->isCharging());
+    writeYLED(bms->isCharging() || bms->isBoosting() );
 
     if(tempWarningBlink_wait.isTimerExpired())
     {

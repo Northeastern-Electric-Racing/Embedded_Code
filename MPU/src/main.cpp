@@ -17,6 +17,7 @@ void setup()
     config.trigger = 5;         /* in seconds, 0->128 */
     config.timeout = 10;        /* in seconds, 0->128 */
     wdt.begin(config);
+    delay(2000);
 }
 
 void loop()

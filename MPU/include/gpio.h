@@ -35,7 +35,7 @@ class GPIO
          * @brief Handles the high voltage motor controller fault from when it initially boots
          * 
          */
-        void handleMCHVFault();
+        bool handleMCHVFault();
 
         /**
          * @brief Handles the logic behind starting/stopping the pump

@@ -63,7 +63,6 @@ void ORIONBMS::setBoosting()
 {
     if(!isBoostReady()){return;}
     boosting_time.startTimer(BOOSTING_TIME_LIMIT);
-    boosting_warningTime.startTimer(BOOSTING_TIME_LIMIT - BOOSTING_EXIT_TIME);
     boostRecharge_wait.startTimer(BOOSTING_TIME_LIMIT + BOOSTING_RECHARGE_TIME);
 }
 

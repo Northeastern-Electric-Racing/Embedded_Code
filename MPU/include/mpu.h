@@ -22,9 +22,12 @@ class MPU
         ORIONBMS bms;
         
         bool isShutdown = false;
+        bool ssReady = false;
 
         Timer ioRead_wait;
         Timer canTest_wait;
+        Timer spinningCheck_wait;
+        Timer boosting_debounce;
 
         enum
         {
@@ -45,6 +48,7 @@ class MPU
         * 
         */
         void shutOffCar();
+        
 
     public:
         MPU();

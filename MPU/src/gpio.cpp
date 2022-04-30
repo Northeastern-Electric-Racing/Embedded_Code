@@ -16,21 +16,23 @@ GPIO::GPIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 GPIO::~GPIO(){}
 
 
-void GPIO::handleMCHVFault()
+bool GPIO::handleMCHVFault()
 {
     if(!digitalRead(SS_READY_SEN))
     {
         //Serial.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         isSSPowerCycle = true;
         motorController->raiseFault();
-        return;
+        return false;
     }
     if (isSSPowerCycle && digitalRead(SS_READY_SEN) == HIGH)
     {
         //Serial.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         motorController->clearFault();
         isSSPowerCycle = false;
+        return true;
     }
+    return false;
 }
 
 void GPIO::handlePump()

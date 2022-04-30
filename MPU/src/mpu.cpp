@@ -10,6 +10,9 @@ MPU::MPU()
 
     ioRead_wait.cancelTimer();
     canTest_wait.cancelTimer();
+    spinningCheck_wait.cancelTimer();
+    boosting_debounce.cancelTimer();
+
     pinMode(RELAY_PIN, OUTPUT);
     writeFaultLatch(FAULT_OK);
 }
@@ -33,20 +36,26 @@ void MPU::driverioProcess()
 
 void MPU::pedalsProcess()
 {
-    isShutdown = verifyMotorSpinning();
+    //isShutdown = isShutdown ? true : !verifyMotorSpinning();
+    if(!verifyMotorSpinning())
+    {Serial.println("MOTOR NOT SPINNING");}
     // Serial.println("Pedals process...");
     pedals.readBrake();
-    isShutdown = pedals.readAccel();
+    isShutdown = isShutdown ? true : pedals.readAccel();
+    if(pedals.readAccel())
+    {Serial.println("ACCEL FAULT");}
 }
 
 
 void MPU::gpioProcess()
 {
-    gpio.handleMCHVFault();
+    bool faultReset = gpio.handleMCHVFault();
     gpio.handlePump();
     gpio.handleRadiatorFan();
-    isShutdown = !isCANLineOK();
-    Serial.println(!isCANLineOK());
+
+    isShutdown = isShutdown ? true : !isCANLineOK();
+    if(!isCANLineOK())
+    {Serial.println("CAN FAULT");}
 }
 
 
@@ -70,7 +79,7 @@ void MPU::setBMSSoC(uint8_t p_soc)
 
 bool MPU::isCANLineOK()
 {
-    if(canTest_wait.isTimerExpired())
+    if(canTest_wait.isTimerExpired() && (digitalRead(SS_READY_SEN) == HIGH))
     {
         Serial.println("CAN FUCKED@$#^!$^@$#&");
         return false;
@@ -131,10 +140,11 @@ void MPU::bmsCurrentProcess(int16_t currentDraw)
 {
     bms.setCurrentDraw(currentDraw);
 
-    if(bms.isCurrentPastLimit())
+    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired())
     {
         bms.setBoosting();
     }
+    
 }
 
 
@@ -163,9 +173,15 @@ void MPU::setMotorTemp(int16_t temp)
 
 bool MPU::verifyMotorSpinning()
 {
-    if(motorController.shouldMotorBeSpinning())
+    if(motorController.shouldMotorBeSpinning() && motorController.getIsOn())
     {
-        return !motorController.isMotorMoving();
+        if(motorController.isMotorMoving())
+        {
+            spinningCheck_wait.startTimer(5000);
+        }
+        if(spinningCheck_wait.isTimerExpired()) {
+            return false;
+        }
     }
-    return false;
+    return true;
 }

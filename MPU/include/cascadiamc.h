@@ -6,7 +6,7 @@
 #ifndef CASCADIAMC_H
 #define CASCADIAMC_H
 
-#define CAN_CMD_DELAY 10 // ms
+#define CAN_CMD_DELAY 5 // ms
 
 #include <nerduino.h>
 

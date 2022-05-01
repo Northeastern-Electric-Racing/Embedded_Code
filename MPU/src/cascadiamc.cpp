@@ -88,6 +88,9 @@ void CASCADIAMC::clearFault()
 
 void CASCADIAMC::raiseFault()
 {
+    if (isFaulted == false) {
+        delay(3000);
+    }
     isFaulted = true;
 }
 

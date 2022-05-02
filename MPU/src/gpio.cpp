@@ -42,10 +42,14 @@ void GPIO::handlePump()
 
 void GPIO::handleRadiatorFan()
 {
-    int16_t temp = motorController->getRadiatorTemp();
-    
-    //Convert temp to pwm speed with ceiling
-    uint8_t fanSpeed = temp > MAX_FANSPEED_TEMP ? 255 : 255 * (temp/MAX_FANSPEED_TEMP);
+    int16_t temp = motorController->getRadiatorTemp() / 10;
 
-    analogWrite(RADIATORFAN_PIN, fanSpeed);
+    Serial.print("MC TEMP: ");
+    Serial.println(temp);
+
+    if (temp > MAX_FANSPEED_TEMP) {
+        digitalWrite(RADIATORFAN_PIN, LOW);
+    } else {
+        digitalWrite(RADIATORFAN_PIN, HIGH);
+    }
 }

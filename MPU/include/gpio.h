@@ -14,7 +14,7 @@
 #define PUMP_PIN            8
 #define RADIATORFAN_PIN     28
 
-#define MAX_FANSPEED_TEMP   70   //degrees celcius
+#define MAX_FANSPEED_TEMP   10   //degrees celcius
 
 class GPIO
 {

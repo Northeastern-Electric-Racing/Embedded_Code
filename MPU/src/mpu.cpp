@@ -96,7 +96,7 @@ void MPU::CANLineVerified()
 
 void MPU::checkShutdownStatus()
 {
-    Serial.println(isShutdown);
+    // Serial.println(isShutdown);
     if(isShutdown)
     {
         shutOffCar();

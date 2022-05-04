@@ -14,8 +14,8 @@ void setup()
     NERduino.begin();
     initializeCAN(1);           //The "1" parameter is useless for now, in the future the parameter is which CAN line to initialize
     WDT_timings_t config;
-    config.trigger = 5;         /* in seconds, 0->128 */
-    config.timeout = 10;        /* in seconds, 0->128 */
+    config.trigger = 10;         /* in seconds, 0->128 */
+    config.timeout = 60;        /* in seconds, 0->128 */
     wdt.begin(config);
     delay(2000);
 }

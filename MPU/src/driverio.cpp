@@ -63,7 +63,6 @@ void DRIVERIO::handleSSButton()
             writeSpeaker(HIGH);
             speaker_wait.startTimer(1500);
         }
-        Serial.println("");
         powerToggle_wait.startTimer(1500);
         ssButton_debounce.cancelTimer();
         return;

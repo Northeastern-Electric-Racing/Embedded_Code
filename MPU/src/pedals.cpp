@@ -58,7 +58,7 @@ bool PEDALS::readAccel()
 		double multiplier = ((double)flippedVal - 250)  / 650; // torque multiplier from 0 to 1;
 		appliedTorque = calcTorque(multiplier);
 		
-		Serial.println(appliedTorque);
+		// Serial.println(appliedTorque);
 		pedalReading_debounce.startTimer(40);
 		pedalDiff = MAXIMUM_TORQUE;
 	}
@@ -115,6 +115,7 @@ int16_t PEDALS::calcCLTorqueLimit()
 		calculated = (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / motorSpeed;
 	}
 	
+	/*
 	Serial.print("Vdc: ");                                               
 	Serial.print(dcVoltage);
 	Serial.print(", Idc: ");
@@ -126,7 +127,7 @@ int16_t PEDALS::calcCLTorqueLimit()
 	Serial.print(calculated);
 
 	Serial.print(", ");
-	Serial.println(calculated);
+	Serial.println(calculated);*/
 
 	return calculated;
 }

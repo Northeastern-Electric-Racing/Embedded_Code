@@ -78,11 +78,8 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	int16_t torqueLim = 10 * calcCLTorqueLimit();
 
 	//scale torque if the BMS is leaving the boosting state
-	if(!bms->isBoostReady())
-	{
-		if (pedalTorque > torqueLim) {
-			pedalTorque = torqueLim;
-		}
+	if (pedalTorque > torqueLim) {
+		pedalTorque = torqueLim;
 	}
 
 	//Cleansing Value
@@ -110,9 +107,9 @@ int16_t PEDALS::calcCLTorqueLimit()
 	int16_t calculated = 230;
 
 	if (motorSpeed < 250) {
-		calculated = 210;
+		calculated = 200;
 	} else {
-		calculated = (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / motorSpeed;
+		calculated = 0.9 * (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / motorSpeed;
 	}
 	
 	/*

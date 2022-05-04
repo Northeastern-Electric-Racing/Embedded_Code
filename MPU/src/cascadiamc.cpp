@@ -90,7 +90,7 @@ void CASCADIAMC::raiseFault()
 {
     if (isFaulted == false) {
         Serial.println("CUCK");
-        delay(3000);
+        delay(2000);
     }
     isFaulted = true;
 }

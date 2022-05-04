@@ -145,7 +145,23 @@ int16_t PEDALS::calcCLRegenLimit()
 
 void PEDALS::readBrake()
 {
-	if(!brakeReading_debounce.isTimerExpired())
+	if(brakeReading_debounce.isTimerExpired())
+	{
+		int brake1Val = analogRead(BRAKE1_PIN);	//rear
+		int brake2Val = analogRead(BRAKE2_PIN); //front
+		
+		int brakeAvg = (brake1Val + brake2Val) / 2;
+
+		if (brakeAvg > ANALOG_BRAKE_THRESH) {
+			digitalWrite(BRAKELIGHT_PIN, HIGH);
+		} else {
+			digitalWrite(BRAKELIGHT_PIN, LOW);
+		}
+
+		brakeReading_debounce.startTimer(250);
+	}
+
+	/*if(!brakeReading_debounce.isTimerExpired())
 	{
 		int brake1Val = analogRead(BRAKE1_PIN);	//rear
 		int brake2Val = analogRead(BRAKE2_PIN); //front
@@ -188,5 +204,5 @@ void PEDALS::readBrake()
 	{
 		digitalWrite(BRAKELIGHT_PIN,LOW);
 		Serial.println("OFF");
-	}
+	}*/
 }

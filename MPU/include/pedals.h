@@ -37,7 +37,7 @@
 
 #define CL_TO_TOQRUE_CONST          7.84    //constant for calculating the current limited torque
 
-#define ANALOG_BRAKE_THRESH         195
+#define ANALOG_BRAKE_THRESH         175
 #define MAXIMUM_BRAKE               255
 
 class PEDALS

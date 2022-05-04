@@ -77,12 +77,15 @@ bool PEDALS::readAccel()
 int16_t PEDALS::calcTorque(double torqueScale)
 {
 	int16_t pedalTorque = 0;
+	int16_t maxTorque = 0;
 
 	if (torqueBoostReady) {
-		pedalTorque = torqueScale * MAXIMUM_TORQUE;
+		maxTorque = MAXIMUM_TORQUE;
 	} else {
-		pedalTorque = torqueScale * CONT_TORQUE;
+		maxTorque = CONT_TORQUE;
 	}
+
+	pedalTorque = torqueScale * maxTorque;
 	
 	int16_t torqueLim = 10 * calcCLTorqueLimit();
 
@@ -125,12 +128,12 @@ int16_t PEDALS::calcCLTorqueLimit()
 	int16_t dcCurrent = bms->getCurrentLimit();
 	int16_t motorSpeed = abs(motorController->getMotorSpeed());
 
-	int16_t calculated = 240;
+	int16_t calculated = 120;
 
-	if (motorSpeed < 250) {
-		calculated = 200;
+	if (motorSpeed < 500) {
+		calculated = 190;
 	} else {
-		calculated = 0.9 * (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / motorSpeed;
+		calculated = 0.9 * (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / (motorSpeed + 1);
 	}
 	
 	/*

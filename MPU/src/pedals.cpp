@@ -149,13 +149,13 @@ void PEDALS::readBrake()
 	{
 		int brake1Val = analogRead(BRAKE1_PIN);	//rear
 		int brake2Val = analogRead(BRAKE2_PIN); //front
-		/*
+		
 		Serial.print("brake1:\t");
 		Serial.println(brake1Val);
 		Serial.print("brake2:\t");
 		Serial.println(brake2Val);
 		Serial.println();
-		*/
+		
 		int avgBrakeVal_tmp = (brake1Val > brake2Val) ? brake1Val : brake2Val;
 
 		if(avgBrakeVal_tmp > avgBrakeVal)
@@ -182,9 +182,11 @@ void PEDALS::readBrake()
 	{
 		digitalWrite(BRAKELIGHT_PIN, HIGH);
 		brakeLight_wait.startTimer(200);
+		Serial.println("ON");
 	}
 	if(brakeLight_wait.isTimerExpired())
 	{
 		digitalWrite(BRAKELIGHT_PIN,LOW);
+		Serial.println("OFF");
 	}
 }

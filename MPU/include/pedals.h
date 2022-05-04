@@ -20,6 +20,7 @@
 
 // motor torque constants
 #define MAXIMUM_TORQUE              2300    // in Nm x 10 (ex: 123 = 12.3Nm)
+#define CONT_TORQUE                 1200    // ' '
 #define POT_LOWER_BOUND             35      // a pot value from 0 to 1023
 #define POT_UPPER_BOUND             1023    // a pot value from 0 to 1023
 
@@ -55,6 +56,8 @@ class PEDALS
         Timer pedalReading_wait;
         Timer pedalReading_debounce;
         Timer brakeLight_wait;
+        Timer torqueBoost_time;
+        Timer torqueBoost_cooldown;
 
         int16_t clTorque; //Torque limit determined by current limit
 
@@ -71,6 +74,9 @@ class PEDALS
 
         int16_t prev1 = 0;
         int16_t prev2 = 0;
+
+        bool torqueBoostReady = true;
+        bool torqueBoosting = false;
 
         /**
          * @brief Calculates what torque to send to the motor controller

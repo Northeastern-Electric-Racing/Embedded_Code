@@ -13,6 +13,8 @@ PEDALS::PEDALS(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 	pedalReading_wait.cancelTimer();
 	pedalReading_debounce.cancelTimer();
 	brakeLight_wait.cancelTimer();
+	torqueBoost_time.cancelTimer();
+    torqueBoost_cooldown.cancelTimer();
 
 	motorController = p_motorController;
 	bms = p_bms;
@@ -74,7 +76,14 @@ bool PEDALS::readAccel()
 
 int16_t PEDALS::calcTorque(double torqueScale)
 {
-	int16_t pedalTorque = torqueScale * MAXIMUM_TORQUE;
+	int16_t pedalTorque = 0;
+
+	if (torqueBoostReady) {
+		pedalTorque = torqueScale * MAXIMUM_TORQUE;
+	} else {
+		pedalTorque = torqueScale * CONT_TORQUE;
+	}
+	
 	int16_t torqueLim = 10 * calcCLTorqueLimit();
 
 	//scale torque if the BMS is leaving the boosting state
@@ -94,6 +103,18 @@ int16_t PEDALS::calcTorque(double torqueScale)
 		return pedalTorque;
 	}
 
+	if (pedalTorque > CONT_TORQUE & torqueBoostReady) {
+		torqueBoost_time.startTimer(3000);
+		torqueBoosting = true;
+		torqueBoostReady = false;
+	} else if (torqueBoost_time.isTimerExpired() & torqueBoosting) {
+		torqueBoost_cooldown.startTimer(15000);
+		torqueBoosting = false;
+		torqueBoostReady = false;
+	} else if (torqueBoost_cooldown.isTimerExpired()) {
+		torqueBoostReady = true;
+	}
+
 	return pedalTorque;
 }
 
@@ -104,7 +125,7 @@ int16_t PEDALS::calcCLTorqueLimit()
 	int16_t dcCurrent = bms->getCurrentLimit();
 	int16_t motorSpeed = abs(motorController->getMotorSpeed());
 
-	int16_t calculated = 230;
+	int16_t calculated = 240;
 
 	if (motorSpeed < 250) {
 		calculated = 200;

@@ -90,7 +90,7 @@ bool MPU::isCANLineOK()
 
 void MPU::CANLineVerified()
 {
-    canTest_wait.startTimer(500);
+    canTest_wait.startTimer(1000);
 }
 
 

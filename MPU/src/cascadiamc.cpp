@@ -89,6 +89,7 @@ void CASCADIAMC::clearFault()
 void CASCADIAMC::raiseFault()
 {
     if (isFaulted == false) {
+        Serial.println("CUCK");
         delay(3000);
     }
     isFaulted = true;

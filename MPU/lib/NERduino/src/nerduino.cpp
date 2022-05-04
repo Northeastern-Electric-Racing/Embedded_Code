@@ -7,7 +7,7 @@ NERDUINO NERduino;
 NERDUINO::NERDUINO()
 {
     Wire.begin();
-    Serial.begin(9600);
+    Serial.begin(57600);
 }
 
 

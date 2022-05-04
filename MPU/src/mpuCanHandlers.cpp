@@ -78,6 +78,6 @@ void canHandler_CANMSG_BMSCURRENTS(const CAN_message_t &msg)
     mpu.setChargeCurrentLimit(chargeCurrentLimit);
     int16_t currentDraw = (msg.buf[4] << 8) | msg.buf[5];
     mpu.bmsCurrentProcess(currentDraw);
-    // Serial.println(dischargeCurrentLimit);
+    Serial.println(dischargeCurrentLimit);
     //6 and 7 are rolling avg current
 }

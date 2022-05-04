@@ -107,7 +107,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	}
 
 	if (pedalTorque > CONT_TORQUE & torqueBoostReady) {
-		torqueBoost_time.startTimer(1500);
+		torqueBoost_time.startTimer(3000);
 		torqueBoosting = true;
 		torqueBoostReady = false;
 	} else if (torqueBoost_time.isTimerExpired() & torqueBoosting) {
@@ -131,9 +131,9 @@ int16_t PEDALS::calcCLTorqueLimit()
 	int16_t calculated = 120;
 
 	if (motorSpeed < 500) {
-		calculated = 190;
+		calculated = 120;
 	} else {
-		calculated = 0.9 * (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / (motorSpeed + 1);
+		calculated = (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / (motorSpeed + 1);
 	}
 	
 	/*

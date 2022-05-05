@@ -114,20 +114,23 @@ void DRIVERIO::handleErrorLights()
 
     writeYLED(bms->isCharging() || bms->isBoosting() );
 
-    if(tempWarningBlink_wait.isTimerExpired())
-    {
-        writeLED5(LOW);
-    }
-
     if(bms->isAvgTempCritical())
     {
+        
         if(bms->isAvgTempShutdown())
         {
             writeLED5(HIGH);
             return;
         }
-        writeLED5(HIGH);
-        tempWarningBlink_wait.startTimer(500);
+
+        if(tempWarningBlink_wait.isTimerExpired())
+        {
+            
+            LED5_status = !LED5_status;
+            writeLED5(LED5_status);
+        }
+
+        tempWarningBlink_wait.startTimer(1000);    
     }
 }
 

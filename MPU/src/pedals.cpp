@@ -106,7 +106,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 		return pedalTorque;
 	}
 
-	if (pedalTorque > CONT_TORQUE & torqueBoostReady) {
+	if ((pedalTorque > CONT_TORQUE) & torqueBoostReady) {
 		torqueBoost_time.startTimer(3000);
 		torqueBoosting = true;
 		torqueBoostReady = false;

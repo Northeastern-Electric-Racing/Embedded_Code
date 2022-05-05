@@ -37,8 +37,9 @@ void MPU::driverioProcess()
 void MPU::pedalsProcess()
 {
     //isShutdown = isShutdown ? true : !verifyMotorSpinning();
-    if(!verifyMotorSpinning())
-    {Serial.println("MOTOR NOT SPINNING");}
+    // TEMP TODO: reimplement
+    // if(!verifyMotorSpinning())
+    // {Serial.println("MOTOR NOT SPINNING");}
     // Serial.println("Pedals process...");
     pedals.readBrake();
     isShutdown = isShutdown ? true : pedals.readAccel();
@@ -120,7 +121,7 @@ void MPU::shutOffCar()
 
 void MPU::writeFaultLatch(bool status)
 {
-    digitalWrite(RELAY_PIN, status);
+    digitalWrite(RELAY_PIN, 1); // TEMP TODO: remove
 }
 
 

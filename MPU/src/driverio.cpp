@@ -119,18 +119,18 @@ void DRIVERIO::handleErrorLights()
         
         if(bms->isAvgTempShutdown())
         {
+            Serial.println("shutdown");
             writeLED5(HIGH);
             return;
         }
 
         if(tempWarningBlink_wait.isTimerExpired())
         {
-            
+            Serial.println("check");
             LED5_status = !LED5_status;
             writeLED5(LED5_status);
-        }
-
-        tempWarningBlink_wait.startTimer(1000);    
+            tempWarningBlink_wait.startTimer(1000);
+        } 
     }
 }
 

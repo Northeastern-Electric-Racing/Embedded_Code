@@ -9,7 +9,7 @@
 
 #include <nerduino.h>
 
-#define CRITICAL_CELLTEMP           10      //degrees celcius
+#define CRITICAL_CELLTEMP           40      //degrees celcius
 #define SHUTDOWN_CELLTEMP           55      //degrees celcius
 
 #define CRITICAL_SOC                20      //percentage

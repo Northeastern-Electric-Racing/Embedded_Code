@@ -80,7 +80,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	int16_t maxTorque = 0;
 
 	if (torqueBoostReady) {
-		maxTorque = MAXIMUM_TORQUE;
+		maxTorque = CONT_TORQUE;
 	} else {
 		maxTorque = CONT_TORQUE;
 	}
@@ -131,9 +131,9 @@ int16_t PEDALS::calcCLTorqueLimit()
 	int16_t calculated = 120;
 
 	if (motorSpeed < 500) {
-		calculated = 120;
+		calculated = 100;
 	} else {
-		calculated = (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / (motorSpeed + 1);
+		calculated = (0.9* (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent)) / (motorSpeed + 1);
 	}
 	
 	/*

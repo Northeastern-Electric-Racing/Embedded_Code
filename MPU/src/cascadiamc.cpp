@@ -79,6 +79,12 @@ void CASCADIAMC::changeTorque(uint16_t p_accelTorque)
 }
 
 
+uint16_t CASCADIAMC::getTorque()
+{
+    return mcMsg.config.accelTorque;
+}
+
+
 void CASCADIAMC::clearFault()
 {
     sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);

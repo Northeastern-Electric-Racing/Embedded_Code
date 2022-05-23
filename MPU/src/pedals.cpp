@@ -30,13 +30,15 @@ bool PEDALS::readAccel()
 	{
 		int accelPin1Val = analogRead(ACCEL1_PIN);
 		int accelPin2Val = analogRead(ACCEL2_PIN);
-		
+
+		// Iteratively narrow towards value
 		if(pedalDiff > abs(accelPin1Val-accelPin2Val))
 		{
 			pedalDiff = abs(accelPin1Val-accelPin2Val);
 			avgPedalVal = (accelPin1Val + accelPin2Val) / 2;
 		}
 
+		// Check for out of range values and errors
 		if (accelPin1Val == 0 ||
 			accelPin2Val == 0 ||
 			accelPin1Val == 1023 ||
@@ -61,14 +63,16 @@ bool PEDALS::readAccel()
 		appliedTorque = calcTorque(multiplier);
 		
 		// Serial.println(appliedTorque);
+		// Reset debounce and error checking params
 		pedalReading_debounce.startTimer(40);
+		accelErrors = 0;
 		pedalDiff = MAXIMUM_TORQUE;
 	}
 	motorController->changeTorque(appliedTorque);
 	//Serial.print("Acceleration:\t");
 	//Serial.println(appliedTorque / 10); // prints out applied torque
 
-	pedalReading_wait.startTimer(25);
+	pedalReading_wait.startTimer(15);
 
 	return accelFault;
 }
@@ -80,7 +84,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	int16_t maxTorque = 0;
 
 	if (torqueBoostReady) {
-		maxTorque = CONT_TORQUE;
+		maxTorque = MAXIMUM_TORQUE;
 	} else {
 		maxTorque = CONT_TORQUE;
 	}
@@ -89,7 +93,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	
 	int16_t torqueLim = 10 * calcCLTorqueLimit();
 
-	//scale torque if the BMS is leaving the boosting state
+	// Scale torque to match BMS current limit
 	if (pedalTorque > torqueLim) {
 		pedalTorque = torqueLim;
 	}
@@ -98,12 +102,10 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	if(pedalTorque >= MAXIMUM_TORQUE)
 	{
 		pedalTorque = MAXIMUM_TORQUE;
-		return pedalTorque;
 	}
-	if(pedalTorque < 0)
+	else if(pedalTorque < 0)
 	{
 		pedalTorque = 0;
-		return pedalTorque;
 	}
 
 	if ((pedalTorque > CONT_TORQUE) & torqueBoostReady) {
@@ -128,13 +130,13 @@ int16_t PEDALS::calcCLTorqueLimit()
 	int16_t dcCurrent = bms->getCurrentLimit();
 	int16_t motorSpeed = abs(motorController->getMotorSpeed());
 
-	int16_t calculated = 120;
+	int16_t calculated = 102;
 
-	if (motorSpeed < 500) {
+	/* if (motorSpeed < 500) {
 		calculated = 100;
-	} else {
+	} else {*/
 		calculated = (0.9* (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent)) / (motorSpeed + 1);
-	}
+	// }
 	
 	/*
 	Serial.print("Vdc: ");                                               

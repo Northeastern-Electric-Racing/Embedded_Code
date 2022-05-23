@@ -30,7 +30,7 @@ void MPU::driverioProcess()
     driverio.handleSSLED();
     driverio.handleReverseSwitch();
     driverio.handleErrorLights();
-    ioRead_wait.startTimer(100);
+    ioRead_wait.startTimer(10);
 }
 
 
@@ -42,8 +42,9 @@ void MPU::pedalsProcess()
     // {Serial.println("MOTOR NOT SPINNING");}
     // Serial.println("Pedals process...");
     pedals.readBrake();
-    isShutdown = isShutdown ? true : pedals.readAccel();
-    if(pedals.readAccel())
+    bool accelFault = pedals.readAccel();
+    isShutdown = isShutdown ? true : accelFault;
+    if(accelFault)
     {Serial.println("ACCEL FAULT");}
 }
 

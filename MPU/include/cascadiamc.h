@@ -93,6 +93,12 @@ class CASCADIAMC
         void changeTorque(uint16_t p_accelTorque);
 
         /**
+         * @brief Returns the acceleration torque from the MC message
+         *  
+         */
+        uint16_t getTorque();
+
+        /**
          * @brief Clears the Fault for Failing to Generate High Voltage
          * 
          */

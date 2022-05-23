@@ -55,7 +55,7 @@ void DRIVERIO::handleSSButton()
         ssButton_debounce.cancelTimer();
         return;
     }
-    if(ssButtonDebounced() && (motorController->getIsOn() || (!motorController->getIsOn() && !bms->getChargeMode())))
+    if(ssButtonDebounced() && (motorController->getIsOn() || (!motorController->getIsOn() && !motorController->checkFault())))
     {
         motorController->togglePower();    //Writes the power state of the motor to the MC message to be sent
         if(motorController->getIsOn())
@@ -113,7 +113,7 @@ void DRIVERIO::handleErrorLights()
     writeLED4(bms->isSoCCritical());
 
     //writeYLED(bms->isCharging() || bms->isBoosting());
-    writeYLED(motorController->getTorque());
+    writeYLED(motorController->getTorque() > 1020);
 
     if(bms->isAvgTempCritical())
     {

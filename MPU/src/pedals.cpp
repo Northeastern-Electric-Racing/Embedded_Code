@@ -81,17 +81,23 @@ bool PEDALS::readAccel()
 int16_t PEDALS::calcTorque(double torqueScale)
 {
 	int16_t pedalTorque = 0;
-	int16_t maxTorque = 0;
 
-	if (torqueBoostReady) {
-		maxTorque = MAXIMUM_TORQUE;
+	if (torqueBoostReady | torqueBoosting) {
+		pedalTorque = torqueScale * MAXIMUM_TORQUE;
 	} else {
-		maxTorque = CONT_TORQUE;
+		pedalTorque = torqueScale * CONT_TORQUE;
+		if (pedalTorque > CONT_TORQUE) {
+			pedalTorque = CONT_TORQUE;
+		}
 	}
-
-	pedalTorque = torqueScale * maxTorque;
 	
 	int16_t torqueLim = 10 * calcCLTorqueLimit();
+
+	/*
+	Serial.print("Pedal: ");
+	Serial.println(pedalTorque);
+	Serial.print("C Limit:");
+	Serial.println(torqueLim);*/
 
 	// Scale torque to match BMS current limit
 	if (pedalTorque > torqueLim) {
@@ -108,15 +114,20 @@ int16_t PEDALS::calcTorque(double torqueScale)
 		pedalTorque = 0;
 	}
 
+	/*
+	Serial.print("Boosting: ");
+	Serial.println(torqueBoosting);
+	Serial.print("Boost Ready: ");
+	Serial.println(torqueBoostReady);*/
+
 	if ((pedalTorque > CONT_TORQUE) & torqueBoostReady) {
-		torqueBoost_time.startTimer(3000);
+		torqueBoost_time.startTimer(1500);
 		torqueBoosting = true;
 		torqueBoostReady = false;
 	} else if (torqueBoost_time.isTimerExpired() & torqueBoosting) {
-		torqueBoost_cooldown.startTimer(15000);
+		torqueBoost_cooldown.startTimer(10000);
 		torqueBoosting = false;
-		torqueBoostReady = false;
-	} else if (torqueBoost_cooldown.isTimerExpired()) {
+	} else if (torqueBoost_cooldown.isTimerExpired() & !torqueBoosting) {
 		torqueBoostReady = true;
 	}
 
@@ -132,11 +143,11 @@ int16_t PEDALS::calcCLTorqueLimit()
 
 	int16_t calculated = 102;
 
-	/* if (motorSpeed < 500) {
-		calculated = 100;
-	} else {*/
-		calculated = (0.9* (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent)) / (motorSpeed + 1);
-	// }
+	calculated = (0.9 * (CL_TO_TOQRUE_CONST * (dcVoltage / 10) * dcCurrent)) / (motorSpeed + 1);
+
+	if (calculated < 0) {
+		calculated = MAXIMUM_TORQUE / 10;
+	}
 	
 	/*
 	Serial.print("Vdc: ");                                               
@@ -150,9 +161,9 @@ int16_t PEDALS::calcCLTorqueLimit()
 	Serial.print(calculated);
 
 	Serial.print(", ");
-	Serial.println(calculated);*/
+	Serial.println(calculated); */
 
-	return calculated;
+	return calculated * 10;
 }
 
 

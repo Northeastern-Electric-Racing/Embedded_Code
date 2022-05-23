@@ -87,6 +87,7 @@ uint16_t CASCADIAMC::getTorque()
 
 void CASCADIAMC::clearFault()
 {
+    Serial.println("RESET");
     sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
     isFaulted = false;
 }
@@ -96,7 +97,7 @@ void CASCADIAMC::raiseFault()
 {
     if (isFaulted == false) {
         Serial.println("CUCK");
-        delay(2000);
+        delay(1000);
     }
     isFaulted = true;
 }

@@ -87,8 +87,11 @@ uint16_t CASCADIAMC::getTorque()
 
 void CASCADIAMC::clearFault()
 {
-    Serial.println("RESET");
-    sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
+    int time = millis() + 250;
+    while(millis() < time) {
+        sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
+        delay(5);
+    }
     isFaulted = false;
 }
 

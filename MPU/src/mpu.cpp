@@ -121,7 +121,7 @@ void MPU::shutOffCar()
 
 void MPU::writeFaultLatch(bool status)
 {
-    digitalWrite(RELAY_PIN, 0);
+    digitalWrite(RELAY_PIN, status);
 }
 
 

@@ -119,7 +119,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	Serial.print("Boost Ready: ");
 	Serial.println(torqueBoostReady);*/
 
-	if ((pedalTorque > CONT_TORQUE) & torqueBoostReady) {
+	if ((pedalTorque > CONT_TORQUE) & torqueBoostReady & motorController->getIsOn()) {
 		torqueBoost_time.startTimer(3000);
 		torqueBoosting = true;
 		torqueBoostReady = false;

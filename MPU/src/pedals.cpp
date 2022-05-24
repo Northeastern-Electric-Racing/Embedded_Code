@@ -119,12 +119,12 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	Serial.print("Boost Ready: ");
 	Serial.println(torqueBoostReady);*/
 
-	if ((pedalTorque > CONT_TORQUE) & torqueBoostReady & motorController->getIsOn()) {
-		torqueBoost_time.startTimer(3000);
+	if ((pedalTorque > CONT_TORQUE) & torqueBoostReady) {
+		torqueBoost_time.startTimer(9000);
 		torqueBoosting = true;
 		torqueBoostReady = false;
 	} else if (torqueBoost_time.isTimerExpired() & torqueBoosting) {
-		torqueBoost_cooldown.startTimer(20000);
+		torqueBoost_cooldown.startTimer(3000);
 		torqueBoosting = false;
 	} else if (torqueBoost_cooldown.isTimerExpired() & !torqueBoosting) {
 		torqueBoostReady = true;
@@ -148,7 +148,6 @@ int16_t PEDALS::calcCLTorqueLimit()
 		calculated = MAXIMUM_TORQUE / 10;
 	}
 	
-	/*
 	Serial.print("Vdc: ");                                               
 	Serial.print(dcVoltage);
 	Serial.print(", Idc: ");
@@ -160,7 +159,7 @@ int16_t PEDALS::calcCLTorqueLimit()
 	Serial.print(calculated);
 
 	Serial.print(", ");
-	Serial.println(calculated);*/
+	Serial.println(10 * calculated);
 
 	return calculated * 10;
 }

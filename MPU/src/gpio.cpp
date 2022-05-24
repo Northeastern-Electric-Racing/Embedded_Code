@@ -21,14 +21,12 @@ bool GPIO::handleMCHVFault()
 {
     if(!digitalRead(SS_READY_SEN))
     {
-        //Serial.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         isSSPowerCycle = true;
         motorController->raiseFault();
         return false;
     }
     if (isSSPowerCycle && digitalRead(SS_READY_SEN) == HIGH)
     {
-        //Serial.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         motorController->clearFault();
         isSSPowerCycle = false;
         return true;

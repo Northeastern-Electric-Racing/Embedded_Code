@@ -62,7 +62,6 @@ bool PEDALS::readAccel()
 		double multiplier = ((double)flippedVal - 250)  / 650; // torque multiplier from 0 to 1;
 		appliedTorque = calcTorque(multiplier);
 		
-		// Serial.println(appliedTorque);
 		// Reset debounce and error checking params
 		pedalReading_debounce.startTimer(40);
 		accelErrors = 0;
@@ -194,49 +193,4 @@ void PEDALS::readBrake()
 
 		brakeReading_debounce.startTimer(250);
 	}
-
-	/*if(!brakeReading_debounce.isTimerExpired())
-	{
-		int brake1Val = analogRead(BRAKE1_PIN);	//rear
-		int brake2Val = analogRead(BRAKE2_PIN); //front
-		
-		Serial.print("brake1:\t");
-		Serial.println(brake1Val);
-		Serial.print("brake2:\t");
-		Serial.println(brake2Val);
-		Serial.println();
-		
-		int avgBrakeVal_tmp = (brake1Val > brake2Val) ? brake1Val : brake2Val;
-
-		if(avgBrakeVal_tmp > avgBrakeVal)
-		{
-			avgBrakeVal = avgBrakeVal_tmp;
-		}
-	}
-	else
-	{
-		//Serial.println(avgBrakeVal);
-		if(avgBrakeVal > ANALOG_BRAKE_THRESH)
-		{
-			brakePressed = true;
-		}
-		// if brake is not being pressed, toggle brakePressed variable
-		else
-		{
-			brakePressed = false;
-		}
-		brakeReading_debounce.startTimer(300);
-		avgBrakeVal = 0;
-	}
-	if(brakePressed)
-	{
-		digitalWrite(BRAKELIGHT_PIN, HIGH);
-		brakeLight_wait.startTimer(200);
-		Serial.println("ON");
-	}
-	if(brakeLight_wait.isTimerExpired())
-	{
-		digitalWrite(BRAKELIGHT_PIN,LOW);
-		Serial.println("OFF");
-	}*/
 }

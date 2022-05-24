@@ -98,7 +98,6 @@ void MPU::CANLineVerified()
 
 void MPU::checkShutdownStatus()
 {
-    // Serial.println(isShutdown);
     if(isShutdown)
     {
         shutOffCar();
@@ -122,7 +121,7 @@ void MPU::shutOffCar()
 
 void MPU::writeFaultLatch(bool status)
 {
-    digitalWrite(RELAY_PIN, 1); // TEMP TODO: remove
+    digitalWrite(RELAY_PIN, 0);
 }
 
 

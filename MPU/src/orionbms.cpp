@@ -69,8 +69,6 @@ void ORIONBMS::setBoosting()
 
 bool ORIONBMS::isBoosting()
 {
-    //TEMP
-    // return !boosting_time.isTimerExpired();
     return currentDraw > (currentLimit + 1);
 }
 

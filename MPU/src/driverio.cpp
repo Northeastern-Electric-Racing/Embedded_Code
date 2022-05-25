@@ -73,7 +73,7 @@ void DRIVERIO::handleSSButton()
     }
     if(digitalRead(SS_BUTT_PIN) && powerToggle_wait.isTimerExpired()) // If pressed and no timer
     {
-        ssButton_debounce.startTimer(25);
+        ssButton_debounce.startTimer(50);
     }
 }
 
@@ -117,7 +117,6 @@ void DRIVERIO::handleErrorLights()
 
     if(bms->isAvgTempCritical())
     {
-        
         if(bms->isAvgTempShutdown())
         {
             Serial.println("shutdown");

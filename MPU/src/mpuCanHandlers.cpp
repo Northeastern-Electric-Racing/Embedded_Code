@@ -55,6 +55,8 @@ void canHandler_CANMSG_MOTORMOTION(const CAN_message_t &msg)
 {
     //angular motor speed is found at bytes 2 and 3
     int16_t motorSpeed = ((msg.buf[3] << 8) | msg.buf[2]) / 10;
+    Serial.print("Motorspeed: ");
+    Serial.println(motorSpeed);
     mpu.setMotorSpeed(motorSpeed);
 }
 
@@ -66,6 +68,8 @@ void canHandler_CANMSG_BMSCHARGINGSTATE(const CAN_message_t &msg)
 void canHandler_CANMSG_MOTORETEMP3(const CAN_message_t &msg)
 {
     int16_t motorTemp = (msg.buf[5] << 8) | msg.buf[4];
+    Serial.print("MotorTemp: ");
+    Serial.println(motorTemp / 10);
     mpu.setMotorTemp(motorTemp);
 }
 
@@ -78,6 +82,8 @@ void canHandler_CANMSG_BMSCURRENTS(const CAN_message_t &msg)
     mpu.setChargeCurrentLimit(chargeCurrentLimit);
     int16_t currentDraw = (msg.buf[4] << 8) | msg.buf[5];
     mpu.bmsCurrentProcess(currentDraw);
+    Serial.print("CurrentDraw: ");
+    Serial.println(currentDraw);
     //Serial.println(dischargeCurrentLimit);
     //6 and 7 are rolling avg current
 }

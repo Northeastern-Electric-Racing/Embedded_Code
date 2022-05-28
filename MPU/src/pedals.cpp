@@ -92,11 +92,6 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	
 	int16_t torqueLim = calcCLTorqueLimit();
 
-	/*Serial.print("Pedal: ");
-	Serial.println(pedalTorque);
-	Serial.print("C Limit:");
-	Serial.println(torqueLim);*/
-
 	// Scale torque to match BMS current limit
 	if (pedalTorque > torqueLim) {
 		pedalTorque = torqueLim;
@@ -123,11 +118,16 @@ int16_t PEDALS::calcTorque(double torqueScale)
 		torqueBoosting = true;
 		torqueBoostReady = false;
 	} else if (torqueBoost_time.isTimerExpired() & torqueBoosting) {
-		torqueBoost_cooldown.startTimer(0);
+		torqueBoost_cooldown.startTimer(1);
 		torqueBoosting = false;
 	} else if (torqueBoost_cooldown.isTimerExpired() & !torqueBoosting) {
 		torqueBoostReady = true;
 	}
+
+	Serial.print("Pedal: ");
+	Serial.println(pedalTorque);
+	Serial.print("C Limit:");
+	Serial.println(torqueLim);
 
 	return pedalTorque;
 }
@@ -141,7 +141,8 @@ int16_t PEDALS::calcCLTorqueLimit()
 
 	int16_t calculated = 102;
 
-	calculated = (0.9 * (CL_TO_TOQRUE_CONST * (dcVoltage / 10) * dcCurrent)) / (motorSpeed + 1);
+	//calculated = (0.9 * (CL_TO_TOQRUE_CONST * (dcVoltage / 10) * dcCurrent)) / (motorSpeed + 1);
+	calculated = (0.9 * (CL_TO_TOQRUE_CONST * (dcVoltage / 10) * dcCurrent)) / (500 + 1);
 
 	if ((calculated < 0) | (calculated > (MAXIMUM_TORQUE / 10))) {
 		calculated = MAXIMUM_TORQUE / 10;

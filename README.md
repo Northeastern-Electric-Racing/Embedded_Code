@@ -1,5 +1,5 @@
 # Embedded_Code
-Contains all the code for the embedded systems found within the car as of the 2022 competition
+Contains all the code for the embedded systems found within the car as of the 2023 competition
 
 Built off of the [NERduino](https://github.com/Northeastern-Electric-Racing/NERduino) library
 

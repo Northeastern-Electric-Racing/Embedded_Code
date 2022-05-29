@@ -19,7 +19,8 @@
 #define BRAKELIGHT_PIN              4
 
 // motor torque constants
-#define MAXIMUM_TORQUE              2300    // in Nm x 10 (ex: 123 = 12.3Nm)
+#define MAXIMUM_TORQUE              2220    // in Nm x 10 (ex: 123 = 12.3Nm)
+#define CONT_TORQUE                 1020    // ' '
 #define POT_LOWER_BOUND             35      // a pot value from 0 to 1023
 #define POT_UPPER_BOUND             1023    // a pot value from 0 to 1023
 
@@ -31,11 +32,14 @@
 #define MAX_BRAKE_ERRORS            5
 #define MAX_ACCEL_ERRORS            5
 
-#define ACCELERATOR_ERROR_PER       0.05
+#define ACCELERATOR_ERROR_PER       0.10
 
 #define LEAVING_BOOST_TORQUE_SCALE  0.9
 
 #define CL_TO_TOQRUE_CONST          7.84    //constant for calculating the current limited torque
+
+#define ANALOG_BRAKE_THRESH         185
+#define MAXIMUM_BRAKE               255
 
 class PEDALS
 {
@@ -51,24 +55,48 @@ class PEDALS
         Timer brakeReading_debounce;
         Timer pedalReading_wait;
         Timer pedalReading_debounce;
+        Timer brakeLight_wait;
+        Timer torqueBoost_time;
+        Timer torqueBoost_cooldown;
 
         int16_t clTorque; //Torque limit determined by current limit
 
         uint8_t accelErrors = 0;
         bool accelFault = false;
 
+        uint16_t pedalDiff = MAXIMUM_TORQUE;
+		int16_t avgPedalVal;
+
+        uint16_t brakeDiff = 0;
+        int16_t avgBrakeVal;
+
+        int16_t appliedTorque = 0; // applied motor torque
+
+        int16_t prev1 = 0;
+        int16_t prev2 = 0;
+
+        bool torqueBoostReady = false;
+        bool torqueBoosting = false;
+
         /**
          * @brief Calculates what torque to send to the motor controller
          * 
          */
-        void calcTorque(double torqueScale, int16_t &appliedTorque);
+        int16_t calcTorque(double torqueScale);
 
         /**
-         * @brief Calculates the torque limit based on the BMS's calculated current limit
+         * @brief Calculates the torque limit based on the BMS's calculated discharge current limit
+         * 
+         * @return int16_t
+         */
+        int16_t calcCLTorqueLimit();
+
+        /**
+         * @brief calculates the regen charge limit based on the BMS's calculated charge current limit
          * 
          * @return int16_t 
          */
-        int16_t calcCLTorqueLimit();
+        int16_t calcCLRegenLimit();
 
     public:
         PEDALS();

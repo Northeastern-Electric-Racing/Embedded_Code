@@ -10,8 +10,11 @@ MPU::MPU()
 
     ioRead_wait.cancelTimer();
     canTest_wait.cancelTimer();
+    spinningCheck_wait.cancelTimer();
+    boosting_debounce.cancelTimer();
+
     pinMode(RELAY_PIN, OUTPUT);
-    digitalWrite(RELAY_PIN, HIGH);
+    writeFaultLatch(FAULT_OK);
 }
 
 
@@ -27,24 +30,34 @@ void MPU::driverioProcess()
     driverio.handleSSLED();
     driverio.handleReverseSwitch();
     driverio.handleErrorLights();
-    ioRead_wait.startTimer(100);
+    ioRead_wait.startTimer(10);
 }
 
 
 void MPU::pedalsProcess()
 {
+    //isShutdown = isShutdown ? true : !verifyMotorSpinning();
+    // TEMP TODO: reimplement
+    // if(!verifyMotorSpinning())
+    // {Serial.println("MOTOR NOT SPINNING");}
     // Serial.println("Pedals process...");
     pedals.readBrake();
-    isShutdown = pedals.readAccel();
+    bool accelFault = pedals.readAccel();
+    isShutdown = isShutdown ? true : accelFault;
+    if(accelFault)
+    {Serial.println("ACCEL FAULT");}
 }
 
 
 void MPU::gpioProcess()
 {
-    gpio.handleMCHVFault();
+    bool faultReset = gpio.handleMCHVFault();
     gpio.handlePump();
     gpio.handleRadiatorFan();
-    isShutdown = isCANLineOK();
+
+    isShutdown = isShutdown ? true : !isCANLineOK();
+    if(!isCANLineOK())
+    {Serial.println("CAN FAULT");}
 }
 
 
@@ -68,13 +81,18 @@ void MPU::setBMSSoC(uint8_t p_soc)
 
 bool MPU::isCANLineOK()
 {
-    return !canTest_wait.isTimerExpired();
+    if(canTest_wait.isTimerExpired() && (digitalRead(SS_READY_SEN) == HIGH))
+    {
+        Serial.println("CAN FUCKED@$#^!$^@$#&");
+        return false;
+    }
+    return true;
 }
 
 
 void MPU::CANLineVerified()
 {
-    canTest_wait.startTimer(500);
+    canTest_wait.startTimer(1000);
 }
 
 
@@ -95,14 +113,15 @@ void MPU::shutOffCar()
 {
     writeFaultLatch(TRIGGER_FAULT);
     motorController.emergencyShutdown();
-    delay(5000);
+    Serial.println("Shutting off Car!!!!!");
+    while(1){}
     writeFaultLatch(FAULT_OK);
 }
 
 
 void MPU::writeFaultLatch(bool status)
 {
-    digitalWrite(RELAY_PIN, !status);
+    digitalWrite(RELAY_PIN, status);
 }
 
 
@@ -112,14 +131,34 @@ void MPU::setCurrentLimit(uint16_t currentLimit)
 }
 
 
+void MPU::setChargeCurrentLimit(uint16_t currentLimit)
+{
+    bms.setChargeCurrentLimit(currentLimit);
+}
+
+
 void MPU::bmsCurrentProcess(int16_t currentDraw)
 {
     bms.setCurrentDraw(currentDraw);
 
-    if(bms.isCurrentPastLimit())
+    if(!boosting_debounce.isTimerExpired())
+    {
+        if(!bms.isCurrentPastLimit())
+        {
+            boosting_debounce.cancelTimer();
+        }
+    }
+
+    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired() && !boosting_debounce.isTimerReset())
     {
         bms.setBoosting();
     }
+
+    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired())
+    {
+        boosting_debounce.startTimer(100);
+    }
+
 }
 
 
@@ -146,3 +185,17 @@ void MPU::setMotorTemp(int16_t temp)
     motorController.setRadiatorTemp(temp);
 }
 
+bool MPU::verifyMotorSpinning()
+{
+    if(motorController.shouldMotorBeSpinning() && motorController.getIsOn())
+    {
+        if(motorController.isMotorMoving())
+        {
+            spinningCheck_wait.startTimer(5000);
+        }
+        if(spinningCheck_wait.isTimerExpired()) {
+            return false;
+        }
+    }
+    return true;
+}

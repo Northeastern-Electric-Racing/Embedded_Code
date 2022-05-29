@@ -79,15 +79,29 @@ void CASCADIAMC::changeTorque(uint16_t p_accelTorque)
 }
 
 
+uint16_t CASCADIAMC::getTorque()
+{
+    return mcMsg.config.accelTorque;
+}
+
+
 void CASCADIAMC::clearFault()
 {
-    sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
+    int time = millis() + 250;
+    while(millis() < time) {
+        sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
+        delay(5);
+    }
     isFaulted = false;
 }
 
 
 void CASCADIAMC::raiseFault()
 {
+    if (isFaulted == false) {
+        Serial.println("CUCK");
+        delay(1000);
+    }
     isFaulted = true;
 }
 
@@ -114,6 +128,12 @@ void CASCADIAMC::setMotorSpeed(int16_t p_motorSpeed)
 bool CASCADIAMC::isMotorMoving()
 {
     return abs(motorSpeed) > 0;
+}
+
+
+bool CASCADIAMC::shouldMotorBeSpinning()
+{
+    return mcMsg.config.accelTorque > NOT_SPINNING_TORQUE_LIMIT;
 }
 
 

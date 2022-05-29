@@ -9,12 +9,12 @@
 
 #include <nerduino.h>
 
-#define CRITICAL_CELLTEMP           45      //degrees celcius
+#define CRITICAL_CELLTEMP           40      //degrees celcius
 #define SHUTDOWN_CELLTEMP           55      //degrees celcius
 
-#define CRITICAL_SOC                10      //percentage
+#define CRITICAL_SOC                20      //percentage
 
-#define BOOSTING_TIME_LIMIT         1000    //milliseconds
+#define BOOSTING_TIME_LIMIT         950    //milliseconds
 #define BOOSTING_EXIT_TIME          100     //milliseconds (Time for system to adjust to leaving boost state)
 #define BOOSTING_RECHARGE_TIME      60000   //milliseconds (Time for the BMS to be allowed into a boost state again)
 
@@ -30,6 +30,7 @@ class ORIONBMS
         uint8_t SoC;
         uint8_t avgTemp;
         uint16_t currentLimit;
+        uint16_t chargeCurrentLimit;
         int16_t currentDraw;
         int16_t liveVoltage;
 
@@ -147,11 +148,25 @@ class ORIONBMS
         void setCurrentLimit(uint16_t p_currentLimit);
 
         /**
+         * @brief Set the Charge Current Limit 
+         * 
+         * @param p_chargeCurrentLimit 
+         */
+        void setChargeCurrentLimit(uint16_t p_chargeCurrentLimit);
+
+        /**
          * @brief Get the Current Limit of the BMS
          * 
          * @return uint16_t 
          */
         uint16_t getCurrentLimit();
+
+        /**
+         * @brief Get the Charge Current Limit
+         * 
+         * @return uint16_t 
+         */
+        uint16_t getChargeCurrentLimit();
 
         /**
          * @brief Set the current draw

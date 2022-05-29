@@ -18,6 +18,9 @@ DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
     pinMode(LED5_PIN, OUTPUT);
     digitalWrite(LED5_PIN, LOW);
 
+    pinMode(YLED_PIN, OUTPUT);
+    digitalWrite(YLED_PIN, LOW);
+
     pinMode(SPEAKER_PIN, OUTPUT);
     digitalWrite(SPEAKER_PIN, HIGH);
 
@@ -36,44 +39,50 @@ DRIVERIO::~DRIVERIO(){}
 
 void DRIVERIO::handleSSButton()
 {
-    if(digitalRead(SS_BUTT_PIN) && powerToggle_wait.isTimerExpired()) // If pressed and no timer
+    //if the button is still being held during and after the timer runs out, then toggle power
+    if(!ssButton_debounce.isTimerExpired())
     {
-        ssButton_debounce.startTimer(50);
-
-        //if the button is still being held during and after the timer runs out, then toggle power
-        while(!ssButton_debounce.isTimerExpired())
+        if(!digitalRead(SS_BUTT_PIN)) // If released
         {
-            if(!digitalRead(SS_BUTT_PIN)) // If released
-            {
-                ssButton_debounce.cancelTimer();
-                break;
-            }
+            ssButton_debounce.cancelTimer();
         }
-        if(bms->getChargeMode() && digitalRead(SS_BUTT_PIN))
-        {
-            bms->toggleAIR();
-            return;
-        }
-        if(digitalRead(SS_BUTT_PIN) && (motorController->getIsOn() || (!motorController->getIsOn() && !motorController->checkFault())))
-        {
-            motorController->togglePower();    //Writes the power state of the motor to the MC message to be sent
-            if(motorController->getIsOn())
-            {
-                writeSpeaker(HIGH);
-                speaker_wait.startTimer(1500);
-            }
-            powerToggle_wait.startTimer(1000);
-#ifdef DEBUG
-            Serial.println("***********************Toggling Power**********************");
-#endif
-        }
+        return;
     }
-
+    if(ssButtonDebounced() && bms->getChargeMode())
+    {
+        bms->toggleAIR();
+        powerToggle_wait.startTimer(1500);
+        ssButton_debounce.cancelTimer();
+        return;
+    }
+    if(ssButtonDebounced() && (motorController->getIsOn() || (!motorController->getIsOn() && !motorController->checkFault())))
+    {
+        motorController->togglePower();    //Writes the power state of the motor to the MC message to be sent
+        if(motorController->getIsOn())
+        {
+            writeSpeaker(HIGH);
+            speaker_wait.startTimer(1500);
+        }
+        powerToggle_wait.startTimer(1500);
+        ssButton_debounce.cancelTimer();
+        return;
+    }
     if(speaker_wait.isTimerExpired())
     {
         writeSpeaker(LOW);
     }
+    if(digitalRead(SS_BUTT_PIN) && powerToggle_wait.isTimerExpired()) // If pressed and no timer
+    {
+        ssButton_debounce.startTimer(50);
+    }
 }
+
+
+bool DRIVERIO::ssButtonDebounced()
+{
+    return (digitalRead(SS_BUTT_PIN) && ssButton_debounce.isTimerExpired() && !ssButton_debounce.isTimerReset());
+}
+
 
 void DRIVERIO::handleSSLED()
 {
@@ -90,48 +99,39 @@ void DRIVERIO::handleSSLED()
 
 void DRIVERIO::handleReverseSwitch()
 {
-    Serial.print("Switch State:\t");
-    Serial.println(motorController->getDirection());
+    //Serial.print("Switch State:\t");
+    //Serial.println(motorController->getDirection());
     if(digitalRead(REVERSE_SW_PIN) != motorController->getDirection())
     {
         motorController->toggleDirection();    //writes the direction of the motor to the MC message to be sent
-
-#ifdef DEBUG
-        Serial.println("~~~~~~~~~~~~~~~~~~~~Switching Direction~~~~~~~~~~~~~~~~~~~~~~~~");
-#endif
     }
-#ifdef DEBUG
-    Serial.println(motorController->getDirection() ? "Forward" : "Reverse");
-#endif
 }
 
 
 void DRIVERIO::handleErrorLights()
 {
     writeLED4(bms->isSoCCritical());
-    if(bms->isSoCCritical())
-    {
-        Serial.println("SOC Critical");
-    }
 
-    writeYLED(bms->isCharging());
-
-    if(tempWarningBlink_wait.isTimerExpired())
-    {
-        writeLED5(LOW);
-    }
+    //writeYLED(bms->isCharging() || bms->isBoosting());
+    writeYLED(((motorController->getTorque() > 1020) && motorController->getIsOn()) || bms->isCharging());
 
     if(bms->isAvgTempCritical())
     {
         if(bms->isAvgTempShutdown())
         {
+            Serial.println("shutdown");
             writeLED5(HIGH);
             return;
         }
-        writeLED5(HIGH);
-        tempWarningBlink_wait.startTimer(500);
-    }
 
+        if(tempWarningBlink_wait.isTimerExpired())
+        {
+            Serial.println("check");
+            LED5_status = !LED5_status;
+            writeLED5(LED5_status);
+            tempWarningBlink_wait.startTimer(1000);
+        } 
+    }
 }
 
 

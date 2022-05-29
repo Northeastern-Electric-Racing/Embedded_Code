@@ -22,9 +22,12 @@ class MPU
         ORIONBMS bms;
         
         bool isShutdown = false;
+        bool ssReady = false;
 
         Timer ioRead_wait;
         Timer canTest_wait;
+        Timer spinningCheck_wait;
+        Timer boosting_debounce;
 
         enum
         {
@@ -45,6 +48,7 @@ class MPU
         * 
         */
         void shutOffCar();
+        
 
     public:
         MPU();
@@ -112,6 +116,13 @@ class MPU
         void setCurrentLimit(uint16_t currentLimit);
 
         /**
+         * @brief Set the Charge Current Limit for the BMS
+         * 
+         * @param currentLimit 
+         */
+        void setChargeCurrentLimit(uint16_t currentLimit);
+
+        /**
          * @brief Sets the current draw and also puts the BMS into boost mode if the current exceeds the current limit
          * 
          */
@@ -142,6 +153,14 @@ class MPU
          * @param temp 
          */
         void setMotorTemp(int16_t temp);
+
+        /**
+         * @brief Make sure the motor is spinning if we send a motor torque command
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool verifyMotorSpinning();
 };
 
 extern MPU mpu;

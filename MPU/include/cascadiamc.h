@@ -6,10 +6,11 @@
 #ifndef CASCADIAMC_H
 #define CASCADIAMC_H
 
-#define CAN_CMD_DELAY 10 // ms
+#define CAN_CMD_DELAY 5 // ms
 
 #include <nerduino.h>
 
+#define NOT_SPINNING_TORQUE_LIMIT   1500
 
 class CASCADIAMC
 {
@@ -92,6 +93,12 @@ class CASCADIAMC
         void changeTorque(uint16_t p_accelTorque);
 
         /**
+         * @brief Returns the acceleration torque from the MC message
+         *  
+         */
+        uint16_t getTorque();
+
+        /**
          * @brief Clears the Fault for Failing to Generate High Voltage
          * 
          */
@@ -128,6 +135,14 @@ class CASCADIAMC
          * @return false 
          */
         bool isMotorMoving();
+
+        /**
+         * @brief Sees if the commanded motor torque is 0
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool shouldMotorBeSpinning();
 
         /**
          * @brief Get the Motor Speed

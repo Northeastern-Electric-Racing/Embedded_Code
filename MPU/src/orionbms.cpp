@@ -38,7 +38,7 @@ uint8_t ORIONBMS::getSoC()
 
 bool ORIONBMS::isSoCCritical()
 {
-    return (SoC / 200) < CRITICAL_SOC;
+    return SoC < CRITICAL_SOC;
 }
 
 
@@ -61,15 +61,15 @@ bool ORIONBMS::isAvgTempShutdown()
 
 void ORIONBMS::setBoosting()
 {
+    if(!isBoostReady()){return;}
     boosting_time.startTimer(BOOSTING_TIME_LIMIT);
-    boosting_warningTime.startTimer(BOOSTING_TIME_LIMIT - BOOSTING_EXIT_TIME);
     boostRecharge_wait.startTimer(BOOSTING_TIME_LIMIT + BOOSTING_RECHARGE_TIME);
 }
 
 
 bool ORIONBMS::isBoosting()
 {
-    return !boosting_time.isTimerExpired();
+    return currentDraw > (currentLimit + 1);
 }
 
 
@@ -90,10 +90,21 @@ void ORIONBMS::setCurrentLimit(uint16_t p_currentLimit)
     currentLimit = p_currentLimit;
 }
 
+void ORIONBMS::setChargeCurrentLimit(uint16_t p_chargeCurrentLimit)
+{
+    chargeCurrentLimit = p_chargeCurrentLimit;
+}
+
 
 uint16_t ORIONBMS::getCurrentLimit()
 {
     return currentLimit;
+}
+
+
+uint16_t ORIONBMS::getChargeCurrentLimit()
+{
+    return chargeCurrentLimit;
 }
 
 
@@ -129,7 +140,7 @@ int16_t ORIONBMS::getLiveVoltage()
 
 void ORIONBMS::enableChargingMode()
 {
-    isInChargeMode.startTimer(1000);
+    isInChargeMode.startTimer(2000);
 }
 
 

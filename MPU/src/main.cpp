@@ -14,11 +14,16 @@ void setup()
     config.trigger = 5;         /* in seconds, 0->128 */
     config.timeout = 15;        /* in seconds, 0->128 */
     wdt.begin(config);
+
     pedals = PEDALS(&motorController, &bms);
     driverio = DRIVERIO(&motorController, &bms);
     gpio = GPIO(&motorController, &bms);
     pinMode(RELAY_PIN, OUTPUT);
     writeFaultLatch(FAULT_OK);
+
+    canTest_wait.cancelTimer();
+    boosting_debounce.cancelTimer();
+    spinningCheck_wait.cancelTimer();
     
     bool isShutdown = false;
     delay(2000);
@@ -27,10 +32,10 @@ void setup()
 void loop()
 {
     myCan.events();
-    mpu.gpioProcess();
-    mpu.driverioProcess();
-    mpu.pedalsProcess();
+    gpioProcess();
+    driverioProcess();
+    pedalsProcess();
     motorController.writeMCState();
-    mpu.checkShutdownStatus();
+    checkShutdownStatus();
     wdt.feed();
 }

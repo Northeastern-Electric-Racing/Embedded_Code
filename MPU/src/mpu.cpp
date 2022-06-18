@@ -1,3 +1,4 @@
+#include "mpu.h"
 
 void driverioProcess()
 {  
@@ -6,7 +7,6 @@ void driverioProcess()
     driverio.handleSSLED();
     driverio.handleReverseSwitch();
     driverio.handleErrorLights();
-    ioRead_wait.startTimer(10);
 }
 
 
@@ -20,8 +20,7 @@ void pedalsProcess()
     pedals.readBrake();
     bool accelFault = pedals.readAccel();
     isShutdown = isShutdown ? true : accelFault;
-    if(accelFault)
-    {Serial.println("ACCEL FAULT");}
+    if(accelFault){Serial.println("ACCEL FAULT");}
 }
 
 
@@ -32,8 +31,7 @@ void gpioProcess()
     gpio.handleRadiatorFan();
 
     isShutdown = isShutdown ? true : !isCANLineOK();
-    if(!isCANLineOK())
-    {Serial.println("CAN FAULT");}
+    if(!isCANLineOK()){Serial.println("CAN FAULT");}
 }
 
 bool isCANLineOK()

@@ -8,6 +8,7 @@
 /***************************************************************************/
 /**
  * CAN Handlers specific to MPU
+ * Functions are called in /lib/NERduino/canMsgHandler.cpp
  * @note Motor Controller is little Endian
  */
 /***************************************************************************/
@@ -41,7 +42,7 @@ void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
 
 void canHandler_CANMSG_BMSCURRENTLIMITS(const CAN_message_t &msg)
 {
-    mpu.CANLineVerified();
+    CANLineVerified();
     /*
     uint16_t dischargeCurrentLimit = (msg.buf[1] << 8) | msg.buf[0];
     mpu.setCurrentLimit(dischargeCurrentLimit);
@@ -71,7 +72,7 @@ void canHandler_CANMSG_MOTORETEMP3(const CAN_message_t &msg)
 
 void canHandler_CANMSG_BMSCURRENTS(const CAN_message_t &msg)
 {
-    mpu.CANLineVerified();
+    CANLineVerified();
 
     uint16_t dischargeCurrentLimit = (msg.buf[0] << 8) | msg.buf[1];
     bms.setCurrentLimit(dischargeCurrentLimit);

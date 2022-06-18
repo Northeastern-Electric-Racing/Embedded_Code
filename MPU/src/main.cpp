@@ -5,9 +5,6 @@
  */
 #include <nerduino.h>
 #include "mpu.h"
-#include "Watchdog_t4.h"
-
-WDT_T4<WDT1> wdt;
 
 void setup()
 {
@@ -17,6 +14,13 @@ void setup()
     config.trigger = 5;         /* in seconds, 0->128 */
     config.timeout = 15;        /* in seconds, 0->128 */
     wdt.begin(config);
+    pedals = PEDALS(&motorController, &bms);
+    driverio = DRIVERIO(&motorController, &bms);
+    gpio = GPIO(&motorController, &bms);
+    pinMode(RELAY_PIN, OUTPUT);
+    writeFaultLatch(FAULT_OK);
+    
+    bool isShutdown = false;
     delay(2000);
 }
 
@@ -26,7 +30,7 @@ void loop()
     mpu.gpioProcess();
     mpu.driverioProcess();
     mpu.pedalsProcess();
-    mpu.sendMCMsg();
+    motorController.writeMCState();
     mpu.checkShutdownStatus();
     wdt.feed();
 }

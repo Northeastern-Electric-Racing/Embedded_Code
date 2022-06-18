@@ -1,30 +1,6 @@
-#include "mpu.h"
 
-MPU mpu;
-
-MPU::MPU()
-{
-    pedals = PEDALS(&motorController, &bms);
-    driverio = DRIVERIO(&motorController, &bms);
-    gpio = GPIO(&motorController, &bms);
-
-    ioRead_wait.cancelTimer();
-    canTest_wait.cancelTimer();
-    spinningCheck_wait.cancelTimer();
-    boosting_debounce.cancelTimer();
-
-    pinMode(RELAY_PIN, OUTPUT);
-    writeFaultLatch(FAULT_OK);
-}
-
-
-MPU::~MPU(){}
-
-
-void MPU::driverioProcess()
-{
-    if(!ioRead_wait.isTimerExpired()){return;}
-    
+void driverioProcess()
+{  
     // Serial.println("DriverIO process...");
     driverio.handleSSButton();
     driverio.handleSSLED();
@@ -34,7 +10,7 @@ void MPU::driverioProcess()
 }
 
 
-void MPU::pedalsProcess()
+void pedalsProcess()
 {
     //isShutdown = isShutdown ? true : !verifyMotorSpinning();
     // TEMP TODO: reimplement
@@ -49,7 +25,7 @@ void MPU::pedalsProcess()
 }
 
 
-void MPU::gpioProcess()
+void gpioProcess()
 {
     bool faultReset = gpio.handleMCHVFault();
     gpio.handlePump();
@@ -60,26 +36,7 @@ void MPU::gpioProcess()
     {Serial.println("CAN FAULT");}
 }
 
-
-void MPU::sendMCMsg()
-{
-    motorController.writeMCState();
-}
-
-
-void MPU::setBMSAvgTemp(uint8_t p_avgTemp)
-{
-    bms.setAvgTemp(p_avgTemp);
-}
-
-
-void MPU::setBMSSoC(uint8_t p_soc)
-{
-    bms.setSoC(p_soc);
-}
-
-
-bool MPU::isCANLineOK()
+bool isCANLineOK()
 {
     if(canTest_wait.isTimerExpired() && (digitalRead(SS_READY_SEN) == HIGH))
     {
@@ -90,13 +47,13 @@ bool MPU::isCANLineOK()
 }
 
 
-void MPU::CANLineVerified()
+void CANLineVerified()
 {
     canTest_wait.startTimer(1000);
 }
 
 
-void MPU::checkShutdownStatus()
+void checkShutdownStatus()
 {
     if(isShutdown)
     {
@@ -109,7 +66,7 @@ void MPU::checkShutdownStatus()
 }
 
 
-void MPU::shutOffCar()
+void shutOffCar()
 {
     writeFaultLatch(TRIGGER_FAULT);
     motorController.emergencyShutdown();
@@ -119,25 +76,14 @@ void MPU::shutOffCar()
 }
 
 
-void MPU::writeFaultLatch(bool status)
+void writeFaultLatch(bool status)
 {
     digitalWrite(RELAY_PIN, status);
 }
 
 
-void MPU::setCurrentLimit(uint16_t currentLimit)
-{
-    bms.setCurrentLimit(currentLimit);
-}
 
-
-void MPU::setChargeCurrentLimit(uint16_t currentLimit)
-{
-    bms.setChargeCurrentLimit(currentLimit);
-}
-
-
-void MPU::bmsCurrentProcess(int16_t currentDraw)
+void bmsCurrentProcess(int16_t currentDraw)
 {
     bms.setCurrentDraw(currentDraw);
 
@@ -161,31 +107,7 @@ void MPU::bmsCurrentProcess(int16_t currentDraw)
 
 }
 
-
-void MPU::setMotorSpeed(int16_t motorSpeed)
-{
-    motorController.setMotorSpeed(motorSpeed);
-}
-
-
-void MPU::enableBMSChargingMode()
-{
-    bms.enableChargingMode();
-}
-
-
-void MPU::setBMSVoltage(int16_t voltage)
-{
-    bms.setLiveVoltage(voltage);
-}
-
-
-void MPU::setMotorTemp(int16_t temp)
-{
-    motorController.setRadiatorTemp(temp);
-}
-
-bool MPU::verifyMotorSpinning()
+bool verifyMotorSpinning()
 {
     if(motorController.shouldMotorBeSpinning() && motorController.getIsOn())
     {

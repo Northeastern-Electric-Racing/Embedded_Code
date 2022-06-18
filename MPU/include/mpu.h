@@ -11,6 +11,21 @@
 #include "gpio.h"
 #include "pedals.h"
 #include "orionbms.h"
+#include "Watchdog_t4.h"
+
+enum
+{
+    TRIGGER_FAULT,
+    FAULT_OK
+};
+
+DRIVERIO driverio;
+GPIO gpio;
+PEDALS pedals;
+CASCADIAMC motorController;
+ORIONBMS bms;
+
+WDT_T4<WDT1> wdt;
 
 class MPU
 {

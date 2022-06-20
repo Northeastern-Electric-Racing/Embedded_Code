@@ -19,20 +19,20 @@ enum
     FAULT_OK
 };
 
-DRIVERIO driverio;
-GPIO gpio;
-PEDALS pedals;
-CASCADIAMC motorController;
-ORIONBMS bms;
+extern DRIVERIO driverio;
+extern GPIO gpio;
+extern PEDALS pedals;
+extern CASCADIAMC motorController;
+extern ORIONBMS bms;
 
-WDT_T4<WDT1> wdt;
+extern WDT_T4<WDT1> wdt;
 
-bool isShutdown = false;
-bool ssReady = false;
+extern bool isShutdown;
+extern bool ssReady;
 
-Timer canTest_wait;
-Timer boosting_debounce;
-Timer spinningCheck_wait;
+extern Timer canTest_wait;
+extern Timer boosting_debounce;
+extern Timer spinningCheck_wait;
 
 /**
  * @brief Writes the fault latch whichever condition you pass (see above enumerator)
@@ -48,7 +48,10 @@ void writeFaultLatch(bool status);
 */
 void shutOffCar();
         
-
+/**
+ * @brief Handles all driverio processes
+ * 
+ */
 void driverioProcess();
 
 /**

@@ -82,7 +82,26 @@ void canHandler_CANMSG_BMSCURRENTS(const CAN_message_t &msg)
 
 
     int16_t currentDraw = (msg.buf[4] << 8) | msg.buf[5];
-    mpu.bmsCurrentProcess(currentDraw);
+    bms.setCurrentDraw(currentDraw);
+    
+    if(!boosting_debounce.isTimerExpired())
+    {
+        if(!bms.isCurrentPastLimit())
+        {
+            boosting_debounce.cancelTimer();
+        }
+    }
+
+    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired() && !boosting_debounce.isTimerReset())
+    {
+        bms.setBoosting();
+    }
+
+    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired())
+    {
+        boosting_debounce.startTimer(100);
+    }
+
     Serial.print("CurrentDraw: ");
     Serial.println(currentDraw);
     //Serial.println(dischargeCurrentLimit);

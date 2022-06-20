@@ -24,8 +24,7 @@ void setup()
     canTest_wait.cancelTimer();
     boosting_debounce.cancelTimer();
     spinningCheck_wait.cancelTimer();
-    
-    bool isShutdown = false;
+
     delay(2000);
 }
 

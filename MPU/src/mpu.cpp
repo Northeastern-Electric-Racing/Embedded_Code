@@ -1,7 +1,20 @@
 #include "mpu.h"
 
+DRIVERIO driverio;
+GPIO gpio;
+PEDALS pedals;
+CASCADIAMC motorController;
+ORIONBMS bms;
+WDT_T4<WDT1> wdt;
+bool isShutdown = false;
+bool ssReady = false;
+Timer canTest_wait;
+Timer boosting_debounce;
+Timer spinningCheck_wait;
+
+
 void driverioProcess()
-{  
+{
     // Serial.println("DriverIO process...");
     driverio.handleSSButton();
     driverio.handleSSLED();
@@ -79,31 +92,6 @@ void writeFaultLatch(bool status)
     digitalWrite(RELAY_PIN, status);
 }
 
-
-
-void bmsCurrentProcess(int16_t currentDraw)
-{
-    bms.setCurrentDraw(currentDraw);
-
-    if(!boosting_debounce.isTimerExpired())
-    {
-        if(!bms.isCurrentPastLimit())
-        {
-            boosting_debounce.cancelTimer();
-        }
-    }
-
-    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired() && !boosting_debounce.isTimerReset())
-    {
-        bms.setBoosting();
-    }
-
-    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired())
-    {
-        boosting_debounce.startTimer(100);
-    }
-
-}
 
 bool verifyMotorSpinning()
 {

@@ -10,6 +10,7 @@
 #include <nerduino.h>
 #include "cascadiamc.h"
 #include "orionbms.h"
+#include "pedalHW.h"
 
 //Pins
 #define ACCEL1_PIN                  A0

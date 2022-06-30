@@ -11,7 +11,7 @@
 #include <nerduino.h>
 
 //Maximum ADC value based on resolution (10 bit resolution for Teensy 4.1)
-#define MAX_ADC_VALUE               1023    //1111111111 in binary
+#define MAX_ADC_VALUE               1023 //1111111111 in binary
 
 //Timer macros
 #define PEDAL_DEBOUNCE_TIME         40 //ms

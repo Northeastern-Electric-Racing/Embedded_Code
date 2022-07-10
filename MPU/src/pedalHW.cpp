@@ -2,7 +2,9 @@
 
 PEDAL_HW::PEDAL_HW(){}
 
-PEDAL_HW::PEDAL_HW(uint8_t p_errorPercent, uint8_t p_maxErrors, uint8_t pinNumbers[2])
+PEDAL_HW::~PEDAL_HW(){}
+
+PEDAL_HW::PEDAL_HW(float p_errorPercent, uint8_t p_maxErrors, uint8_t *pinNumbers)
 {
     errorPercent = p_errorPercent;
     maxErrors = p_maxErrors;
@@ -13,20 +15,19 @@ PEDAL_HW::PEDAL_HW(uint8_t p_errorPercent, uint8_t p_maxErrors, uint8_t pinNumbe
 	readingDebounce.cancelTimer();
 }
 
-uint8_t PEDAL_HW::readPressedPercentage()
+uint16_t PEDAL_HW::readValue()
 {
     if(!readingDebounce.isTimerExpired())
     {
         minimizingDiffDebounce();
+        return NOT_DONE_READING;
     }
-    
-    uint16_t finalReading = avgReading;
-    uint8_t readingPercentage = finalReading/MAX_ADC_VALUE;
 
+    uint16_t finalReading = avgReading;
     avgReading = MAX_ADC_VALUE;
     readingDebounce.startTimer(PEDAL_DEBOUNCE_TIME);
 
-    return readingPercentage;
+    return finalReading;
 }
 
 void PEDAL_HW::minimizingDiffDebounce()
@@ -56,13 +57,20 @@ void PEDAL_HW::checkForPedalError(uint16_t val1, uint16_t val2)
         readingErrors++;
         if(readingErrors >= maxErrors)
         {
-            readingFault = true;
+            readingFault = FAULTED;
         }
     }
 }
 
+FaultStatus_t PEDAL_HW::isFaulted()
+{
+    return readingFault;
+}
+
 
 BRAKELIGHT_HW::BRAKELIGHT_HW(){}
+
+BRAKELIGHT_HW::~BRAKELIGHT_HW(){}
 
 BRAKELIGHT_HW::BRAKELIGHT_HW(uint8_t pinNumber)
 {

@@ -16,6 +16,7 @@
 //Timer macros
 #define PEDAL_DEBOUNCE_TIME         40 //ms
 #define BRAKELIGHT_MIN_TIME_ON      250 //ms
+#define NOT_DONE_READING            0xFFFF
 
 class PEDAL_HW
 {
@@ -27,7 +28,7 @@ class PEDAL_HW
         int16_t avgReading;
         //Pedal error counting
         uint8_t readingErrors = 0;
-        bool readingFault = false;
+        FaultStatus_t readingFault = NOT_FAULTED;
 
         //Constants specific to which pedal
         uint8_t errorPercent;
@@ -57,16 +58,24 @@ class PEDAL_HW
          * @param errorPercent
          * @param maxErrors
          */
-        PEDAL_HW(uint8_t p_errorPercent, uint8_t p_maxErrors, uint8_t pinNumbers[2]);
+        PEDAL_HW(float p_errorPercent, uint8_t p_maxErrors, uint8_t *pinNumbers);
 
         ~PEDAL_HW();
 
         /**
-         * @brief Reads the current brake value with error-checking and accuracy debounce
+         * @brief Reads the current pedal value with error-checking and accuracy debounce
          * 
-         * @return Percentage (0-100) of how much brake is pressed
+         * @return The value being sensed (0 to MAX_ADC_VALUE)
          */
-        uint8_t readPressedPercentage();
+        uint16_t readValue();
+
+        /**
+         * @brief Returns if the maximum number of reading errors allowed has been reached
+         * 
+         * @return true 
+         * @return false 
+         */
+        FaultStatus_t isFaulted();
 };
 
 class BRAKELIGHT_HW

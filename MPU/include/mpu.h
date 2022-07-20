@@ -76,7 +76,7 @@ bool isCANLineOK();
  * @brief Sets the canLineOK to true
  * 
  */
-void CANLineVerified();
+void setCANLineOK();
 
 /**
  * @brief Shuts down the car if the isShutdown boolean is false

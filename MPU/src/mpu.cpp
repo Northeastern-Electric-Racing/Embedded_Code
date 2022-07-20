@@ -58,7 +58,7 @@ bool isCANLineOK()
 }
 
 
-void CANLineVerified()
+void setCANLineOK()
 {
     canTest_wait.startTimer(1000);
 }

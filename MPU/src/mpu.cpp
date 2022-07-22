@@ -72,24 +72,25 @@ void checkShutdownStatus()
     }
     else
     {
-        writeFaultLatch(FAULT_OK);
+        writeFaultLatch(NOT_FAULTED);
     }
 }
 
 
 void shutOffCar()
 {
-    writeFaultLatch(TRIGGER_FAULT);
+    writeFaultLatch(FAULTED);
     motorController.emergencyShutdown();
     Serial.println("Shutting off Car!!!!!");
     while(1){}
-    writeFaultLatch(FAULT_OK);
+    writeFaultLatch(NOT_FAULTED);
 }
 
 
-void writeFaultLatch(bool status)
+void writeFaultLatch(FaultStatus_t status)
 {
-    digitalWrite(RELAY_PIN, status);
+    //The logic is flipped because of how the enum is set up to allow for exceptions if fault (FAULT = 1 = true, NOT FAULTED = 0 = False)
+    digitalWrite(RELAY_PIN, !status);
 }
 
 

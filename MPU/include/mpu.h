@@ -13,12 +13,6 @@
 #include "orionbms.h"
 #include "Watchdog_t4.h"
 
-enum
-{
-    TRIGGER_FAULT,
-    FAULT_OK
-};
-
 extern DRIVERIO driverio;
 extern GPIO gpio;
 extern PEDALS pedals;
@@ -39,7 +33,7 @@ extern Timer spinningCheck_wait;
  * 
  * @param status 
  */
-void writeFaultLatch(bool status);
+void writeFaultLatch(FaultStatus_t status);
 
 /**
 * @brief Shuts off the car in the event of an error

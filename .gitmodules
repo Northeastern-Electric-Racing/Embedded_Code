@@ -4,4 +4,4 @@
 [submodule "MPU/lib/NERduino"]
 	path = MPU/lib/NERduino
 	url = https://github.com/Northeastern-Electric-Racing/NERduino.git
-	branch = main
+	branch = mpu-improvements

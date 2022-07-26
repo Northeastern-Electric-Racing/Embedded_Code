@@ -61,15 +61,9 @@ class PEDALS
         uint8_t brakePins[2] = {BRAKE1_PIN, BRAKE2_PIN};
         uint8_t accelPins[2] = {ACCEL1_PIN, ACCEL2_PIN};
 
-        Timer torqueBoost_time;
-        Timer torqueBoost_cooldown;
-
         int16_t clTorque; //Torque limit determined by current limit
 
         int16_t appliedTorque = 0; // applied motor torque
-
-        bool torqueBoostReady = false;
-        bool torqueBoosting = false;
 
         /**
          * @brief Calculates what torque to send to the motor controller

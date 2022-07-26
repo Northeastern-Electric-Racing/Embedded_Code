@@ -9,9 +9,6 @@ PEDALS::PEDALS(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 	pinMode(BRAKELIGHT_PIN, OUTPUT);
 	digitalWrite(BRAKELIGHT_PIN, HIGH);
 
-	torqueBoost_time.cancelTimer();
-    torqueBoost_cooldown.cancelTimer();
-
 	motorController = p_motorController;
 	bms = p_bms;
 
@@ -31,18 +28,18 @@ FaultStatus_t PEDALS::readAccel()
 	Serial.println(pedalVal,HEX);
 
 	//If the pedal reading process is NOT finished, return NOT_FAULTED because it hasn't finished collecting data
-	if(pedalVal == NOT_DONE_READING){return NOT_FAULTED;}
+	if(pedalVal == NOT_DONE_READING) return NOT_FAULTED;
 
 	//If the pedal reading process has detected a FAULT, return FAULT
-	if(accelerator.isFaulted() == FAULTED){return FAULTED;}
+	if(accelerator.isFaulted() == FAULTED) return FAULTED;
 
 	//Calculate percentage value for how far down the accelerator is pressed
 	int16_t flippedVal = (pedalVal * -1) + 1023; // reverse it so 0 is when pedal not pressed, and 1023 is at full press
-	
+
 	//Cleansing Value
 	//Note: POT_LOWER_BOUND is nonzero to allow for some mechanical give while not exerting torque
-	if(flippedVal < POT_LOWER_BOUND){flippedVal = 0;}
-	if(flippedVal > POT_UPPER_BOUND){flippedVal = POT_UPPER_BOUND;}
+	if(flippedVal < POT_LOWER_BOUND) flippedVal = 0;
+	if(flippedVal > POT_UPPER_BOUND) flippedVal = POT_UPPER_BOUND;
 
 	double multiplier = ((double)flippedVal - ACCEL_OFFSET)  / 650; // torque multiplier from 0 to 1;
 
@@ -68,10 +65,10 @@ FaultStatus_t PEDALS::readBrake()
 	uint16_t pedalVal = brakes.readValue();
 
 	//If the pedal reading process is NOT finished, return NOT_FAULTED because it hasn't finished collecting data
-	if(pedalVal == NOT_DONE_READING){return NOT_FAULTED;}
+	if(pedalVal == NOT_DONE_READING) return NOT_FAULTED;
 
 	//If the pedal reading process has detected a FAULT, return FAULT
-	if(brakes.isFaulted() == FAULTED){return FAULTED;}
+	if(brakes.isFaulted() == FAULTED) return FAULTED;
 
 	//Set brakePressed to whether or not the brake value is greater than the braking threshold
 	brakePressed = pedalVal > ANALOG_BRAKE_THRESH ? HIGH : LOW;
@@ -86,14 +83,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 {
 	int16_t pedalTorque = 0;
 
-	if (torqueBoostReady | torqueBoosting) {
-		pedalTorque = torqueScale * MAXIMUM_TORQUE;
-	} else {
-		pedalTorque = torqueScale * CONT_TORQUE;
-		if (pedalTorque > CONT_TORQUE) {
-			pedalTorque = CONT_TORQUE;
-		}
-	}
+	pedalTorque = torqueScale * MAXIMUM_TORQUE;
 
 	int16_t torqueLim = calcCLTorqueLimit();
 
@@ -102,7 +92,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 		pedalTorque = torqueLim;
 	}
 
-	//Cleansing Value
+	//Cleansing Value just in case (Somewhat redundant)
 	if(pedalTorque >= MAXIMUM_TORQUE)
 	{
 		pedalTorque = MAXIMUM_TORQUE;
@@ -110,23 +100,6 @@ int16_t PEDALS::calcTorque(double torqueScale)
 	else if(pedalTorque < 0)
 	{
 		pedalTorque = 0;
-	}
-
-	/*
-	Serial.print("Boosting: ");
-	Serial.println(torqueBoosting);
-	Serial.print("Boost Ready: ");
-	Serial.println(torqueBoostReady);*/
-
-	if ((pedalTorque > CONT_TORQUE) & torqueBoostReady) {
-		torqueBoost_time.startTimer(10000);
-		torqueBoosting = true;
-		torqueBoostReady = false;
-	} else if (torqueBoost_time.isTimerExpired() & torqueBoosting) {
-		torqueBoost_cooldown.startTimer(1);
-		torqueBoosting = false;
-	} else if (torqueBoost_cooldown.isTimerExpired() & !torqueBoosting) {
-		torqueBoostReady = true;
 	}
 
 	Serial.print("Pedal: ");
@@ -153,7 +126,7 @@ int16_t PEDALS::calcCLTorqueLimit()
 		calculated = MAXIMUM_TORQUE / 10;
 	}
 	
-	/*Serial.print("Vdc: ");                                               
+	/*Serial.print("Vdc: ");
 	Serial.print(dcVoltage);
 	Serial.print(", Idc: ");
 	Serial.print(dcCurrent);

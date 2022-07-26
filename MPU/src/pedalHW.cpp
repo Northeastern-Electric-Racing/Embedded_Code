@@ -17,6 +17,9 @@ PEDAL_HW::PEDAL_HW(float p_errorPercent, uint8_t p_maxErrors, uint8_t *pinNumber
 
 uint16_t PEDAL_HW::readValue()
 {
+    //Acounting for first loop
+    if(readingDebounce.isTimerReset()) readingDebounce.startTimer(PEDAL_DEBOUNCE_TIME);
+
     if(!readingDebounce.isTimerExpired())
     {
         minimizingDiffDebounce();

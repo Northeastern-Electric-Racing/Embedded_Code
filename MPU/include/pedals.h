@@ -23,7 +23,7 @@
 #define MAXIMUM_TORQUE              2220    // in Nm x 10 (ex: 123 = 12.3Nm)
 #define CONT_TORQUE                 1020    // ' '
 #define POT_LOWER_BOUND             35      // a pot value from 0 to 1023
-#define POT_UPPER_BOUND             1023    // a pot value from 0 to 1023
+#define POT_UPPER_BOUND             MAX_ADC_VALUE    // a pot value from 0 to 1023
 
 // regen braking constants
 #define START_TIME                  0       // delay from when brake is pressed to when regen starts
@@ -32,9 +32,10 @@
 
 #define MAX_BRAKE_ERRORS            5
 #define MAX_ACCEL_ERRORS            5
+#define ACCEL_OFFSET                250
 
-#define ACCELERATOR_ERROR_PERCENT   (float)0.1
-#define BRAKES_ERROR_PERCENT        (float)0.1
+#define ACCELERATOR_ERROR_PERCENT   0.2
+#define BRAKES_ERROR_PERCENT        0.2
 
 #define LEAVING_BOOST_TORQUE_SCALE  0.9
 

@@ -28,6 +28,7 @@ FaultStatus_t PEDALS::readAccel()
 {
 	//Begin or continue the pedal reading process
 	uint16_t pedalVal = accelerator.readValue();
+	Serial.println(pedalVal,HEX);
 
 	//If the pedal reading process is NOT finished, return NOT_FAULTED because it hasn't finished collecting data
 	if(pedalVal == NOT_DONE_READING){return NOT_FAULTED;}
@@ -37,11 +38,13 @@ FaultStatus_t PEDALS::readAccel()
 
 	//Calculate percentage value for how far down the accelerator is pressed
 	int16_t flippedVal = (pedalVal * -1) + 1023; // reverse it so 0 is when pedal not pressed, and 1023 is at full press
-	if (flippedVal < POT_LOWER_BOUND)
-	{
-		flippedVal = 0; // Set low point to prevent a positive torque in the resting pedal position
-	}
-	double multiplier = ((double)flippedVal - 250)  / 650; // torque multiplier from 0 to 1;
+	
+	//Cleansing Value
+	//Note: POT_LOWER_BOUND is nonzero to allow for some mechanical give while not exerting torque
+	if(flippedVal < POT_LOWER_BOUND){flippedVal = 0;}
+	if(flippedVal > POT_UPPER_BOUND){flippedVal = POT_UPPER_BOUND;}
+
+	double multiplier = ((double)flippedVal - ACCEL_OFFSET)  / 650; // torque multiplier from 0 to 1;
 
 	//Calculate the correct amount of torque to command using precentage pressed value
 	appliedTorque = calcTorque(multiplier);
@@ -53,7 +56,7 @@ FaultStatus_t PEDALS::readAccel()
 	Serial.print("Acceleration:\t");
 	Serial.println(appliedTorque / 10); // prints out applied torque
 #endif
-
+	Serial.println("A");
 	//Return the current fault status of the accelerator, send fault if it wasn't caught earlier
 	return accelerator.isFaulted();
 }
@@ -62,7 +65,7 @@ FaultStatus_t PEDALS::readAccel()
 FaultStatus_t PEDALS::readBrake()
 {
 	//Begin or continue the pedal reading process
-	uint16_t pedalVal = accelerator.readValue();
+	uint16_t pedalVal = brakes.readValue();
 
 	//If the pedal reading process is NOT finished, return NOT_FAULTED because it hasn't finished collecting data
 	if(pedalVal == NOT_DONE_READING){return NOT_FAULTED;}
@@ -91,7 +94,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 			pedalTorque = CONT_TORQUE;
 		}
 	}
-	
+
 	int16_t torqueLim = calcCLTorqueLimit();
 
 	// Scale torque to match BMS current limit

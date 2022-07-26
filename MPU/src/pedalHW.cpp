@@ -22,11 +22,9 @@ uint16_t PEDAL_HW::readValue()
         minimizingDiffDebounce();
         return NOT_DONE_READING;
     }
-
     uint16_t finalReading = avgReading;
-    avgReading = MAX_ADC_VALUE;
+    readingDiff = MAX_ADC_VALUE;
     readingDebounce.startTimer(PEDAL_DEBOUNCE_TIME);
-
     return finalReading;
 }
 
@@ -41,7 +39,6 @@ void PEDAL_HW::minimizingDiffDebounce()
         readingDiff = abs(pin1Val-pin2Val);
         avgReading = (pin1Val + pin2Val) / 2;
     }
-
     checkForPedalError(pin1Val, pin2Val);
 }
 

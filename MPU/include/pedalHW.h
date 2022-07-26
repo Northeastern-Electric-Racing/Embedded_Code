@@ -25,7 +25,7 @@ class PEDAL_HW
         Timer readingDebounce;
         //Pedal reading
         uint16_t readingDiff;
-        int16_t avgReading;
+        uint16_t avgReading;
         //Pedal error counting
         uint8_t readingErrors = 0;
         FaultStatus_t readingFault = NOT_FAULTED;

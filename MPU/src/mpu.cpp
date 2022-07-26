@@ -24,7 +24,7 @@ MPU::~MPU(){}
 void MPU::driverioProcess()
 {
     if(!ioRead_wait.isTimerExpired()){return;}
-    
+
     // Serial.println("DriverIO process...");
     driverio.handleSSButton();
     driverio.handleSSLED();

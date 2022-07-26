@@ -19,10 +19,9 @@ void setup()
     driverio = DRIVERIO(&motorController, &bms);
     gpio = GPIO(&motorController, &bms);
     pinMode(RELAY_PIN, OUTPUT);
-    writeFaultLatch(FAULT_OK);
+    writeFaultLatch(NOT_FAULTED);
 
     canTest_wait.cancelTimer();
-    boosting_debounce.cancelTimer();
     spinningCheck_wait.cancelTimer();
 
     delay(2000);

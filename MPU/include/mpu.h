@@ -25,7 +25,6 @@ extern bool isShutdown;
 extern bool ssReady;
 
 extern Timer canTest_wait;
-extern Timer boosting_debounce;
 extern Timer spinningCheck_wait;
 
 /**

@@ -75,9 +75,6 @@ class PEDALS
         int16_t prev1 = 0;
         int16_t prev2 = 0;
 
-        bool torqueBoostReady = false;
-        bool torqueBoosting = false;
-
         /**
          * @brief Calculates what torque to send to the motor controller
          * 

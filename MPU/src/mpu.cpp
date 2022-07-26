@@ -9,7 +9,6 @@ WDT_T4<WDT1> wdt;
 bool isShutdown = false;
 bool ssReady = false;
 Timer canTest_wait;
-Timer boosting_debounce;
 Timer spinningCheck_wait;
 
 

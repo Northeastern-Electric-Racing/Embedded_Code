@@ -42,7 +42,7 @@ void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
 
 void canHandler_CANMSG_BMSCURRENTLIMITS(const CAN_message_t &msg)
 {
-    CANLineVerified();
+    setCANLineOK();
     /*
     uint16_t dischargeCurrentLimit = (msg.buf[1] << 8) | msg.buf[0];
     mpu.setCurrentLimit(dischargeCurrentLimit);
@@ -72,7 +72,7 @@ void canHandler_CANMSG_MOTORETEMP3(const CAN_message_t &msg)
 
 void canHandler_CANMSG_BMSCURRENTS(const CAN_message_t &msg)
 {
-    CANLineVerified();
+    setCANLineOK();
 
     uint16_t dischargeCurrentLimit = (msg.buf[0] << 8) | msg.buf[1];
     bms.setCurrentLimit(dischargeCurrentLimit);
@@ -80,27 +80,8 @@ void canHandler_CANMSG_BMSCURRENTS(const CAN_message_t &msg)
     uint16_t chargeCurrentLimit = (msg.buf[2] << 8) | msg.buf[3];
     bms.setChargeCurrentLimit(chargeCurrentLimit);
 
-
     int16_t currentDraw = (msg.buf[4] << 8) | msg.buf[5];
     bms.setCurrentDraw(currentDraw);
-    
-    if(!boosting_debounce.isTimerExpired())
-    {
-        if(!bms.isCurrentPastLimit())
-        {
-            boosting_debounce.cancelTimer();
-        }
-    }
-
-    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired() && !boosting_debounce.isTimerReset())
-    {
-        bms.setBoosting();
-    }
-
-    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired())
-    {
-        boosting_debounce.startTimer(100);
-    }
 
     Serial.print("CurrentDraw: ");
     Serial.println(currentDraw);

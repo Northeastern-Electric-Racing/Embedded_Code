@@ -11,6 +11,7 @@
 #include <nerduino.h>
 #include "cascadiamc.h"
 #include "orionbms.h"
+#include "driverioHW.h"
 
 //Pins
 #define LED4_PIN        3

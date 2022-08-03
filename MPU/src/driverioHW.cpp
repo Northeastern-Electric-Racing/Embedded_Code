@@ -185,3 +185,14 @@ STARTBUTTON::STARTBUTTON(uint8_t ledPinNumber, uint8_t buttonPinNumber)
     : BUTTON(buttonPinNumber), LED(ledPinNumber) {}
 
 STARTBUTTON::~STARTBUTTON(){}
+
+/**************************************************************************************/
+/**
+ * @brief Dashboard Class Implementation
+ */
+/**************************************************************************************/
+
+DASHBOARD::DASHBOARD()
+{}
+
+DASHBOARD::~DASHBOARD(){}

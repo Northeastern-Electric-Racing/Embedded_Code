@@ -22,7 +22,9 @@ typedef enum ButtonState_t
 
 class DASHBOARD
 {
-
+    public:
+        DASHBOARD();
+        ~DASHBOARD();
 };
 
 

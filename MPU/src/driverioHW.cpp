@@ -144,3 +144,33 @@ void LED::updateBlink()
         writeLED(blinkState);
     }
 }
+
+/**************************************************************************************/
+/**
+ * @brief Switch Class Implementation
+ */
+/**************************************************************************************/
+
+SWITCH::SWITCH(uint8_t pinNumber)
+{
+    pin = pinNumber;
+    pinMode(pin,INPUT_PULLUP);
+    previousReading = getSwitchState();
+}
+
+SWITCH::~SWITCH(){}
+
+bool SWITCH::getSwitchState()
+{
+    bool switchReading = digitalRead(pin);
+    previousReading = switchReading;
+    return switchReading;
+}
+
+bool SWITCH::hasSwitchToggled()
+{
+    if(getSwitchState() == previousReading) return false;
+
+    previousReading = getSwitchState();
+    return true;
+}

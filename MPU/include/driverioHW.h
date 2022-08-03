@@ -68,7 +68,30 @@ class BUTTON
 
 class SWITCH
 {
+    private:
+        uint8_t pin;
+        bool previousReading;
 
+    public:
+        SWITCH(uint8_t pinNumber);
+        
+        ~SWITCH();
+
+        /**
+         * @brief Get the current reading of the switch pin
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool getSwitchState();
+
+        /**
+         * @brief Return whether the switch state has been flipped since the last reading
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool hasSwitchToggled();
 };
 
 

@@ -42,12 +42,7 @@ class DRIVERIO
         //For future development and integration with Raspberry Pi
         //DASHBOARD dashboard;
 
-        Timer ssButton_debounce;
         Timer powerToggle_wait;
-        Timer speaker_wait;
-        Timer tempWarningBlink_wait;
-
-        bool LED5_status = false;
 
     public:
         DRIVERIO();

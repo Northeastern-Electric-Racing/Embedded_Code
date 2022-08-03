@@ -42,7 +42,6 @@ void DRIVERIO::handleSSButtonPress()
     {
         bms->toggleAIR();
         powerToggle_wait.startTimer(1500);
-        ssButton_debounce.cancelTimer();
         return;
     }
 

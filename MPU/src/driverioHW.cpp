@@ -1,16 +1,20 @@
 #include <nerduino.h>
 #include "driverioHW.h"
 
+/**************************************************************************************/
+/**
+ * @brief Button Class Implementation
+ */
+/**************************************************************************************/
 
 BUTTON::BUTTON(uint8_t pinNumber)
 {
     pin = pinNumber;
+    pinMode(pin, INPUT_PULLUP);
     debounce.cancelTimer();
 }
 
-
 BUTTON::~BUTTON(){}
-
 
 void BUTTON::checkButtonPin(uint8_t debounceTime)
 {
@@ -25,7 +29,6 @@ void BUTTON::checkButtonPin(uint8_t debounceTime)
         state = NOT_PRESSED;
     }
 }
-
 
 bool BUTTON::isButtonPressed()
 {
@@ -44,7 +47,6 @@ bool BUTTON::isButtonPressed()
     }
     return false;
 }
-
 
 bool BUTTON::isButtonPressed_Pulse()
 {
@@ -70,3 +72,75 @@ bool BUTTON::isButtonPressed_Pulse()
     return false;
 }
 
+/**************************************************************************************/
+/**
+ * @brief Speaker Class Implementation
+ */
+/**************************************************************************************/
+
+SPEAKER::SPEAKER(uint8_t pinNumber)
+{
+    pin = pinNumber;
+    pinMode(pin, OUTPUT);
+    writeSpeaker(LOW);
+    waitTime.cancelTimer();
+}
+
+SPEAKER::~SPEAKER(){}
+
+void SPEAKER::writeSpeaker(bool state)
+{
+    //We need to invert the logic of the speaker due to the hardware
+    digitalWrite(pin,!state);
+}
+
+void SPEAKER::playSpeaker()
+{
+    writeSpeaker(HIGH);
+    waitTime.startTimer(SPEAKER_DURATION);
+}
+
+void SPEAKER::attemptToStopSpeaker()
+{
+    if(waitTime.isTimerExpired())
+    {
+        writeSpeaker(LOW);
+    }
+}
+
+/**************************************************************************************/
+/**
+ * @brief LED Class Implementation
+ */
+/**************************************************************************************/
+
+LED::LED(uint8_t pinNumber)
+{
+    pin = pinNumber;
+    pinMode(pin, OUTPUT);
+    writeLED(LOW);
+}
+
+LED::~LED(){}
+
+void LED::writeLED(bool state)
+{
+    digitalWrite(pin,state);
+}
+
+void LED::blinkEnable(bool state)
+{
+    isBlinkEnabled = state;
+    if(isBlinkEnabled) blinkTimer.startTimer(LED_BLINK_TIME);
+}
+
+void LED::updateBlink()
+{
+    if(!isBlinkEnabled) return;
+
+    if(blinkTimer.isTimerExpired())
+    {
+        blinkState = !blinkState;
+        writeLED(blinkState);
+    }
+}

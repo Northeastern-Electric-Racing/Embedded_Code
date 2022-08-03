@@ -9,6 +9,9 @@
 
 #include <nerduino.h>
 
+#define SPEAKER_DURATION    1500    //in milliseconds
+#define LED_BLINK_TIME      1000    //in milliseconds
+
 typedef enum ButtonState_t
 {
     NOT_PRESSED,
@@ -71,13 +74,50 @@ class SWITCH
 
 class LED
 {
+    private:
+        Timer blinkTimer;
+        uint8_t pin;
+        bool isBlinkEnabled = false;
 
+        /**
+         * @brief Internal state of LED while blinking for toggling state
+         */
+        bool blinkState = 0;
+
+    public:
+        LED(uint8_t pinNumber);
+
+        ~LED();
+
+        void writeLED(bool state);
+
+        void blinkEnable(bool state);
+
+        void updateBlink();
 };
 
 
 class SPEAKER
 {
-    
+    private:
+        Timer waitTime;
+        uint8_t pin;
+
+        void writeSpeaker(bool state);
+
+    public:
+        SPEAKER(uint8_t pinNumber);
+        ~SPEAKER();
+
+        /**
+         * @brief start the speaker sound and speaker time
+         */
+        void playSpeaker();
+
+        /**
+         * @brief Attempts to stop speaker based on the internal timer
+         */
+        void attemptToStopSpeaker();
 };
 
 

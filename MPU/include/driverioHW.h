@@ -9,8 +9,9 @@
 
 #include <nerduino.h>
 
-#define SPEAKER_DURATION    1500    //in milliseconds
-#define LED_BLINK_TIME      1000    //in milliseconds
+#define SPEAKER_DURATION        1500    //in milliseconds
+#define LED_BLINK_TIME          1000    //in milliseconds
+#define BUTTON_DEBOUNCE_TIME    50      //in milliseconds
 
 typedef enum ButtonState_t
 {
@@ -41,6 +42,7 @@ class BUTTON
         bool readyToReadPulse = false;
 
     public:
+        BUTTON();
         BUTTON(uint8_t pinNumber);
         virtual ~BUTTON();
 
@@ -48,7 +50,7 @@ class BUTTON
          * @brief Checks the state of the passed button pin and starts debounce if going from 0->1
          * @note Does nothing if the button is already attempting a debounce
          */
-        void checkButtonPin(uint8_t debounceTime);
+        void checkButtonPin();
 
         /**
          * @brief Returns if the button has successfully passed the debounce
@@ -75,6 +77,7 @@ class SWITCH
         bool previousReading;
 
     public:
+        SWITCH();
         SWITCH(uint8_t pinNumber);
         
         ~SWITCH();
@@ -110,6 +113,7 @@ class LED
         bool blinkState = 0;
 
     public:
+        LED();
         LED(uint8_t pinNumber);
 
         virtual ~LED();
@@ -131,6 +135,7 @@ class SPEAKER
         void writeSpeaker(bool state);
 
     public:
+        SPEAKER();
         SPEAKER(uint8_t pinNumber);
         ~SPEAKER();
 
@@ -149,6 +154,7 @@ class SPEAKER
 class STARTBUTTON: public BUTTON, public LED
 {
     public:
+        STARTBUTTON();
         STARTBUTTON(uint8_t ledPinNumber, uint8_t buttonPinNumber);
         ~STARTBUTTON();
 };

@@ -7,6 +7,8 @@
  */
 /**************************************************************************************/
 
+BUTTON::BUTTON(){}
+
 BUTTON::BUTTON(uint8_t pinNumber)
 {
     pin = pinNumber;
@@ -16,12 +18,12 @@ BUTTON::BUTTON(uint8_t pinNumber)
 
 BUTTON::~BUTTON(){}
 
-void BUTTON::checkButtonPin(uint8_t debounceTime)
+void BUTTON::checkButtonPin()
 {
     if(digitalRead(pin) == HIGH && state == NOT_PRESSED)
     {
         state = DEBOUNCING;
-        debounce.startTimer(debounceTime);
+        debounce.startTimer(BUTTON_DEBOUNCE_TIME);
     }
     else if(digitalRead(pin) == LOW)
     {
@@ -78,6 +80,8 @@ bool BUTTON::isButtonPressed_Pulse()
  */
 /**************************************************************************************/
 
+SPEAKER::SPEAKER(){}
+
 SPEAKER::SPEAKER(uint8_t pinNumber)
 {
     pin = pinNumber;
@@ -113,6 +117,8 @@ void SPEAKER::attemptToStopSpeaker()
  * @brief LED Class Implementation
  */
 /**************************************************************************************/
+
+LED::LED(){}
 
 LED::LED(uint8_t pinNumber)
 {
@@ -151,6 +157,8 @@ void LED::updateBlink()
  */
 /**************************************************************************************/
 
+SWITCH::SWITCH(){}
+
 SWITCH::SWITCH(uint8_t pinNumber)
 {
     pin = pinNumber;
@@ -180,6 +188,8 @@ bool SWITCH::hasSwitchToggled()
  * @brief Start Button Class Implementation
  */
 /**************************************************************************************/
+
+STARTBUTTON::STARTBUTTON(){}
 
 STARTBUTTON::STARTBUTTON(uint8_t ledPinNumber, uint8_t buttonPinNumber)
     : BUTTON(buttonPinNumber), LED(ledPinNumber) {}

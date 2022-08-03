@@ -29,9 +29,18 @@
 class DRIVERIO
 {
     private:
-
         CASCADIAMC *motorController;
         ORIONBMS *bms;
+
+        SPEAKER speaker;
+        LED socLED;
+        LED tempLED;
+        LED yLED;
+        STARTBUTTON ssButton;
+        SWITCH reverseSwitch;
+        
+        //For future development and integration with Raspberry Pi
+        //DASHBOARD dashboard;
 
         Timer ssButton_debounce;
         Timer powerToggle_wait;
@@ -39,40 +48,6 @@ class DRIVERIO
         Timer tempWarningBlink_wait;
 
         bool LED5_status = false;
-
-        /**
-         * @brief Checks if the button is being pressed and the timer isn't canceled and the timer isn't canceled
-         * 
-         */
-        bool ssButtonDebounced();
-
-        /**
-         * @brief Writes LED4 to a specific state
-         * 
-         * @param state 
-         */
-        void writeLED4(bool state);
-
-        /**
-         * @brief Writes LED5 to a specific state
-         * 
-         * @param state 
-         */
-        void writeLED5(bool state);
-
-        /**
-         * @brief Writes the speaker to a specific state
-         * 
-         * @param state 
-         */
-        void writeSpeaker(bool state);
-
-        /**
-         * @brief Writes the Yellow LED to a specific state
-         * 
-         * @param state 
-         */
-        void writeYLED(bool state);
 
     public:
         DRIVERIO();
@@ -85,7 +60,7 @@ class DRIVERIO
          * @brief Debounces the Start/Stop button and toggles the power depending on if the button was pushed
          * 
          */
-        void handleSSButton();
+        void handleSSButtonPress();
 
         /**
          * @brief Handles the state of the Start/Stop LED

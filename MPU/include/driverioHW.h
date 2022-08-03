@@ -110,7 +110,7 @@ class LED
     public:
         LED(uint8_t pinNumber);
 
-        ~LED();
+        virtual ~LED();
 
         void writeLED(bool state);
 
@@ -144,13 +144,11 @@ class SPEAKER
 };
 
 
-class STARTBUTTON: public BUTTON
+class STARTBUTTON: public BUTTON, public LED
 {
-    private:
-        LED led;
-
     public:
-
-
+        STARTBUTTON(uint8_t ledPinNumber, uint8_t buttonPinNumber);
+        ~STARTBUTTON();
 };
+
 #endif

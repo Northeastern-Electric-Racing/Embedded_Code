@@ -174,3 +174,14 @@ bool SWITCH::hasSwitchToggled()
     previousReading = getSwitchState();
     return true;
 }
+
+/**************************************************************************************/
+/**
+ * @brief Start Button Class Implementation
+ */
+/**************************************************************************************/
+
+STARTBUTTON::STARTBUTTON(uint8_t ledPinNumber, uint8_t buttonPinNumber)
+    : BUTTON(buttonPinNumber), LED(ledPinNumber) {}
+
+STARTBUTTON::~STARTBUTTON(){}

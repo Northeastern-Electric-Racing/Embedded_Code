@@ -17,6 +17,9 @@ DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 
     motorController = p_motorController;
     bms = p_bms;
+
+    //Initializes the motor direction based on the initial switch state
+    if(reverseSwitch.getSwitchState()) motorController->toggleDirection();
 }
 
 
@@ -82,50 +85,23 @@ void DRIVERIO::handleReverseSwitch()
 
 void DRIVERIO::handleErrorLights()
 {
-    writeLED4(bms->isSoCCritical());
-
-    //writeYLED(bms->isCharging() || bms->isBoosting());
-    writeYLED(((motorController->getTorque() > 1020) && motorController->getIsOn()) || bms->isCharging());
-
+    tempLED.updateBlink();
     if(bms->isAvgTempCritical())
     {
         if(bms->isAvgTempShutdown())
         {
-            Serial.println("shutdown");
-            writeLED5(HIGH);
-            return;
+            tempLED.blinkEnable(false);
+            tempLED.writeLED(HIGH);
         }
-
-        if(tempWarningBlink_wait.isTimerExpired())
-        {
-            Serial.println("check");
-            LED5_status = !LED5_status;
-            writeLED5(LED5_status);
-            tempWarningBlink_wait.startTimer(1000);
-        } 
+        else tempLED.blinkEnable(true);
     }
-}
+    else
+    {
+        tempLED.blinkEnable(false);
+        tempLED.writeLED(LOW);
+    }
 
-
-void DRIVERIO::writeLED4(bool state)
-{
-    digitalWrite(LED4_PIN, state);
-}
-
-
-void DRIVERIO::writeLED5(bool state)
-{
-    digitalWrite(LED5_PIN, state);
-}
-
-
-void DRIVERIO::writeSpeaker(bool state)
-{
-    digitalWrite(SPEAKER_PIN, !state);
-}
-
-
-void DRIVERIO::writeYLED(bool state)
-{
-    digitalWrite(YLED_PIN, state);
+    //No updating of blinking for these LED's
+    socLED.writeLED(bms->isSoCCritical());
+    yLED.writeLED(((motorController->getTorque() > 1020) && motorController->getIsOn()) || bms->isCharging());
 }

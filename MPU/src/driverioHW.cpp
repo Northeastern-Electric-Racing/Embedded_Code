@@ -131,7 +131,7 @@ LED::~LED(){}
 
 void LED::writeLED(bool state)
 {
-    digitalWrite(pin,state);
+    if(!isBlinkEnabled) digitalWrite(pin,state);
 }
 
 void LED::blinkEnable(bool state)

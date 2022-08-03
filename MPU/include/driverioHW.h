@@ -118,6 +118,11 @@ class LED
 
         virtual ~LED();
 
+        /**
+         * @note if the LED's blinking is enabled, this function does nothing and is overridden by blinking
+         * 
+         * @param state 
+         */
         void writeLED(bool state);
 
         void blinkEnable(bool state);

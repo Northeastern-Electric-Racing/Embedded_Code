@@ -43,9 +43,6 @@ void GPIO::handleRadiatorFan()
 {
     int16_t temp = motorController->getRadiatorTemp() / 10;
 
-    //Serial.print("MC TEMP: ");
-    //Serial.println(temp);
-
     if (temp > MAX_FANSPEED_TEMP) {
         digitalWrite(RADIATORFAN_PIN, HIGH);
     } else {

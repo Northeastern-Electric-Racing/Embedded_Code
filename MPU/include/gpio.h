@@ -7,6 +7,7 @@
 #define GPIO_H
 
 #include <nerduino.h>
+#include "gpioHW.h"
 #include "cascadiamc.h"
 #include "orionbms.h"
 

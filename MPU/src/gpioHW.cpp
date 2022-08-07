@@ -46,7 +46,7 @@ TSMS::TSMS(uint8_t pinNum)
 
 TSMS::~TSMS(){}
 
-bool TSMS::getStatus()
+bool TSMS::isReady()
 {
     bool reading = digitalRead(pin);
 

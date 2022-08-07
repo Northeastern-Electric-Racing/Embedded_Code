@@ -38,6 +38,8 @@ class COOLINGPUMP
         COOLINGPUMP();
         COOLINGPUMP(uint8_t pinNum);
 
+        ~COOLINGPUMP();
+
         /**
          * @brief Enables/disables the pump
          * 
@@ -63,18 +65,18 @@ class TSMS  //TSMS stands for "Tractive System Main Switch"
          * @brief Returns if TS power has been cycled (1 -> 0)
          * @note Resets the power cycle flag upon reading
          * 
-         * @return true 
+         * @return true
          * @return false 
          */
         bool isPowerCycled();
 
         /**
-         * @brief Returns the current reading of the line
+         * @brief Returns the current reading of the line (If TSMS is switched on)
          * 
          * @return true 
          * @return false 
          */
-        bool getStatus();
+        bool isReady();
 };
 
 #endif

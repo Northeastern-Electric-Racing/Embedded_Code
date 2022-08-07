@@ -20,7 +20,10 @@
 class GPIO
 {
     private:
-        bool isSSPowerCycle = true;
+        
+        RADIATORFAN radiatorFan;
+        COOLINGPUMP coolingPump;
+        TSMS tsms;
 
         CASCADIAMC *motorController;
         ORIONBMS *bms;

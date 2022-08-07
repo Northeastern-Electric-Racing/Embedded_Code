@@ -24,7 +24,7 @@ bool GPIO::handleMCHVFault()
         motorController->raiseFault();
         return false;
     }
-    if (tsms.isPowerCycled() && tsms.isReady())
+    if(tsms.isPowerCycled() && tsms.isReady())
     {
         motorController->clearFault();
         return true;

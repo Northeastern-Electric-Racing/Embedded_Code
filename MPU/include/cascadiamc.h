@@ -8,6 +8,8 @@
 
 #define CAN_CMD_DELAY 5 // ms
 
+#define FAULT_CLEAR_ATTEMPTS 5
+
 #include <nerduino.h>
 
 #define NOT_SPINNING_TORQUE_LIMIT   1500
@@ -35,8 +37,6 @@ class CASCADIAMC
 
         int16_t motorSpeed = 0;
         uint16_t radiatorTemp = 0;
-
-        Timer motorCommand_wait;
 
         bool isMCLocked = false;
         bool isChangingDirection = false;

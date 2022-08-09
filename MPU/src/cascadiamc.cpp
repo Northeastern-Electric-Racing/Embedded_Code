@@ -1,10 +1,7 @@
 #include "cascadiamc.h"
 
 
-CASCADIAMC::CASCADIAMC()
-{
-    motorCommand_wait.cancelTimer();
-}
+CASCADIAMC::CASCADIAMC(){}
 
 
 CASCADIAMC::~CASCADIAMC(){}
@@ -12,11 +9,7 @@ CASCADIAMC::~CASCADIAMC(){}
 
 void CASCADIAMC::disableMCLockout()
 {
-    while(!motorCommand_wait.isTimerExpired()){}
-
     sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcOff); // release lockout / OFF
-
-    motorCommand_wait.startTimer(CAN_CMD_DELAY);
     isMCLocked = false;
 }
 
@@ -26,9 +19,7 @@ void CASCADIAMC::writeMCState()
     if(isMCLocked)
     {
         disableMCLockout();
-        while(!motorCommand_wait.isTimerExpired()){}
     }
-    while(!motorCommand_wait.isTimerExpired()){}
 
 #ifdef DEBUG
     Serial.println("CAN MC Message:");
@@ -40,8 +31,6 @@ void CASCADIAMC::writeMCState()
 #endif
 
     sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcMsg.canMsg);
-
-    motorCommand_wait.startTimer(CAN_CMD_DELAY);
 }
 
 
@@ -87,10 +76,9 @@ uint16_t CASCADIAMC::getTorque()
 
 void CASCADIAMC::clearFault()
 {
-    int time = millis() + 250;
-    while(millis() < time) {
+    for(int tries = 0; tries < FAULT_CLEAR_ATTEMPTS; tries++)
+    {
         sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
-        delay(5);
     }
     isFaulted = false;
 }
@@ -99,8 +87,7 @@ void CASCADIAMC::clearFault()
 void CASCADIAMC::raiseFault()
 {
     if (isFaulted == false) {
-        Serial.println("CUCK");
-        delay(1000);
+        Serial.println("MC Faulted");
     }
     isFaulted = true;
 }

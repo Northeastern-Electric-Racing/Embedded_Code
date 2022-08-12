@@ -60,11 +60,18 @@ class CASCADIAMC
         void writeMCState();
 
         /**
-         * @brief Loads the desired direction into the MC message
+         * @brief Toggles the desired direction into the MC message
          * 
          * @param p_isForward 
          */
         void toggleDirection();
+
+        /**
+         * @brief Set the direction into the MC Message
+         * 
+         * @param p_direction
+         */
+        void setDirection(bool p_direction);
 
         /**
          * @brief Loads the desired power state into the MC message

@@ -42,7 +42,6 @@ class BUTTON
         bool readyToReadPulse = false;
 
     public:
-        BUTTON();
         BUTTON(uint8_t pinNumber);
         virtual ~BUTTON();
 
@@ -77,7 +76,6 @@ class SWITCH
         bool previousReading;
 
     public:
-        SWITCH();
         SWITCH(uint8_t pinNumber);
         
         ~SWITCH();
@@ -110,10 +108,9 @@ class LED
         /**
          * @brief Internal state of LED while blinking for toggling state
          */
-        bool blinkState = 0;
+        bool blinkState = LOW;
 
     public:
-        LED();
         LED(uint8_t pinNumber);
 
         virtual ~LED();
@@ -159,7 +156,6 @@ class SPEAKER
 class STARTBUTTON: public BUTTON, public LED
 {
     public:
-        STARTBUTTON();
         STARTBUTTON(uint8_t ledPinNumber, uint8_t buttonPinNumber);
         ~STARTBUTTON();
 };

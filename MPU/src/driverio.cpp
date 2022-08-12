@@ -6,20 +6,10 @@ DRIVERIO::DRIVERIO(){}
 
 DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 {
-    reverseSwitch = SWITCH(REVERSE_SW_PIN);
-    ssButton = STARTBUTTON(SS_LED_PIN, SS_BUTT_PIN);
-    socLED = LED(LED4_PIN);
-    tempLED = LED(LED5_PIN);
-    yLED = LED(YLED_PIN);
-    speaker = SPEAKER(SPEAKER_PIN);
-
     powerToggle_wait.cancelTimer();
 
     motorController = p_motorController;
     bms = p_bms;
-
-    //Initializes the motor direction based on the initial switch state
-    if(reverseSwitch.getSwitchState()) motorController->toggleDirection();
 }
 
 
@@ -75,10 +65,7 @@ void DRIVERIO::handleSSLED()
 
 void DRIVERIO::handleReverseSwitch()
 {
-    if(reverseSwitch.hasSwitchToggled())
-    {
-        motorController->toggleDirection();    //writes the direction of the motor to the MC message to be sent
-    }
+    motorController->setDirection(reverseSwitch.getSwitchState());
 }
 
 

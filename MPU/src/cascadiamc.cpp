@@ -53,6 +53,14 @@ void CASCADIAMC::toggleDirection()
     mcMsg.config.isForward = !mcMsg.config.isForward;
 }
 
+void CASCADIAMC::setDirection(bool p_direction)
+{
+    if (mcMsg.config.isOn) {
+        togglePower();
+    }
+    mcMsg.config.isForward = p_direction;
+}
+
 
 void CASCADIAMC::togglePower()
 {

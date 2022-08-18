@@ -1,52 +1,53 @@
-/**
- * File names are logged in the format "log-0.txt", where the 0 is an incrememnted number for
- * each operation session.
- * 
- * The standard block size for SD card transfers is 512 bytes. Each write operation to the SD card should
- * be as close to this size as possible, as the remaining space will be padded and used anyway.
- *  - buffer data up to 512 bytes before writing
- * 
- */
-
 #include <Arduino.h>
 #include <FlexCAN_T4.h>
-#include <SD.h>
+#include "nerduino.h"
+#include "Watchdog_t4.h"
+#include "xbee_at.h"
+#include "logger.h"
+#include "debug.h"
 
-#define BAUD_RATE 250000U // 250 kbps 
+#define TEST_LOG 0 // set to 1 to log the test messages in the main loop()
+#define LOG_ALL 0 // set to 1 to log all CAN messages, 0 to filter
+
+#define BAUD_RATE 1000000U // 250 kbps 
 #define MAX_MB_NUM 16 // maximum number of CAN mailboxes to use 
 
-#define MAX_BUFFERED_MESSAGES 10 // max number of buffered CAN messages before logging to SD card
+#define MIN_LOG_FREQUENCY 1000 // the max time length between logs (in ms)
+
+#define ACCEL_HUMID_LOG_FREQUENCY 100 // time between logging accel/humid data
+#define ACCEL_LOG_ID 0x300
+#define HUMID_LOG_ID 0x301
+
 
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> myCan; // main CAN object
+WDT_T4<WDT1> wdt;
 
-File myFile;
+bool loggable = false;
 
-// CAN Ids of the messages to log to SD card
-const uint32_t LOG_IDS[] = {0x01, 0x02, 0x03, 0x04};
-const int NUM_IDS = 4;
 
-// Logging information
-int bufLength = 0;
-char* messageBuf[MAX_BUFFERED_MESSAGES]; 
-uint32_t lastLogTime = 0;
-int nextFileNum = 0; // log file names in the format log-0.txt
+// CAN Ids of the messages to log to SD card (only considered if LOG_ALL is 0)
+const uint32_t LOG_IDS[] = {0x001, 0x002, 0x003, 0x004, 0x0A0, 0x0A1, 0x0A2, 0x0A5, 0x0A6, 0x0A7, 0x0AA, 0x0AB, 0x0AC, 0x202, 0xC0};
+const int NUM_IDS = sizeof(LOG_IDS) / sizeof(uint32_t);
 
 
 // function declarations
 int sendMessage(uint32_t id, uint8_t len, const uint8_t *buf); 
 void incomingCANCallback(const CAN_message_t &msg);
-bool SDWrite(String messages);
-void logMessage(const CAN_message_t &msg);
-
+void logSensorData();
 
 
 /**
- * @brief Init serial console, CAN bus, and brake switch digital pins
+ * @brief Init the many peripherals and communication lines.
  * 
  */
 void setup() {
-  Serial.begin(115200); 
-  delay(400);
+  Serial.begin(9600); 
+  delay(100);
+
+  LoggerInit(MIN_LOG_FREQUENCY);
+
+  NERduino.begin();
+  delay(3000); // TODO: Do we need this delay
 
   myCan.begin();
   myCan.setBaudRate(BAUD_RATE);
@@ -54,96 +55,106 @@ void setup() {
   myCan.enableFIFO(); 
   myCan.enableFIFOInterrupt(); 
   myCan.onReceive(incomingCANCallback);
+  
+  // XbeeInit(&Serial1, 115200);
 
-  while (!SD.begin(BUILTIN_SDCARD)) {
-    Serial.println(F("SD Init Failed!"));
-    delay(250);
-  }
-
-  while (SD.exists("log-" + String(nextFileNum) + ".txt")) {
-    Serial.print(F("log-"));
-    Serial.print(String(nextFileNum));
-    Serial.println(F(".txt exists..."));
-    nextFileNum += 1;
-  }
-
-  Serial.print(F("setup complete. nextFileNum is "));
-  Serial.println(String(nextFileNum));
-
-  myFile = SD.open("log-" + String(nextFileNum) + ".txt", FILE_WRITE);
-
-  if (myFile) {
-    Serial.println("File could not be opened!");
-    while(1){};
-  }
+  WDT_timings_t config;
+  config.trigger = 5; /* in seconds, 0->128 */
+  config.timeout = 15; /* in seconds, 0->128 */
+  wdt.begin(config);
 }
 
+
 /**
- * @brief Continuoulsy read incoming CAN messages and the values of the 
+ * @brief Continuously read incoming CAN messages and the values of the 
  *        accelerator potentiometers and brake switches
  * 
  */
 void loop() {
+  wdt.feed();
   myCan.events();
+
+  if (LoggerWrite() == LOGGER_ERROR_SD_CARD) {
+    LoggerInit(MIN_LOG_FREQUENCY);
+    DPRINTLN(F("Reinitializing logger due to internal error")); 
+  }
+
+  // logging the extra sensor data from the accelerometer and temp/humid sensor
+  static uint32_t dataLastRecorded = 0;
+  if (millis() - dataLastRecorded > ACCEL_HUMID_LOG_FREQUENCY) {
+    //logSensorData(); // TODO: Fix Nerduino blocking I2C calls before uncommenting this line
+    dataLastRecorded = millis();
+  }
+
+  // USED FOR TESTING WHEN NOT CONNECTED TO CAN
+#if TEST_LOG == 1 
+  static unsigned long writeTime = millis();
+  static uint8_t writeData = 0;
+  if (millis() - writeTime > 10) {
+    const uint8_t buf[] = {writeData, writeData, writeData, writeData};
+    LoggerBufferMessage(0x01, 4, buf);
+
+    writeData++;
+    writeData %= 20;
+    writeTime = millis();
+  }
+#endif
 }
 
 
 /**
-   Logs errors to SD card.
-   @returns true if logging was successful, false if it failed
-*/
-bool SDWrite() {
-  if (myFile) {
-    for (int i = 0; i < bufLength; i++) {
-      myFile.print(messageBuf[i]);
-    }
-    
-    lastLogTime = millis();
-    return true;
-  } 
-  
-  return false;
+ * @brief Log the data from the attached sensors (accelerometer and humidity/temp sensor)
+ * 
+ */
+void logSensorData() {
+  XYZData_t xyzData[1];
+  HumidData_t humidData[1];
+
+  NERduino.getADXLdata(xyzData, 1);
+  NERduino.getSHTdata(humidData, 1);
+
+  uint8_t accelBuf[6] = {
+    xyzData[0].XData.rawdata[0], xyzData[0].XData.rawdata[1],
+    xyzData[0].YData.rawdata[0], xyzData[0].YData.rawdata[1],
+    xyzData[0].ZData.rawdata[0], xyzData[0].ZData.rawdata[1]
+  };
+
+  uint8_t humidBuf[4] = {
+    humidData[0].TempData.rawdata[0], humidData[0].TempData.rawdata[1],
+    humidData[0].HumidData.rawdata[0], humidData[0].HumidData.rawdata[1]
+  };
+
+  LoggerBufferMessage(ACCEL_LOG_ID, 6, accelBuf);
+  LoggerBufferMessage(HUMID_LOG_ID, 4, humidBuf);
 }
 
-
-
 /**
- * @brief Handles incoming CAN messages. This CAN node acts as the ECU, so incoming messages are
- *        use to set the values of the global state variables
+ * @brief Handles incoming CAN messages, adding certain ones to the logging message buffer.
  * 
  * @param msg received CAN message
  */
 void incomingCANCallback(const CAN_message_t &msg)
 {
-  for (int i = 0; i < NUM_IDS; i++) {
-    if (LOG_IDS[i] == msg.id) {
-      String message;
-      message += String(millis());
-      message += ",";
-      message += String(msg.id);
-      message += ",";
-      message += String(msg.len);
-      message += ",";
-
-      for (int i = 0; i < msg.len; i++) {
-        message += String(msg.buf[i]);
-        message += ",";
-      }
-      message += "\n";
-
-      messageBuf[bufLength] = message;
-      bufLength += 1;
-
-      if (bufLength == MAX_BUFFERED_MESSAGES) {
-        if (SDWrite()) { // if successfully
-          Serial.println(F("Logging successful"));
-        } else { 
-          Serial.println(F("Error with logging"));
-        }
-        bufLength = 0;
+  // only log if the message id is in the LOG_IDS list or LOG_ALL is enabled
+  int foundId = 0;
+  if (LOG_ALL) {
+    foundId = 1;
+  } else {
+    for (int i = 0; i < NUM_IDS; i++) {
+      if (LOG_IDS[i] == msg.id) {
+        foundId = 1;
+        break;
       }
     }
   }
+
+  // exit the function if we shouldn't log message
+  if (!foundId) {
+    return;
+  }
+
+  // add message to log buffer
+  LoggerBufferMessage(msg.id, msg.len, msg.buf);
 }
 
 

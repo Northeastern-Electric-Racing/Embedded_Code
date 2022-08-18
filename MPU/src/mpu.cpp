@@ -24,7 +24,7 @@ MPU::~MPU(){}
 void MPU::driverioProcess()
 {
     if(!ioRead_wait.isTimerExpired()){return;}
-    
+
     // Serial.println("DriverIO process...");
     driverio.handleSSButton();
     driverio.handleSSLED();
@@ -41,11 +41,14 @@ void MPU::pedalsProcess()
     // if(!verifyMotorSpinning())
     // {Serial.println("MOTOR NOT SPINNING");}
     // Serial.println("Pedals process...");
-    pedals.readBrake();
-    bool accelFault = pedals.readAccel();
-    isShutdown = isShutdown ? true : accelFault;
-    if(accelFault)
-    {Serial.println("ACCEL FAULT");}
+    FaultStatus_t pedalFault = NOT_FAULTED;
+    pedalFault = pedals.readBrake();
+    pedalFault = pedals.readAccel();
+    if(pedalFault == FAULTED)
+    {
+        Serial.println("ACCEL FAULT");
+        isShutdown = true;
+    }
 }
 
 

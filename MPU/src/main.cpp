@@ -18,10 +18,12 @@ void setup()
     config.timeout = 15;        /* in seconds, 0->128 */
     wdt.begin(config);
     delay(2000);
+    Serial.println("Cycle");
 }
 
 void loop()
 {
+    //Serial.println(".");
     myCan.events();
     mpu.gpioProcess();
     mpu.driverioProcess();

@@ -57,7 +57,7 @@ void DRIVERIO::handleSSLED()
         ssButton.writeLED(!bms->isAIROpen());
     }
     else
-    {
+    {  
         ssButton.writeLED(motorController->getIsOn());
     }
 }

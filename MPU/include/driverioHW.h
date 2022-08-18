@@ -36,11 +36,6 @@ class BUTTON
         Timer debounce;
         uint8_t pin;
 
-        /**
-         * @brief Flag that indicates that the button has passed debounce and hasn't been read yet
-         */
-        bool readyToReadPulse = false;
-
     public:
         BUTTON(uint8_t pinNumber);
         virtual ~BUTTON();

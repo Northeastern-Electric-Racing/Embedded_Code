@@ -50,7 +50,7 @@ bool BUTTON::isButtonPressed()
 
 bool BUTTON::isButtonPressed_Pulse()
 {
-    if(!readyToReadPulse) return false;
+    if(state == PRESSED) return false;
 
     /**
      * Returns true if
@@ -65,8 +65,7 @@ bool BUTTON::isButtonPressed_Pulse()
     if(digitalRead(pin) && debounce.isTimerExpired() && !debounce.isTimerReset())
     {
         state = PRESSED;
-        readyToReadPulse = false;
-        return true; 
+        return true;
     }
 
     return false;

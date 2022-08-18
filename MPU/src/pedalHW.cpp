@@ -52,7 +52,7 @@ void PEDAL_HW::checkForPedalError(uint16_t val1, uint16_t val2)
         val2 == 0 ||
         val1 == MAX_ADC_VALUE ||
         val2 == MAX_ADC_VALUE ||
-        (abs(val1 - val2) > (MAX_ADC_VALUE * errorPercent)))
+        (abs(val1 - val2) > (MAX_ADC_VALUE * errorPercent / 100)))
     {
         readingErrors++;
         if(readingErrors >= maxErrors)

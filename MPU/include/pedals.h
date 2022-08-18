@@ -34,8 +34,8 @@
 #define MAX_ACCEL_ERRORS            5
 #define ACCEL_OFFSET                250
 
-#define ACCELERATOR_ERROR_PERCENT   0.2
-#define BRAKES_ERROR_PERCENT        0.2
+#define ACCELERATOR_ERROR_PERCENT   5 //percent
+#define BRAKES_ERROR_PERCENT        10 //percent
 
 #define LEAVING_BOOST_TORQUE_SCALE  0.9
 

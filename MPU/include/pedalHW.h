@@ -31,7 +31,7 @@ class PEDAL_HW
         FaultStatus_t readingFault = NOT_FAULTED;
 
         //Constants specific to which pedal
-        uint8_t errorPercent;
+        int8_t errorPercent;
         uint8_t maxErrors;
         uint8_t pin1;
         uint8_t pin2;

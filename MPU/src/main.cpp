@@ -23,7 +23,7 @@ void setup()
 
 void loop()
 {
-    Serial.println(".");
+    //Serial.println(".");
     myCan.events();
     mpu.gpioProcess();
     mpu.driverioProcess();

@@ -25,7 +25,6 @@ FaultStatus_t PEDALS::readAccel()
 {
 	//Begin or continue the pedal reading process
 	uint16_t pedalVal = accelerator.readValue();
-	Serial.println(pedalVal,HEX);
 
 	//If the pedal reading process is NOT finished, return NOT_FAULTED because it hasn't finished collecting data
 	if(pedalVal == NOT_DONE_READING) return NOT_FAULTED;
@@ -53,7 +52,6 @@ FaultStatus_t PEDALS::readAccel()
 	Serial.print("Acceleration:\t");
 	Serial.println(appliedTorque / 10); // prints out applied torque
 #endif
-	Serial.println("A");
 	//Return the current fault status of the accelerator, send fault if it wasn't caught earlier
 	return accelerator.isFaulted();
 }
@@ -63,7 +61,7 @@ FaultStatus_t PEDALS::readBrake()
 {
 	//Begin or continue the pedal reading process
 	uint16_t pedalVal = brakes.readValue();
-
+	
 	//If the pedal reading process is NOT finished, return NOT_FAULTED because it hasn't finished collecting data
 	if(pedalVal == NOT_DONE_READING) return NOT_FAULTED;
 
@@ -102,10 +100,10 @@ int16_t PEDALS::calcTorque(double torqueScale)
 		pedalTorque = 0;
 	}
 
-	Serial.print("Pedal: ");
-	Serial.println(pedalTorque);
-	Serial.print("C Limit:");
-	Serial.println(torqueLim);
+	//Serial.print("Pedal: ");
+	//Serial.println(pedalTorque);
+	//Serial.print("C Limit:");
+	//Serial.println(torqueLim);
 
 	return pedalTorque;
 }

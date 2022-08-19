@@ -10,6 +10,7 @@
 #include <nerduino.h>
 #include "cascadiamc.h"
 #include "orionbms.h"
+#include "pedalHW.h"
 
 //Pins
 #define ACCEL1_PIN                  A0
@@ -22,7 +23,7 @@
 #define MAXIMUM_TORQUE              2220    // in Nm x 10 (ex: 123 = 12.3Nm)
 #define CONT_TORQUE                 1020    // ' '
 #define POT_LOWER_BOUND             35      // a pot value from 0 to 1023
-#define POT_UPPER_BOUND             1023    // a pot value from 0 to 1023
+#define POT_UPPER_BOUND             MAX_ADC_VALUE    // a pot value from 0 to 1023
 
 // regen braking constants
 #define START_TIME                  0       // delay from when brake is pressed to when regen starts
@@ -31,8 +32,10 @@
 
 #define MAX_BRAKE_ERRORS            5
 #define MAX_ACCEL_ERRORS            5
+#define ACCEL_OFFSET                250
 
-#define ACCELERATOR_ERROR_PER       0.10
+#define ACCELERATOR_ERROR_PERCENT   5 //percent
+#define BRAKES_ERROR_PERCENT        10 //percent
 
 #define LEAVING_BOOST_TORQUE_SCALE  0.9
 
@@ -44,36 +47,23 @@
 class PEDALS
 {
     private:
-        // message to turn motor off
         bool brakePressed = false;
         uint32_t timeBrake = 0;     // the time at which the brake was last pressed
 
         CASCADIAMC *motorController;
         ORIONBMS *bms;
 
-        Timer brakeReading_wait;
-        Timer brakeReading_debounce;
-        Timer pedalReading_wait;
-        Timer pedalReading_debounce;
-        Timer brakeLight_wait;
-        Timer torqueBoost_time;
-        Timer torqueBoost_cooldown;
+        PEDAL_HW brakes;
+        PEDAL_HW accelerator;
+
+        BRAKELIGHT_HW brakeLight;
+
+        uint8_t brakePins[2] = {BRAKE1_PIN, BRAKE2_PIN};
+        uint8_t accelPins[2] = {ACCEL1_PIN, ACCEL2_PIN};
 
         int16_t clTorque; //Torque limit determined by current limit
 
-        uint8_t accelErrors = 0;
-        bool accelFault = false;
-
-        uint16_t pedalDiff = MAXIMUM_TORQUE;
-		int16_t avgPedalVal;
-
-        uint16_t brakeDiff = 0;
-        int16_t avgBrakeVal;
-
         int16_t appliedTorque = 0; // applied motor torque
-
-        int16_t prev1 = 0;
-        int16_t prev2 = 0;
 
         /**
          * @brief Calculates what torque to send to the motor controller
@@ -106,7 +96,7 @@ class PEDALS
          * @brief Reads the status of the brake, and sets brakePressed to True if it is pressed
          * 
          */
-        void readBrake();
+        FaultStatus_t readBrake();
 
         /**
          * @brief Handles the sending of acceleration commands
@@ -114,7 +104,7 @@ class PEDALS
          * 
          * @return If the accelerators are not faulted
          */
-        bool readAccel();
+        FaultStatus_t readAccel();
 };
 
 #endif

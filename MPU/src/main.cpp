@@ -25,10 +25,12 @@ void setup()
     spinningCheck_wait.cancelTimer();
 
     delay(2000);
+    Serial.println("Cycle");
 }
 
 void loop()
 {
+    //Serial.println(".");
     myCan.events();
     gpioProcess();
     driverioProcess();

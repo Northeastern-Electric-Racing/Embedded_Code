@@ -112,7 +112,6 @@ void DRIVERIO::handleErrorLights()
 {
     writeLED4(bms->isSoCCritical());
 
-    //writeYLED(bms->isCharging() || bms->isBoosting());
     writeYLED(((motorController->getTorque() > 1020) && motorController->getIsOn()) || bms->isCharging());
 
     if(bms->isAvgTempCritical())

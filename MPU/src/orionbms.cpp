@@ -2,8 +2,6 @@
 
 ORIONBMS::ORIONBMS()
 {
-    boosting_time.cancelTimer();
-    boosting_warningTime.cancelTimer();
     boostRecharge_wait.cancelTimer();
     isInChargeMode.cancelTimer();
 }
@@ -57,31 +55,6 @@ bool ORIONBMS::isAvgTempCritical()
 bool ORIONBMS::isAvgTempShutdown()
 {
     return avgTemp > SHUTDOWN_CELLTEMP;
-}
-
-void ORIONBMS::setBoosting()
-{
-    if(!isBoostReady()){return;}
-    boosting_time.startTimer(BOOSTING_TIME_LIMIT);
-    boostRecharge_wait.startTimer(BOOSTING_TIME_LIMIT + BOOSTING_RECHARGE_TIME);
-}
-
-
-bool ORIONBMS::isBoosting()
-{
-    return currentDraw > (currentLimit + 1);
-}
-
-
-bool ORIONBMS::isLeavingBoosting()
-{
-    return boosting_warningTime.isTimerExpired() && !boosting_time.isTimerExpired();
-}
-
-
-bool ORIONBMS::isBoostReady()
-{
-    return boostRecharge_wait.isTimerExpired();
 }
 
 

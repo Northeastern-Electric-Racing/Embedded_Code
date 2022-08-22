@@ -36,10 +36,10 @@ class GPIO
         ~GPIO();
 
         /**
-         * @brief Handles the high voltage motor controller fault from when it initially boots
+         * @brief Handles the case for the TSMS switching states
          * 
          */
-        bool handleMCHVFault();
+        bool handleTSMS();
 
         /**
          * @brief Handles the logic behind starting/stopping the pump

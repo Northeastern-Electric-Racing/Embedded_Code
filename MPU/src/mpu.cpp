@@ -42,7 +42,7 @@ void pedalsProcess()
 
 void gpioProcess()
 {
-    bool faultReset = gpio.handleMCHVFault();
+    bool faultReset = gpio.handleTSMS();
     gpio.handlePump();
     gpio.handleRadiatorFan();
 

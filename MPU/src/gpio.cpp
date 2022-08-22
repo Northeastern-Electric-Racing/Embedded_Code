@@ -17,7 +17,7 @@ GPIO::GPIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 GPIO::~GPIO(){}
 
 
-bool GPIO::handleMCHVFault()
+bool GPIO::handleTSMS()
 {
     if(!tsms.isReady())
     {

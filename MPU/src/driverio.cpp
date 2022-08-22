@@ -72,6 +72,7 @@ void DRIVERIO::handleReverseSwitch()
 void DRIVERIO::handleErrorLights()
 {
     tempLED.updateBlink();
+
     if(bms->isAvgTempCritical())
     {
         if(bms->isAvgTempShutdown())

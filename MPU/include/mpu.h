@@ -11,158 +11,85 @@
 #include "gpio.h"
 #include "pedals.h"
 #include "orionbms.h"
+#include "Watchdog_t4.h"
 
-class MPU
-{
-    private:
-        DRIVERIO driverio;
-        GPIO gpio;
-        PEDALS pedals;
-        CASCADIAMC motorController;
-        ORIONBMS bms;
+extern DRIVERIO driverio;
+extern GPIO gpio;
+extern PEDALS pedals;
+extern CASCADIAMC motorController;
+extern ORIONBMS bms;
+
+extern WDT_T4<WDT1> wdt;
+
+extern bool isShutdown;
+extern bool ssReady;
+
+extern Timer canTest_wait;
+extern Timer spinningCheck_wait;
+
+/**
+ * @brief Writes the fault latch whichever condition you pass (see above enumerator)
+ * 
+ * @param status 
+ */
+void writeFaultLatch(FaultStatus_t status);
+
+/**
+* @brief Shuts off the car in the event of an error
+* @note ****Code stays here until power cycle for safety****
+* 
+*/
+void shutOffCar();
         
-        bool isShutdown = false;
-        bool ssReady = false;
+/**
+ * @brief Handles all driverio processes
+ * 
+ */
+void driverioProcess();
 
-        Timer ioRead_wait;
-        Timer canTest_wait;
-        Timer spinningCheck_wait;
-        Timer boosting_debounce;
-
-        enum
-        {
-            TRIGGER_FAULT,
-            FAULT_OK
-        };
+/**
+ * @brief Handles all Pedals Processes
+ * 
+ */
+void pedalsProcess();
         
-        /**
-         * @brief Writes the fault latch whichever condition you pass (see above enumerator)
-         * 
-         * @param status 
-         */
-        void writeFaultLatch(bool status);
+/**
+ * @brief Handles all GPIO Processes
+ * 
+ */
+void gpioProcess();
 
-        /**
-        * @brief Shuts off the car in the event of an error
-        * @note ****Code stays here until power cycle for safety****
-        * 
-        */
-        void shutOffCar();
-        
+/**
+ * @brief Checks if the CAN line is intact
+ * 
+ */
+bool isCANLineOK();
 
-    public:
-        MPU();
+/**
+ * @brief Sets the canLineOK to true
+ * 
+ */
+void setCANLineOK();
 
-        ~MPU();
+/**
+ * @brief Shuts down the car if the isShutdown boolean is false
+ * 
+ */
+void checkShutdownStatus();
 
-        /**
-         * @brief Handles all DriverIO Processes
-         * 
-         */
-        void driverioProcess();
+/**
+ * @brief Sets the current draw and also puts the BMS into boost mode if the current exceeds the current limit
+ * 
+ */
+void bmsCurrentProcess(int16_t currentDraw);
 
-        /**
-         * @brief Handles all Pedals Processes
-         * 
-         */
-        void pedalsProcess();
-        
-        /**
-         * @brief Handles all GPIO Processes
-         * 
-         */
-        void gpioProcess();
+/**
+ * @brief Make sure the motor is spinning if we send a motor torque command
+ * 
+ * @return true 
+ * @return false 
+ */
+bool verifyMotorSpinning();
 
-        /**
-         * @brief Sends the message that was loaded into the MC
-         * 
-         */
-        void sendMCMsg();
-
-        /**
-         * @brief Passes loaded temp into private BMS object
-         * 
-         */
-        void setBMSAvgTemp(uint8_t p_avgTemp);
-
-        /**
-         * @brief Passes Loaded SoC into private BMS object
-         * 
-         */
-        void setBMSSoC(uint8_t p_soc);
-
-        /**
-         * @brief Checks if the CAN line is intact
-         * 
-         */
-        bool isCANLineOK();
-
-        /**
-         * @brief Sets the canLineOK to true
-         * 
-         */
-        void CANLineVerified();
-
-        /**
-         * @brief Shuts down the car if the isShutdown boolean is false
-         * 
-         */
-        void checkShutdownStatus();
-
-        /**
-         * @brief sets the current draw limit for the BMS
-         * 
-         */
-        void setCurrentLimit(uint16_t currentLimit);
-
-        /**
-         * @brief Set the Charge Current Limit for the BMS
-         * 
-         * @param currentLimit 
-         */
-        void setChargeCurrentLimit(uint16_t currentLimit);
-
-        /**
-         * @brief Sets the current draw and also puts the BMS into boost mode if the current exceeds the current limit
-         * 
-         */
-        void bmsCurrentProcess(int16_t currentDraw);
-        
-        /**
-         * @brief Set the motor speed of the MC
-         * 
-         * @param motorSpeed 
-         */
-        void setMotorSpeed(int16_t motorSpeed);
-
-        /**
-         * @brief Enables the BMS to stay in Charging Mode
-         * 
-         */
-        void enableBMSChargingMode();
-
-        /**
-         * @brief Sets the Live BMS Voltage
-         * 
-         */
-        void setBMSVoltage(int16_t voltage);
-
-        /**
-         * @brief Set the Motor Temp
-         * 
-         * @param temp 
-         */
-        void setMotorTemp(int16_t temp);
-
-        /**
-         * @brief Make sure the motor is spinning if we send a motor torque command
-         * 
-         * @return true 
-         * @return false 
-         */
-        bool verifyMotorSpinning();
-};
-
-extern MPU mpu;
 
 #endif

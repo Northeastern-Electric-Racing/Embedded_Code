@@ -1,10 +1,8 @@
 [submodule "MPU/lib/WDT_T4"]
 	path = MPU/lib/WDT_T4
 	url = https://github.com/tonton81/WDT_T4.git
+
 [submodule "MPU/lib/NERduino"]
 	path = MPU/lib/NERduino
 	url = https://github.com/Northeastern-Electric-Racing/NERduino.git
 	branch = mpu-improvements
-[submodule "MPU/lib/--force"]
-	path = MPU/lib/--force
-	url = https://github.com/tonton81/WDT_T4.git

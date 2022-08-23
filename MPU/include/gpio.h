@@ -7,6 +7,7 @@
 #define GPIO_H
 
 #include <nerduino.h>
+#include "gpioHW.h"
 #include "cascadiamc.h"
 #include "orionbms.h"
 
@@ -19,7 +20,10 @@
 class GPIO
 {
     private:
-        bool isSSPowerCycle = true;
+        
+        RADIATORFAN radiatorFan;
+        COOLINGPUMP coolingPump;
+        TSMS tsms;
 
         CASCADIAMC *motorController;
         ORIONBMS *bms;
@@ -32,10 +36,10 @@ class GPIO
         ~GPIO();
 
         /**
-         * @brief Handles the high voltage motor controller fault from when it initially boots
+         * @brief Handles the case for the TSMS switching states
          * 
          */
-        bool handleMCHVFault();
+        bool handleTSMS();
 
         /**
          * @brief Handles the logic behind starting/stopping the pump

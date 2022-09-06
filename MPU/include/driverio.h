@@ -11,6 +11,7 @@
 #include <nerduino.h>
 #include "cascadiamc.h"
 #include "orionbms.h"
+#include "driverioHW.h"
 
 //Pins
 #define LED4_PIN        3
@@ -28,50 +29,20 @@
 class DRIVERIO
 {
     private:
-
         CASCADIAMC *motorController;
         ORIONBMS *bms;
 
-        Timer ssButton_debounce;
+        SPEAKER speaker {SPEAKER_PIN};
+        LED socLED {LED4_PIN};
+        LED tempLED {LED5_PIN};
+        LED yLED {YLED_PIN};
+        STARTBUTTON ssButton {SS_LED_PIN, SS_BUTT_PIN};
+        SWITCH reverseSwitch {REVERSE_SW_PIN};
+        
+        //For future development and integration with Raspberry Pi
+        //DASHBOARD dashboard;
+
         Timer powerToggle_wait;
-        Timer speaker_wait;
-        Timer tempWarningBlink_wait;
-
-        bool LED5_status = false;
-
-        /**
-         * @brief Checks if the button is being pressed and the timer isn't canceled and the timer isn't canceled
-         * 
-         */
-        bool ssButtonDebounced();
-
-        /**
-         * @brief Writes LED4 to a specific state
-         * 
-         * @param state 
-         */
-        void writeLED4(bool state);
-
-        /**
-         * @brief Writes LED5 to a specific state
-         * 
-         * @param state 
-         */
-        void writeLED5(bool state);
-
-        /**
-         * @brief Writes the speaker to a specific state
-         * 
-         * @param state 
-         */
-        void writeSpeaker(bool state);
-
-        /**
-         * @brief Writes the Yellow LED to a specific state
-         * 
-         * @param state 
-         */
-        void writeYLED(bool state);
 
     public:
         DRIVERIO();
@@ -84,7 +55,7 @@ class DRIVERIO
          * @brief Debounces the Start/Stop button and toggles the power depending on if the button was pushed
          * 
          */
-        void handleSSButton();
+        void handleSSButtonPress();
 
         /**
          * @brief Handles the state of the Start/Stop LED

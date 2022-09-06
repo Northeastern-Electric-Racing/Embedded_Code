@@ -15,7 +15,7 @@ Timer spinningCheck_wait;
 void driverioProcess()
 {
     // Serial.println("DriverIO process...");
-    driverio.handleSSButton();
+    driverio.handleSSButtonPress();
     driverio.handleSSLED();
     driverio.handleReverseSwitch();
     driverio.handleErrorLights();

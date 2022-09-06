@@ -162,7 +162,6 @@ SWITCH::~SWITCH(){}
 bool SWITCH::getSwitchState()
 {
     bool switchReading = digitalRead(pin);
-    previousReading = switchReading;
     return switchReading;
 }
 

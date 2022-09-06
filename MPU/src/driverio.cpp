@@ -68,8 +68,9 @@ void DRIVERIO::handleReverseSwitch()
 {
     if(reverseSwitch.hasSwitchToggled())
     {
-       motorController->setDirection(reverseSwitch.getSwitchState()); 
-    }   
+        Serial.println("REVERSE");
+        motorController->setDirection(reverseSwitch.getSwitchState());
+    }  
 }
 
 

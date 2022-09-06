@@ -15,7 +15,7 @@ void CASCADIAMC::disableMCLockout()
     while(!motorCommand_wait.isTimerExpired()){}
 
     sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcOff); // release lockout / OFF
-
+    Serial.println("UNLOCKED");
     motorCommand_wait.startTimer(CAN_CMD_DELAY);
     isMCLocked = false;
 }
@@ -66,6 +66,7 @@ void CASCADIAMC::togglePower()
 {
     mcMsg.config.isOn = !mcMsg.config.isOn;
     isMCLocked = true;
+    Serial.println(mcMsg.config.isOn);
 }
 
 

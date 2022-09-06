@@ -39,6 +39,7 @@ void DRIVERIO::handleSSButtonPress()
     if(motorController->getIsOn() || 
         (!motorController->getIsOn() && !motorController->checkFault()))
     {
+        Serial.println("TOGGLE");
         motorController->togglePower();    //Writes the power state of the motor to the MC message to be sent
         if(motorController->getIsOn())
         {
@@ -65,7 +66,10 @@ void DRIVERIO::handleSSLED()
 
 void DRIVERIO::handleReverseSwitch()
 {
-    motorController->setDirection(reverseSwitch.getSwitchState());
+    if(reverseSwitch.hasSwitchToggled())
+    {
+       motorController->setDirection(reverseSwitch.getSwitchState()); 
+    }   
 }
 
 

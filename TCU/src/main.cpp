@@ -82,7 +82,7 @@ void loop() {
   // logging the extra sensor data from the accelerometer and temp/humid sensor
   static uint32_t dataLastRecorded = 0;
   if (millis() - dataLastRecorded > ACCEL_HUMID_LOG_FREQUENCY) {
-    //logSensorData(); // TODO: Fix Nerduino blocking I2C calls before uncommenting this line
+    logSensorData();
     dataLastRecorded = millis();
   }
 

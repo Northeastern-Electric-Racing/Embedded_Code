@@ -14,10 +14,6 @@
 
 #define CRITICAL_SOC                20      //percentage
 
-#define BOOSTING_TIME_LIMIT         950    //milliseconds
-#define BOOSTING_EXIT_TIME          100     //milliseconds (Time for system to adjust to leaving boost state)
-#define BOOSTING_RECHARGE_TIME      60000   //milliseconds (Time for the BMS to be allowed into a boost state again)
-
 enum
 {
     AIR_CLOSED,
@@ -35,8 +31,6 @@ class ORIONBMS
         int16_t liveVoltage;
 
         uint8_t failsafeCode;
-        Timer boosting_time;
-        Timer boosting_warningTime;
         Timer boostRecharge_wait;
 
         Timer isInChargeMode;
@@ -115,31 +109,6 @@ class ORIONBMS
 /***************************************************************
  * Functions for Current and Voltage Handling
 ****************************************************************/
-
-        /**
-         * @brief Indicates the BMS is going into the "Boost" state
-         *      where the BMS sends out more current than it's set current limit
-         */
-        void setBoosting();
-
-        /**
-         * @brief Gets whether or not the BMS is boosting
-         * 
-         */
-        bool isBoosting();
-
-        /**
-         * @brief Gets if the BMS is about to leave the boosting state
-         * @note this is important, as it gives the MC enough time to realize that we are limiting the current again
-         * 
-         */
-        bool isLeavingBoosting();
-
-        /**
-         * @brief Checks if the boost is ready again
-         * 
-         */
-        bool isBoostReady();
 
         /**
          * @brief sets the current limit of the BMS

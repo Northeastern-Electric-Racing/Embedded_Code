@@ -5,9 +5,6 @@
  */
 #include <nerduino.h>
 #include "mpu.h"
-#include "Watchdog_t4.h"
-
-WDT_T4<WDT1> wdt;
 
 void setup()
 {
@@ -17,16 +14,28 @@ void setup()
     config.trigger = 5;         /* in seconds, 0->128 */
     config.timeout = 15;        /* in seconds, 0->128 */
     wdt.begin(config);
+
+    pedals = PEDALS(&motorController, &bms);
+    driverio = DRIVERIO(&motorController, &bms);
+    gpio = GPIO(&motorController, &bms);
+    pinMode(RELAY_PIN, OUTPUT);
+    writeFaultLatch(NOT_FAULTED);
+
+    canTest_wait.cancelTimer();
+    spinningCheck_wait.cancelTimer();
+
     delay(2000);
+    Serial.println("Cycle");
 }
 
 void loop()
 {
+    //Serial.println(".");
     myCan.events();
-    mpu.gpioProcess();
-    mpu.driverioProcess();
-    mpu.pedalsProcess();
-    mpu.sendMCMsg();
-    mpu.checkShutdownStatus();
+    gpioProcess();
+    driverioProcess();
+    pedalsProcess();
+    motorController.writeMCState();
+    checkShutdownStatus();
     wdt.feed();
 }

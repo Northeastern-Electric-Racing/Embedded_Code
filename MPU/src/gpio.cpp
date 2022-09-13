@@ -5,9 +5,9 @@ GPIO::GPIO(){}
 
 GPIO::GPIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 {
-    pinMode(SS_READY_SEN, INPUT);
-    pinMode(PUMP_PIN, OUTPUT);
-    pinMode(RADIATORFAN_PIN, OUTPUT);
+    radiatorFan = RADIATORFAN(RADIATORFAN_PIN);
+    coolingPump = COOLINGPUMP(PUMP_PIN);
+    tsms = TSMS(SS_READY_SEN);
 
     motorController = p_motorController;
     bms = p_bms;
@@ -17,18 +17,16 @@ GPIO::GPIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 GPIO::~GPIO(){}
 
 
-bool GPIO::handleMCHVFault()
+bool GPIO::handleTSMS()
 {
-    if(!digitalRead(SS_READY_SEN))
+    if(!tsms.isReady())
     {
-        isSSPowerCycle = true;
         motorController->raiseFault();
         return false;
     }
-    if (isSSPowerCycle && digitalRead(SS_READY_SEN) == HIGH)
+    if(tsms.isPowerCycled() && tsms.isReady())
     {
         motorController->clearFault();
-        isSSPowerCycle = false;
         return true;
     }
     return false;
@@ -36,19 +34,12 @@ bool GPIO::handleMCHVFault()
 
 void GPIO::handlePump()
 {
-    digitalWrite(PUMP_PIN, motorController->getIsOn());
+    coolingPump.enablePump(motorController->getIsOn());
 }
 
 void GPIO::handleRadiatorFan()
 {
     int16_t temp = motorController->getRadiatorTemp() / 10;
 
-    //Serial.print("MC TEMP: ");
-    //Serial.println(temp);
-
-    if (temp > MAX_FANSPEED_TEMP) {
-        digitalWrite(RADIATORFAN_PIN, HIGH);
-    } else {
-        digitalWrite(RADIATORFAN_PIN, LOW);
-    }
+    radiatorFan.enableFan(temp > MAX_FANSPEED_TEMP);
 }

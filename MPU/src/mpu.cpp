@@ -1,85 +1,56 @@
 #include "mpu.h"
 
-MPU mpu;
+DRIVERIO driverio;
+GPIO gpio;
+PEDALS pedals;
+CASCADIAMC motorController;
+ORIONBMS bms;
+WDT_T4<WDT1> wdt;
+bool isShutdown = false;
+bool ssReady = false;
+Timer canTest_wait;
+Timer spinningCheck_wait;
 
-MPU::MPU()
+
+void driverioProcess()
 {
-    pedals = PEDALS(&motorController, &bms);
-    driverio = DRIVERIO(&motorController, &bms);
-    gpio = GPIO(&motorController, &bms);
-
-    ioRead_wait.cancelTimer();
-    canTest_wait.cancelTimer();
-    spinningCheck_wait.cancelTimer();
-    boosting_debounce.cancelTimer();
-
-    pinMode(RELAY_PIN, OUTPUT);
-    writeFaultLatch(FAULT_OK);
-}
-
-
-MPU::~MPU(){}
-
-
-void MPU::driverioProcess()
-{
-    if(!ioRead_wait.isTimerExpired()){return;}
-    
     // Serial.println("DriverIO process...");
-    driverio.handleSSButton();
+    driverio.handleSSButtonPress();
     driverio.handleSSLED();
     driverio.handleReverseSwitch();
     driverio.handleErrorLights();
-    ioRead_wait.startTimer(10);
 }
 
 
-void MPU::pedalsProcess()
+void pedalsProcess()
 {
     //isShutdown = isShutdown ? true : !verifyMotorSpinning();
     // TEMP TODO: reimplement
     // if(!verifyMotorSpinning())
     // {Serial.println("MOTOR NOT SPINNING");}
     // Serial.println("Pedals process...");
-    pedals.readBrake();
-    bool accelFault = pedals.readAccel();
-    isShutdown = isShutdown ? true : accelFault;
-    if(accelFault)
-    {Serial.println("ACCEL FAULT");}
+    FaultStatus_t pedalFault = NOT_FAULTED;
+    pedalFault = pedals.readBrake();
+    pedalFault = pedals.readAccel();
+    if(pedalFault == FAULTED)
+    {
+        Serial.println("ACCEL FAULT");
+        isShutdown = true;
+    }
 }
 
 
-void MPU::gpioProcess()
+void gpioProcess()
 {
-    bool faultReset = gpio.handleMCHVFault();
+    bool faultReset = gpio.handleTSMS();
     gpio.handlePump();
     gpio.handleRadiatorFan();
 
     isShutdown = isShutdown ? true : !isCANLineOK();
-    if(!isCANLineOK())
-    {Serial.println("CAN FAULT");}
+    if(!isCANLineOK()){Serial.println("CAN FAULT");}
 }
 
-
-void MPU::sendMCMsg()
-{
-    motorController.writeMCState();
-}
-
-
-void MPU::setBMSAvgTemp(uint8_t p_avgTemp)
-{
-    bms.setAvgTemp(p_avgTemp);
-}
-
-
-void MPU::setBMSSoC(uint8_t p_soc)
-{
-    bms.setSoC(p_soc);
-}
-
-
-bool MPU::isCANLineOK()
+bool isCANLineOK()
 {
     if(canTest_wait.isTimerExpired() && (digitalRead(SS_READY_SEN) == HIGH))
     {
@@ -90,13 +61,13 @@ bool MPU::isCANLineOK()
 }
 
 
-void MPU::CANLineVerified()
+void setCANLineOK()
 {
     canTest_wait.startTimer(1000);
 }
 
 
-void MPU::checkShutdownStatus()
+void checkShutdownStatus()
 {
     if(isShutdown)
     {
@@ -104,88 +75,29 @@ void MPU::checkShutdownStatus()
     }
     else
     {
-        writeFaultLatch(FAULT_OK);
+        writeFaultLatch(NOT_FAULTED);
     }
 }
 
 
-void MPU::shutOffCar()
+void shutOffCar()
 {
-    writeFaultLatch(TRIGGER_FAULT);
+    writeFaultLatch(FAULTED);
     motorController.emergencyShutdown();
     Serial.println("Shutting off Car!!!!!");
     while(1){}
-    writeFaultLatch(FAULT_OK);
+    writeFaultLatch(NOT_FAULTED);
 }
 
 
-void MPU::writeFaultLatch(bool status)
+void writeFaultLatch(FaultStatus_t status)
 {
-    digitalWrite(RELAY_PIN, status);
+    //The logic is flipped because of how the enum is set up to allow for exceptions if fault (FAULT = 1 = true, NOT FAULTED = 0 = False)
+    digitalWrite(RELAY_PIN, !status);
 }
 
 
-void MPU::setCurrentLimit(uint16_t currentLimit)
-{
-    bms.setCurrentLimit(currentLimit);
-}
-
-
-void MPU::setChargeCurrentLimit(uint16_t currentLimit)
-{
-    bms.setChargeCurrentLimit(currentLimit);
-}
-
-
-void MPU::bmsCurrentProcess(int16_t currentDraw)
-{
-    bms.setCurrentDraw(currentDraw);
-
-    if(!boosting_debounce.isTimerExpired())
-    {
-        if(!bms.isCurrentPastLimit())
-        {
-            boosting_debounce.cancelTimer();
-        }
-    }
-
-    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired() && !boosting_debounce.isTimerReset())
-    {
-        bms.setBoosting();
-    }
-
-    if(bms.isCurrentPastLimit() && boosting_debounce.isTimerExpired())
-    {
-        boosting_debounce.startTimer(100);
-    }
-
-}
-
-
-void MPU::setMotorSpeed(int16_t motorSpeed)
-{
-    motorController.setMotorSpeed(motorSpeed);
-}
-
-
-void MPU::enableBMSChargingMode()
-{
-    bms.enableChargingMode();
-}
-
-
-void MPU::setBMSVoltage(int16_t voltage)
-{
-    bms.setLiveVoltage(voltage);
-}
-
-
-void MPU::setMotorTemp(int16_t temp)
-{
-    motorController.setRadiatorTemp(temp);
-}
-
-bool MPU::verifyMotorSpinning()
+bool verifyMotorSpinning()
 {
     if(motorController.shouldMotorBeSpinning() && motorController.getIsOn())
     {

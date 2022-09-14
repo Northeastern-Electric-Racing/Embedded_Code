@@ -1,10 +1,10 @@
 #include "mpu.h"
 
-DRIVERIO driverio;
+DriverIO driverio;
 GPIO gpio;
-PEDALS pedals;
-CASCADIAMC motorController;
-ORIONBMS bms;
+Pedals pedals;
+CascadiaMC motorController;
+OrionBMS bms;
 WDT_T4<WDT1> wdt;
 bool isShutdown = false;
 bool ssReady = false;

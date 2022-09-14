@@ -20,7 +20,7 @@ enum
     AIR_OPEN
 };
 
-class ORIONBMS
+class OrionBMS
 {
     private:
         uint8_t SoC;
@@ -40,9 +40,9 @@ class ORIONBMS
         uint8_t OPEN_AIR_MSG[8] = {0x01,0x00,0x01,0x00,0x00,0xAA,0x00,0x00};
 
     public:
-        ORIONBMS();
+        OrionBMS();
 
-        ~ORIONBMS();
+        ~OrionBMS();
 
 /***************************************************************
  * Functions for Handling Errors and Warnings

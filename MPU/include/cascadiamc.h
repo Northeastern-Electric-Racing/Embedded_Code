@@ -12,7 +12,7 @@
 
 #define NOT_SPINNING_TORQUE_LIMIT   1500
 
-class CASCADIAMC
+class CascadiaMC
 {
     private:
 
@@ -49,9 +49,9 @@ class CASCADIAMC
         void disableMCLockout();
 
     public:
-        CASCADIAMC();
+        CascadiaMC();
 
-        ~CASCADIAMC();
+        ~CascadiaMC();
 
         /**
          * @brief Writes the desired state of the motor controller using the saved config

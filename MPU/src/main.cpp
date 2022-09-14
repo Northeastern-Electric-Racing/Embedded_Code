@@ -15,8 +15,8 @@ void setup()
     config.timeout = 15;        /* in seconds, 0->128 */
     wdt.begin(config);
 
-    pedals = PEDALS(&motorController, &bms);
-    driverio = DRIVERIO(&motorController, &bms);
+    pedals = Pedals(&motorController, &bms);
+    driverio = DriverIO(&motorController, &bms);
     gpio = GPIO(&motorController, &bms);
     pinMode(RELAY_PIN, OUTPUT);
     writeFaultLatch(NOT_FAULTED);

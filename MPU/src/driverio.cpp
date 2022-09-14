@@ -1,22 +1,24 @@
 #include "driverio.h"
 #include <nerduino.h>
 
-DRIVERIO::DRIVERIO(){}
+DriverIO::DriverIO(){}
 
 
-DRIVERIO::DRIVERIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
+DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms)
 {
     powerToggle_wait.cancelTimer();
 
     motorController = p_motorController;
     bms = p_bms;
+
+    motorController->setDirection(reverseSwitch.getSwitchState());
 }
 
 
-DRIVERIO::~DRIVERIO(){}
+DriverIO::~DriverIO(){}
 
 
-void DRIVERIO::handleSSButtonPress()
+void DriverIO::handleSSButtonPress()
 {
     //Poll Button
     ssButton.checkButtonPin();
@@ -39,7 +41,6 @@ void DRIVERIO::handleSSButtonPress()
     if(motorController->getIsOn() || 
         (!motorController->getIsOn() && !motorController->checkFault()))
     {
-        Serial.println("TOGGLE");
         motorController->togglePower();    //Writes the power state of the motor to the MC message to be sent
         if(motorController->getIsOn())
         {
@@ -51,7 +52,7 @@ void DRIVERIO::handleSSButtonPress()
 }
 
 
-void DRIVERIO::handleSSLED()
+void DriverIO::handleSSLED()
 {
     if(bms->getChargeMode())
     {
@@ -64,17 +65,18 @@ void DRIVERIO::handleSSLED()
 }
 
 
-void DRIVERIO::handleReverseSwitch()
+void DriverIO::handleReverseSwitch()
 {
     if(reverseSwitch.hasSwitchToggled())
     {
-        Serial.println("REVERSE");
         motorController->setDirection(reverseSwitch.getSwitchState());
+        Serial.println(motorController->getDirection());
+        Serial.println(".");
     }  
 }
 
 
-void DRIVERIO::handleErrorLights()
+void DriverIO::handleErrorLights()
 {
     tempLED.updateBlink();
 

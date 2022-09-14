@@ -26,11 +26,11 @@
  * @brief Class for handling all Driver IO functionality
  * 
  */
-class DRIVERIO
+class DriverIO
 {
     private:
-        CASCADIAMC *motorController;
-        ORIONBMS *bms;
+        CascadiaMC *motorController;
+        OrionBMS *bms;
 
         SPEAKER speaker {SPEAKER_PIN};
         LED socLED {LED4_PIN};
@@ -45,11 +45,11 @@ class DRIVERIO
         Timer powerToggle_wait;
 
     public:
-        DRIVERIO();
+        DriverIO();
 
-        DRIVERIO(CASCADIAMC *motorController, ORIONBMS *p_bms);
+        DriverIO(CascadiaMC *motorController, OrionBMS *p_bms);
 
-        ~DRIVERIO();
+        ~DriverIO();
 
         /**
          * @brief Debounces the Start/Stop button and toggles the power depending on if the button was pushed

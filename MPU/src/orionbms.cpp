@@ -1,123 +1,123 @@
 #include "orionbms.h"
 
-ORIONBMS::ORIONBMS()
+OrionBMS::OrionBMS()
 {
     boostRecharge_wait.cancelTimer();
     isInChargeMode.cancelTimer();
 }
 
 
-ORIONBMS::~ORIONBMS(){}
+OrionBMS::~OrionBMS(){}
 
 
-void ORIONBMS::setSoC(uint8_t p_SoC)
+void OrionBMS::setSoC(uint8_t p_SoC)
 {
     SoC = p_SoC;
 }
 
 
-void ORIONBMS::setAvgTemp(uint8_t p_avgTemp)
+void OrionBMS::setAvgTemp(uint8_t p_avgTemp)
 {
     avgTemp = p_avgTemp;
 }
 
 
-void ORIONBMS::setFailsafeCode(uint8_t p_failsafeCode)
+void OrionBMS::setFailsafeCode(uint8_t p_failsafeCode)
 {
     failsafeCode = p_failsafeCode;
 }
 
 
-uint8_t ORIONBMS::getSoC()
+uint8_t OrionBMS::getSoC()
 {
     return SoC;
 }
 
 
-bool ORIONBMS::isSoCCritical()
+bool OrionBMS::isSoCCritical()
 {
     return SoC < CRITICAL_SOC;
 }
 
 
-uint8_t ORIONBMS::getAvgTemp()
+uint8_t OrionBMS::getAvgTemp()
 {
     return avgTemp;
 }
 
 
-bool ORIONBMS::isAvgTempCritical()
+bool OrionBMS::isAvgTempCritical()
 {
     return avgTemp > CRITICAL_CELLTEMP;
 }
 
 
-bool ORIONBMS::isAvgTempShutdown()
+bool OrionBMS::isAvgTempShutdown()
 {
     return avgTemp > SHUTDOWN_CELLTEMP;
 }
 
 
-void ORIONBMS::setCurrentLimit(uint16_t p_currentLimit)
+void OrionBMS::setCurrentLimit(uint16_t p_currentLimit)
 {
     currentLimit = p_currentLimit;
 }
 
-void ORIONBMS::setChargeCurrentLimit(uint16_t p_chargeCurrentLimit)
+void OrionBMS::setChargeCurrentLimit(uint16_t p_chargeCurrentLimit)
 {
     chargeCurrentLimit = p_chargeCurrentLimit;
 }
 
 
-uint16_t ORIONBMS::getCurrentLimit()
+uint16_t OrionBMS::getCurrentLimit()
 {
     return currentLimit;
 }
 
 
-uint16_t ORIONBMS::getChargeCurrentLimit()
+uint16_t OrionBMS::getChargeCurrentLimit()
 {
     return chargeCurrentLimit;
 }
 
 
-void ORIONBMS::setCurrentDraw(int16_t p_currentDraw)
+void OrionBMS::setCurrentDraw(int16_t p_currentDraw)
 {
     currentDraw = p_currentDraw;
 }
 
 
-bool ORIONBMS::isCurrentPastLimit()
+bool OrionBMS::isCurrentPastLimit()
 {
     return currentDraw > currentLimit;
 }
 
 
-bool ORIONBMS::isCharging()
+bool OrionBMS::isCharging()
 {
     return currentDraw < 0;
 }
 
 
-void ORIONBMS::setLiveVoltage(int16_t p_voltage)
+void OrionBMS::setLiveVoltage(int16_t p_voltage)
 {
     liveVoltage = p_voltage;
 }
 
 
-int16_t ORIONBMS::getLiveVoltage()
+int16_t OrionBMS::getLiveVoltage()
 {
     return liveVoltage;
 }
 
 
-void ORIONBMS::enableChargingMode()
+void OrionBMS::enableChargingMode()
 {
     isInChargeMode.startTimer(2000);
 }
 
 
-bool ORIONBMS::getChargeMode()
+bool OrionBMS::getChargeMode()
 {
     if(isInChargeMode.isTimerExpired())
     {
@@ -128,14 +128,14 @@ bool ORIONBMS::getChargeMode()
 }
 
 
-void ORIONBMS::toggleAIR()
+void OrionBMS::toggleAIR()
 {
     airOpen = !airOpen;
     sendMessage(CANMSG_MC_SETPARAMETER, 8, airOpen ? OPEN_AIR_MSG : CLOSE_AIR_MSG);
 }
 
 
-bool ORIONBMS::isAIROpen()
+bool OrionBMS::isAIROpen()
 {
     return airOpen;
 }

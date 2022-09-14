@@ -1,10 +1,10 @@
 #include "pedals.h"
 
 
-PEDALS::PEDALS(){}
+Pedals::Pedals(){}
 
 
-PEDALS::PEDALS(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
+Pedals::Pedals(CascadiaMC *p_motorController, OrionBMS *p_bms)
 {
 	pinMode(BRAKELIGHT_PIN, OUTPUT);
 	digitalWrite(BRAKELIGHT_PIN, HIGH);
@@ -18,10 +18,10 @@ PEDALS::PEDALS(CASCADIAMC *p_motorController, ORIONBMS *p_bms)
 }
 
 
-PEDALS::~PEDALS(){}
+Pedals::~Pedals(){}
 
 
-FaultStatus_t PEDALS::readAccel()
+FaultStatus_t Pedals::readAccel()
 {
 	//Begin or continue the pedal reading process
 	uint16_t pedalVal = accelerator.readValue();
@@ -57,7 +57,7 @@ FaultStatus_t PEDALS::readAccel()
 }
 
 
-FaultStatus_t PEDALS::readBrake()
+FaultStatus_t Pedals::readBrake()
 {
 	//Begin or continue the pedal reading process
 	uint16_t pedalVal = brakes.readValue();
@@ -77,7 +77,7 @@ FaultStatus_t PEDALS::readBrake()
 }
 
 
-int16_t PEDALS::calcTorque(double torqueScale)
+int16_t Pedals::calcTorque(double torqueScale)
 {
 	int16_t pedalTorque = 0;
 
@@ -109,7 +109,7 @@ int16_t PEDALS::calcTorque(double torqueScale)
 }
 
 
-int16_t PEDALS::calcCLTorqueLimit()
+int16_t Pedals::calcCLTorqueLimit()
 {
 	int16_t dcVoltage = abs(bms->getLiveVoltage());
 	int16_t dcCurrent = bms->getCurrentLimit();
@@ -141,7 +141,7 @@ int16_t PEDALS::calcCLTorqueLimit()
 }
 
 
-int16_t PEDALS::calcCLRegenLimit()
+int16_t Pedals::calcCLRegenLimit()
 {
 	int16_t dcVoltage = abs(bms->getLiveVoltage());
 	int16_t dcCurrent = bms->getChargeCurrentLimit();

@@ -168,7 +168,7 @@ bool SWITCH::getSwitchState()
 bool SWITCH::hasSwitchToggled()
 {
     if(getSwitchState() == previousReading) return false;
-
+    
     previousReading = getSwitchState();
     return true;
 }

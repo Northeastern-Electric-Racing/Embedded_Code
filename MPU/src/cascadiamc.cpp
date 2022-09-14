@@ -1,16 +1,16 @@
 #include "cascadiamc.h"
 
 
-CASCADIAMC::CASCADIAMC()
+CascadiaMC::CascadiaMC()
 {
     motorCommand_wait.cancelTimer();
 }
 
 
-CASCADIAMC::~CASCADIAMC(){}
+CascadiaMC::~CascadiaMC(){}
 
 
-void CASCADIAMC::disableMCLockout()
+void CascadiaMC::disableMCLockout()
 {
     while(!motorCommand_wait.isTimerExpired()){}
 
@@ -21,7 +21,7 @@ void CASCADIAMC::disableMCLockout()
 }
 
 
-void CASCADIAMC::writeMCState()
+void CascadiaMC::writeMCState()
 {
     if(isMCLocked)
     {
@@ -45,7 +45,7 @@ void CASCADIAMC::writeMCState()
 }
 
 
-void CASCADIAMC::toggleDirection()
+void CascadiaMC::toggleDirection()
 {
     if (mcMsg.config.isOn) {
         togglePower();
@@ -53,7 +53,7 @@ void CASCADIAMC::toggleDirection()
     mcMsg.config.isForward = !mcMsg.config.isForward;
 }
 
-void CASCADIAMC::setDirection(bool p_direction)
+void CascadiaMC::setDirection(bool p_direction)
 {
     if (mcMsg.config.isOn) {
         togglePower();
@@ -62,39 +62,38 @@ void CASCADIAMC::setDirection(bool p_direction)
 }
 
 
-void CASCADIAMC::togglePower()
+void CascadiaMC::togglePower()
 {
     mcMsg.config.isOn = !mcMsg.config.isOn;
     isMCLocked = true;
-    Serial.println(mcMsg.config.isOn);
 }
 
 
-bool CASCADIAMC::getIsOn()
+bool CascadiaMC::getIsOn()
 {
     return mcMsg.config.isOn;
 }
 
 
-bool CASCADIAMC::getDirection()
+bool CascadiaMC::getDirection()
 {
     return mcMsg.config.isForward;
 }
 
 
-void CASCADIAMC::changeTorque(uint16_t p_accelTorque)
+void CascadiaMC::changeTorque(uint16_t p_accelTorque)
 {
     mcMsg.config.accelTorque = p_accelTorque;
 }
 
 
-uint16_t CASCADIAMC::getTorque()
+uint16_t CascadiaMC::getTorque()
 {
     return mcMsg.config.accelTorque;
 }
 
 
-void CASCADIAMC::clearFault()
+void CascadiaMC::clearFault()
 {
     int time = millis() + 250;
     while(millis() < time) {
@@ -105,7 +104,7 @@ void CASCADIAMC::clearFault()
 }
 
 
-void CASCADIAMC::raiseFault()
+void CascadiaMC::raiseFault()
 {
     if (isFaulted == false) {
         Serial.println("CUCK");
@@ -115,13 +114,13 @@ void CASCADIAMC::raiseFault()
 }
 
 
-bool CASCADIAMC::checkFault()
+bool CascadiaMC::checkFault()
 {
     return isFaulted;
 }
 
 
-void CASCADIAMC::emergencyShutdown()
+void CascadiaMC::emergencyShutdown()
 {
     mcMsg.config.isOn = false;
     mcMsg.config.accelTorque = 0;
@@ -129,34 +128,34 @@ void CASCADIAMC::emergencyShutdown()
 }
 
 
-void CASCADIAMC::setMotorSpeed(int16_t p_motorSpeed)
+void CascadiaMC::setMotorSpeed(int16_t p_motorSpeed)
 {
     motorSpeed = p_motorSpeed;
 }
 
-bool CASCADIAMC::isMotorMoving()
+bool CascadiaMC::isMotorMoving()
 {
     return abs(motorSpeed) > 0;
 }
 
 
-bool CASCADIAMC::shouldMotorBeSpinning()
+bool CascadiaMC::shouldMotorBeSpinning()
 {
     return mcMsg.config.accelTorque > NOT_SPINNING_TORQUE_LIMIT;
 }
 
 
-int16_t CASCADIAMC::getMotorSpeed()
+int16_t CascadiaMC::getMotorSpeed()
 {
     return motorSpeed;
 }
 
-void CASCADIAMC::setRadiatorTemp(int16_t temp)
+void CascadiaMC::setRadiatorTemp(int16_t temp)
 {
     radiatorTemp = temp;
 }
 
-int16_t CASCADIAMC::getRadiatorTemp()
+int16_t CascadiaMC::getRadiatorTemp()
 {
     return radiatorTemp;
 }

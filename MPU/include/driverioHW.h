@@ -21,15 +21,15 @@ typedef enum ButtonState_t
 } ButtonState_t;
 
 
-class DASHBOARD
+class Dashboard
 {
     public:
-        DASHBOARD();
-        ~DASHBOARD();
+        Dashboard();
+        ~Dashboard();
 };
 
 
-class BUTTON
+class Button
 {
     private:
         ButtonState_t state = NOT_PRESSED;
@@ -37,8 +37,8 @@ class BUTTON
         uint8_t pin;
 
     public:
-        BUTTON(uint8_t pinNumber);
-        virtual ~BUTTON();
+        Button(uint8_t pinNumber);
+        virtual ~Button();
 
         /**
          * @brief Checks the state of the passed button pin and starts debounce if going from 0->1
@@ -64,16 +64,16 @@ class BUTTON
 };
 
 
-class SWITCH
+class Switch
 {
     private:
         uint8_t pin;
         bool previousReading;
 
     public:
-        SWITCH(uint8_t pinNumber);
+        Switch(uint8_t pinNumber);
         
-        ~SWITCH();
+        ~Switch();
 
         /**
          * @brief Get the current reading of the switch pin
@@ -123,7 +123,7 @@ class LED
 };
 
 
-class SPEAKER
+class Speaker
 {
     private:
         Timer waitTime;
@@ -132,9 +132,9 @@ class SPEAKER
         void writeSpeaker(bool state);
 
     public:
-        SPEAKER();
-        SPEAKER(uint8_t pinNumber);
-        ~SPEAKER();
+        Speaker();
+        Speaker(uint8_t pinNumber);
+        ~Speaker();
 
         /**
          * @brief start the speaker sound and speaker time
@@ -148,11 +148,11 @@ class SPEAKER
 };
 
 
-class STARTBUTTON: public BUTTON, public LED
+class StartButton: public Button, public LED
 {
     public:
-        STARTBUTTON(uint8_t ledPinNumber, uint8_t buttonPinNumber);
-        ~STARTBUTTON();
+        StartButton(uint8_t ledPinNumber, uint8_t buttonPinNumber);
+        ~StartButton();
 };
 
 #endif

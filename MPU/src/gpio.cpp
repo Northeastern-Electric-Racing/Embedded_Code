@@ -5,8 +5,8 @@ GPIO::GPIO(){}
 
 GPIO::GPIO(CascadiaMC *p_motorController, OrionBMS *p_bms)
 {
-    radiatorFan = RADIATORFAN(RADIATORFAN_PIN);
-    coolingPump = COOLINGPUMP(PUMP_PIN);
+    radiatorFan = RadiatorFan(RADIATORFAN_PIN);
+    coolingPump = CoolingPump(PUMP_PIN);
     tsms = TSMS(SS_READY_SEN);
 
     motorController = p_motorController;

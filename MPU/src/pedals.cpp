@@ -12,8 +12,8 @@ Pedals::Pedals(CascadiaMC *p_motorController, OrionBMS *p_bms)
 	motorController = p_motorController;
 	bms = p_bms;
 
-	accelerator = PEDAL_HW(ACCELERATOR_ERROR_PERCENT, MAX_ACCEL_ERRORS, accelPins);
-	brakes = PEDAL_HW(BRAKES_ERROR_PERCENT, MAX_BRAKE_ERRORS, brakePins);
+	accelerator = PedalHW(ACCELERATOR_ERROR_PERCENT, MAX_ACCEL_ERRORS, accelPins);
+	brakes = PedalHW(BRAKES_ERROR_PERCENT, MAX_BRAKE_ERRORS, brakePins);
 	brakeLight = BRAKELIGHT_HW(BRAKELIGHT_PIN);
 }
 

@@ -21,8 +21,8 @@ class GPIO
 {
     private:
         
-        RADIATORFAN radiatorFan;
-        COOLINGPUMP coolingPump;
+        RadiatorFan radiatorFan;
+        CoolingPump coolingPump;
         TSMS tsms;
 
         CascadiaMC *motorController;

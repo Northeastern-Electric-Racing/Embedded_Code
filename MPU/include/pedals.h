@@ -53,8 +53,8 @@ class Pedals
         CascadiaMC *motorController;
         OrionBMS *bms;
 
-        PEDAL_HW brakes;
-        PEDAL_HW accelerator;
+        PedalHW brakes;
+        PedalHW accelerator;
 
         BRAKELIGHT_HW brakeLight;
 

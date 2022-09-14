@@ -1,35 +1,35 @@
 #include "gpioHW.h"
 
-RADIATORFAN::RADIATORFAN(){}
+RadiatorFan::RadiatorFan(){}
 
-RADIATORFAN::RADIATORFAN(uint8_t pinNum)
+RadiatorFan::RadiatorFan(uint8_t pinNum)
 {
     pin = pinNum;
     pinMode(pin, OUTPUT);
     enableFan(false);
 }
 
-RADIATORFAN::~RADIATORFAN(){}
+RadiatorFan::~RadiatorFan(){}
 
-void RADIATORFAN::enableFan(bool status)
+void RadiatorFan::enableFan(bool status)
 {
     isEnabled = status;
     digitalWrite(pin, isEnabled);
 }
 
 
-COOLINGPUMP::COOLINGPUMP(){}
+CoolingPump::CoolingPump(){}
 
-COOLINGPUMP::COOLINGPUMP(uint8_t pinNum)
+CoolingPump::CoolingPump(uint8_t pinNum)
 {
     pin = pinNum;
     pinMode(pin, OUTPUT);
     enablePump(false);
 }
 
-COOLINGPUMP::~COOLINGPUMP(){}
+CoolingPump::~CoolingPump(){}
 
-void COOLINGPUMP::enablePump(bool status)
+void CoolingPump::enablePump(bool status)
 {
     isEnabled = status;
     digitalWrite(pin, isEnabled);

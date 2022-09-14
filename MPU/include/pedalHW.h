@@ -18,7 +18,7 @@
 #define BRAKELIGHT_MIN_TIME_ON      250 //ms
 #define NOT_DONE_READING            0xFFFF
 
-class PEDAL_HW
+class PedalHW
 {
     private:
         //Pedal reading timers
@@ -51,16 +51,16 @@ class PEDAL_HW
         void checkForPedalError(uint16_t val1, uint16_t val2);
 
     public:
-        PEDAL_HW();
+        PedalHW();
 
         /**
          * @brief Construct a new pedal hw object (requires pedal specific parameters)
          * @param errorPercent
          * @param maxErrors
          */
-        PEDAL_HW(float p_errorPercent, uint8_t p_maxErrors, uint8_t *pinNumbers);
+        PedalHW(float p_errorPercent, uint8_t p_maxErrors, uint8_t *pinNumbers);
 
-        ~PEDAL_HW();
+        ~PedalHW();
 
         /**
          * @brief Reads the current pedal value with error-checking and accuracy debounce

@@ -69,6 +69,8 @@ void ADXL312::configureForMeasurement()
 {
     uint8_t cmd[2] = {ADXL312_POWER_CTRL_REG, ADXL312_POWER_CTRL_MEASURECMD}; 
     ADXL312write(cmd, 2);
+    uint8_t cmd2[2] = {0x31, 0x0A}; // Set measurment range to 6g (default 00 is 1.5g)
+    ADXL312write(cmd2, 2);
 }
 
 

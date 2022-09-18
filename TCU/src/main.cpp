@@ -26,7 +26,25 @@ bool loggable = false;
 
 
 // CAN Ids of the messages to log to SD card (only considered if LOG_ALL is 0)
-const uint32_t LOG_IDS[] = {0x001, 0x002, 0x003, 0x004, 0x0A0, 0x0A1, 0x0A2, 0x0A5, 0x0A6, 0x0A7, 0x0AA, 0x0AB, 0x0AC, 0x202, 0xC0};
+const uint32_t LOG_IDS[] = {
+  0x001,
+  0x002, 
+  0x003, 
+  0x004, 
+  0x0A0, 
+  0x0A1, 
+  0x0A2, 
+  0x0A5, 
+  0x0A6, 
+  0x0A7,
+  0x0A8,
+  0x0A9,
+  0x0AA,
+  0x0AB, 
+  0x0AC, 
+  0x202, 
+  0xC0,
+  0x36};
 const int NUM_IDS = sizeof(LOG_IDS) / sizeof(uint32_t);
 
 
@@ -82,7 +100,7 @@ void loop() {
   // logging the extra sensor data from the accelerometer and temp/humid sensor
   static uint32_t dataLastRecorded = 0;
   if (millis() - dataLastRecorded > ACCEL_HUMID_LOG_FREQUENCY) {
-    //logSensorData(); // TODO: Fix Nerduino blocking I2C calls before uncommenting this line
+    logSensorData();
     dataLastRecorded = millis();
   }
 

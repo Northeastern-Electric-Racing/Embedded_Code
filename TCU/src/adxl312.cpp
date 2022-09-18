@@ -75,7 +75,6 @@ void ADXL312::configureForMeasurement()
 void ADXL312::getXYZ(uint8_t *msg)
 {
     uint8_t cmd[1] = {ADXL312_XYZDATA_REG_OFFSET};
-    while(!isDataReady()){}
     ADXL312write(cmd, 1);
     if(ADXL312read(msg, 6))
     {

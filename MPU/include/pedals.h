@@ -44,17 +44,17 @@
 #define ANALOG_BRAKE_THRESH         185
 #define MAXIMUM_BRAKE               255
 
-class PEDALS
+class Pedals
 {
     private:
         bool brakePressed = false;
         uint32_t timeBrake = 0;     // the time at which the brake was last pressed
 
-        CASCADIAMC *motorController;
-        ORIONBMS *bms;
+        CascadiaMC *motorController;
+        OrionBMS *bms;
 
-        PEDAL_HW brakes;
-        PEDAL_HW accelerator;
+        PedalHW brakes;
+        PedalHW accelerator;
 
         BRAKELIGHT_HW brakeLight;
 
@@ -86,11 +86,11 @@ class PEDALS
         int16_t calcCLRegenLimit();
 
     public:
-        PEDALS();
+        Pedals();
 
-        PEDALS(CASCADIAMC *p_motorController, ORIONBMS *p_bms);
+        Pedals(CascadiaMC *p_motorController, OrionBMS *p_bms);
 
-        ~PEDALS();
+        ~Pedals();
 
         /**
          * @brief Reads the status of the brake, and sets brakePressed to True if it is pressed

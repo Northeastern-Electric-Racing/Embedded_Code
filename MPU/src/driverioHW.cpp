@@ -7,16 +7,16 @@
  */
 /**************************************************************************************/
 
-BUTTON::BUTTON(uint8_t pinNumber)
+Button::Button(uint8_t pinNumber)
 {
     pin = pinNumber;
     pinMode(pin, INPUT_PULLUP);
     debounce.cancelTimer();
 }
 
-BUTTON::~BUTTON(){}
+Button::~Button(){}
 
-void BUTTON::checkButtonPin()
+void Button::checkButtonPin()
 {
     if(digitalRead(pin) == HIGH && state == NOT_PRESSED)
     {
@@ -30,7 +30,7 @@ void BUTTON::checkButtonPin()
     }
 }
 
-bool BUTTON::isButtonPressed()
+bool Button::isButtonPressed()
 {
     if(state == PRESSED) return true;
 
@@ -48,7 +48,7 @@ bool BUTTON::isButtonPressed()
     return false;
 }
 
-bool BUTTON::isButtonPressed_Pulse()
+bool Button::isButtonPressed_Pulse()
 {
     if(state == PRESSED) return false;
 
@@ -77,7 +77,7 @@ bool BUTTON::isButtonPressed_Pulse()
  */
 /**************************************************************************************/
 
-SPEAKER::SPEAKER(uint8_t pinNumber)
+Speaker::Speaker(uint8_t pinNumber)
 {
     pin = pinNumber;
     pinMode(pin, OUTPUT);
@@ -85,21 +85,21 @@ SPEAKER::SPEAKER(uint8_t pinNumber)
     waitTime.cancelTimer();
 }
 
-SPEAKER::~SPEAKER(){}
+Speaker::~Speaker(){}
 
-void SPEAKER::writeSpeaker(bool state)
+void Speaker::writeSpeaker(bool state)
 {
     //We need to invert the logic of the speaker due to the hardware
     digitalWrite(pin,!state);
 }
 
-void SPEAKER::playSpeaker()
+void Speaker::playSpeaker()
 {
     writeSpeaker(HIGH);
     waitTime.startTimer(SPEAKER_DURATION);
 }
 
-void SPEAKER::attemptToStopSpeaker()
+void Speaker::attemptToStopSpeaker()
 {
     if(waitTime.isTimerExpired())
     {
@@ -150,25 +150,25 @@ void LED::updateBlink()
  */
 /**************************************************************************************/
 
-SWITCH::SWITCH(uint8_t pinNumber)
+Switch::Switch(uint8_t pinNumber)
 {
     pin = pinNumber;
     pinMode(pin,INPUT_PULLUP);
     previousReading = getSwitchState();
 }
 
-SWITCH::~SWITCH(){}
+Switch::~Switch(){}
 
-bool SWITCH::getSwitchState()
+bool Switch::getSwitchState()
 {
     bool switchReading = digitalRead(pin);
     return switchReading;
 }
 
-bool SWITCH::hasSwitchToggled()
+bool Switch::hasSwitchToggled()
 {
     if(getSwitchState() == previousReading) return false;
-
+    
     previousReading = getSwitchState();
     return true;
 }
@@ -179,10 +179,10 @@ bool SWITCH::hasSwitchToggled()
  */
 /**************************************************************************************/
 
-STARTBUTTON::STARTBUTTON(uint8_t ledPinNumber, uint8_t buttonPinNumber)
-    : BUTTON(buttonPinNumber), LED(ledPinNumber) {}
+StartButton::StartButton(uint8_t ledPinNumber, uint8_t buttonPinNumber)
+    : Button(buttonPinNumber), LED(ledPinNumber) {}
 
-STARTBUTTON::~STARTBUTTON(){}
+StartButton::~StartButton(){}
 
 /**************************************************************************************/
 /**
@@ -190,7 +190,7 @@ STARTBUTTON::~STARTBUTTON(){}
  */
 /**************************************************************************************/
 
-DASHBOARD::DASHBOARD()
+Dashboard::Dashboard()
 {}
 
-DASHBOARD::~DASHBOARD(){}
+Dashboard::~Dashboard(){}

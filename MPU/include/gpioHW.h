@@ -8,16 +8,16 @@
 
 #include <nerduino.h>
 
-class RADIATORFAN
+class RadiatorFan
 {
     private:
         bool isEnabled = true;
         uint8_t pin;
 
     public:
-        RADIATORFAN();
-        RADIATORFAN(uint8_t pinNum);
-        ~RADIATORFAN();
+        RadiatorFan();
+        RadiatorFan(uint8_t pinNum);
+        ~RadiatorFan();
 
         /**
          * @brief Enables/disables the fan entirely
@@ -28,17 +28,17 @@ class RADIATORFAN
 };
 
 
-class COOLINGPUMP
+class CoolingPump
 {
     private:
         bool isEnabled = true;
         uint8_t pin;
 
     public:
-        COOLINGPUMP();
-        COOLINGPUMP(uint8_t pinNum);
+        CoolingPump();
+        CoolingPump(uint8_t pinNum);
 
-        ~COOLINGPUMP();
+        ~CoolingPump();
 
         /**
          * @brief Enables/disables the pump

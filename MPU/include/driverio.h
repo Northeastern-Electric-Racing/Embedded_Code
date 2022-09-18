@@ -26,18 +26,18 @@
  * @brief Class for handling all Driver IO functionality
  * 
  */
-class DRIVERIO
+class DriverIO
 {
     private:
-        CASCADIAMC *motorController;
-        ORIONBMS *bms;
+        CascadiaMC *motorController;
+        OrionBMS *bms;
 
-        SPEAKER speaker {SPEAKER_PIN};
+        Speaker speaker {SPEAKER_PIN};
         LED socLED {LED4_PIN};
         LED tempLED {LED5_PIN};
         LED yLED {YLED_PIN};
-        STARTBUTTON ssButton {SS_LED_PIN, SS_BUTT_PIN};
-        SWITCH reverseSwitch {REVERSE_SW_PIN};
+        StartButton ssButton {SS_LED_PIN, SS_BUTT_PIN};
+        Switch reverseSwitch {REVERSE_SW_PIN};
         
         //For future development and integration with Raspberry Pi
         //DASHBOARD dashboard;
@@ -45,11 +45,11 @@ class DRIVERIO
         Timer powerToggle_wait;
 
     public:
-        DRIVERIO();
+        DriverIO();
 
-        DRIVERIO(CASCADIAMC *motorController, ORIONBMS *p_bms);
+        DriverIO(CascadiaMC *motorController, OrionBMS *p_bms);
 
-        ~DRIVERIO();
+        ~DriverIO();
 
         /**
          * @brief Debounces the Start/Stop button and toggles the power depending on if the button was pushed

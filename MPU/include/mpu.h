@@ -13,11 +13,11 @@
 #include "orionbms.h"
 #include "Watchdog_t4.h"
 
-extern DRIVERIO driverio;
+extern DriverIO driverio;
 extern GPIO gpio;
-extern PEDALS pedals;
-extern CASCADIAMC motorController;
-extern ORIONBMS bms;
+extern Pedals pedals;
+extern CascadiaMC motorController;
+extern OrionBMS bms;
 
 extern WDT_T4<WDT1> wdt;
 

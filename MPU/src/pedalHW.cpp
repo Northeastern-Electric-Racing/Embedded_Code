@@ -1,10 +1,10 @@
 #include "pedalHW.h"
 
-PEDAL_HW::PEDAL_HW(){}
+PedalHW::PedalHW(){}
 
-PEDAL_HW::~PEDAL_HW(){}
+PedalHW::~PedalHW(){}
 
-PEDAL_HW::PEDAL_HW(float p_errorPercent, uint8_t p_maxErrors, uint8_t *pinNumbers)
+PedalHW::PedalHW(float p_errorPercent, uint8_t p_maxErrors, uint8_t *pinNumbers)
 {
     errorPercent = p_errorPercent;
     maxErrors = p_maxErrors;
@@ -15,7 +15,7 @@ PEDAL_HW::PEDAL_HW(float p_errorPercent, uint8_t p_maxErrors, uint8_t *pinNumber
 	readingDebounce.cancelTimer();
 }
 
-uint16_t PEDAL_HW::readValue()
+uint16_t PedalHW::readValue()
 {
     //Acounting for first loop
     if(readingDebounce.isTimerReset()) readingDebounce.startTimer(PEDAL_DEBOUNCE_TIME);
@@ -31,7 +31,7 @@ uint16_t PEDAL_HW::readValue()
     return finalReading;
 }
 
-void PEDAL_HW::minimizingDiffDebounce()
+void PedalHW::minimizingDiffDebounce()
 {
     uint16_t pin1Val = analogRead(pin1);
     uint16_t pin2Val = analogRead(pin2);
@@ -45,7 +45,7 @@ void PEDAL_HW::minimizingDiffDebounce()
     checkForPedalError(pin1Val, pin2Val);
 }
 
-void PEDAL_HW::checkForPedalError(uint16_t val1, uint16_t val2)
+void PedalHW::checkForPedalError(uint16_t val1, uint16_t val2)
 {
     // Check for out of range values and errors (bottoming out of sensors/one faulty sensor)
     if (val1 == 0 ||
@@ -62,7 +62,7 @@ void PEDAL_HW::checkForPedalError(uint16_t val1, uint16_t val2)
     }
 }
 
-FaultStatus_t PEDAL_HW::isFaulted()
+FaultStatus_t PedalHW::isFaulted()
 {
     return readingFault;
 }

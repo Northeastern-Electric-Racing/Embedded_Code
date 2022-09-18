@@ -21,17 +21,17 @@ class GPIO
 {
     private:
         
-        RADIATORFAN radiatorFan;
-        COOLINGPUMP coolingPump;
+        RadiatorFan radiatorFan;
+        CoolingPump coolingPump;
         TSMS tsms;
 
-        CASCADIAMC *motorController;
-        ORIONBMS *bms;
+        CascadiaMC *motorController;
+        OrionBMS *bms;
 
     public:
         GPIO();
 
-        GPIO(CASCADIAMC *p_motorController, ORIONBMS *p_bms);
+        GPIO(CascadiaMC *p_motorController, OrionBMS *p_bms);
 
         ~GPIO();
 

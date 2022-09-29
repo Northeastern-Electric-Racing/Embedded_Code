@@ -1,22 +1,28 @@
 #include <Arduino.h>
 #include <FlexCAN_T4.h>
-#include "nerduino.h"
+#include <TimeLib.h>
 #include "Watchdog_t4.h"
+
+#include "nerduino.h"
+#include "rtc.h"
+#include "message.h"
 #include "xbee_at.h"
 #include "logger.h"
 #include "debug.h"
 
-#define TEST_LOG 0 // set to 1 to log the test messages in the main loop()
-#define LOG_ALL 0 // set to 1 to log all CAN messages, 0 to filter
+
+#define ENABLE_TEST_LOGGING    1 // set to 1 to log the test messages in the main loop()
+#define LOG_ALL_MESSAGES       0 // set to 1 to log all CAN messages, 0 to filter
+#define SEND_XBEE_ALL_MESSAGES 0 // set to 1 to log all CAN messages, 0 to filter
 
 #define BAUD_RATE 1000000U // 250 kbps 
 #define MAX_MB_NUM 16 // maximum number of CAN mailboxes to use 
 
 #define MIN_LOG_FREQUENCY 1000 // the max time length between logs (in ms)
 
-#define ACCEL_HUMID_LOG_FREQUENCY 10 // time between logging accel/humid data
-#define ACCEL_LOG_ID 0x300
-#define HUMID_LOG_ID 0x301
+#define SENSOR_LOG_FREQUENCY 100 // time between recording Nerduino sensor data
+#define ACCELEROMETER_ID 0x300
+#define TEMP_HUMID_ID 0x301
 
 #define ANALOG1_PIN A0 // Pin 14 on teensy
 #define ANALOG2_PIN A6       
@@ -32,7 +38,6 @@ FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> myCan; // main CAN object
 WDT_T4<WDT1> wdt;
 
 int blinkLedState = LOW;
-
 
 // CAN Ids of the messages to log to SD card (only considered if LOG_ALL is 0)
 const uint32_t LOG_IDS[] = {
@@ -56,11 +61,16 @@ const uint32_t LOG_IDS[] = {
   0x36};
 const int NUM_IDS = sizeof(LOG_IDS) / sizeof(uint32_t);
 
+// CAN Ids of the messages to send via XBee (only considered if SEND_XBEE_ALL_MESSAGES is 0)
+const uint32_t SEND_XBEE_IDS[] = {};
+const int NUM_SEND_XBEE_IDS = sizeof(SEND_XBEE_IDS) / sizeof(uint32_t);
+
 
 // function declarations
 int sendMessage(uint32_t id, uint8_t len, const uint8_t *buf); 
 void incomingCANCallback(const CAN_message_t &msg);
-void logSensorData();
+void logAccelerometerData();
+void logTempSensorData();
 void logAnalogs();
 
 
@@ -90,6 +100,7 @@ void setup() {
   Serial.begin(9600); 
   delay(100);
 
+  RtcInit();
   LoggerInit(MIN_LOG_FREQUENCY);
 
   NERduino.begin();
@@ -107,7 +118,7 @@ void setup() {
   pinMode(ANALOG2_PIN, INPUT);
   pinMode(ANALOG3_PIN, INPUT);
   
-  // XbeeInit(&Serial1, 115200);
+  XBeeInit(&Serial1, 115200);
 
   WDT_timings_t config;
   config.trigger = 5; /* in seconds, 0->128 */
@@ -117,8 +128,7 @@ void setup() {
 
 
 /**
- * @brief Continuously read incoming CAN messages and the values of the 
- *        accelerator potentiometers and brake switches
+ * @brief Continuously read incoming CAN messages and log messages.
  * 
  */
 void loop() {
@@ -126,26 +136,32 @@ void loop() {
   myCan.events();
   blinkLED();
 
-  if (LoggerWrite() == LOGGER_ERROR_SD_CARD) {
+  if (LoggerWrite() == LOGGER_STATUS::LGR_ERROR_SD_CARD) {
     LoggerInit(MIN_LOG_FREQUENCY);
     DPRINTLN(F("Reinitializing logger due to internal error")); 
   }
 
   // logging the extra sensor data from the accelerometer and temp/humid sensor
   static uint32_t dataLastRecorded = 0;
-  if (millis() - dataLastRecorded > ACCEL_HUMID_LOG_FREQUENCY) {
-    logSensorData();
+  if (millis() - dataLastRecorded > SENSOR_LOG_FREQUENCY) {
+    logAccelerometerData();
+    logTempSensorData();
     logAnalogs();
     dataLastRecorded = millis();
   }
 
   // USED FOR TESTING WHEN NOT CONNECTED TO CAN
-#if TEST_LOG == 1 
+#if ENABLE_TEST_LOGGING == 1 
   static unsigned long writeTime = millis();
   static uint8_t writeData = 0;
   if (millis() - writeTime > 10) {
     const uint8_t buf[] = {writeData, writeData, writeData, writeData};
-    LoggerBufferMessage(0x01, 4, buf);
+    message_t *message;
+    message->id = 0x01;
+    message->length = 4;
+    memcpy(message->dataBuf, buf, 4);
+    RtcGetTime(&message->timestamp);
+    LoggerBufferMessage(message);
 
     writeData++;
     writeData %= 20;
@@ -156,26 +172,45 @@ void loop() {
 
 
 /**
- * @brief Log the data from the attached sensors (accelerometer and humidity/temp sensor)
- * 
+ * @brief Log the data from the Nerduino accelerometer
  */
-void logSensorData() {
+void logAccelerometerData() {
   XYZData_t xyzData[1];
-  HumidData_t humidData[1];
-
   NERduino.getADXLdata(xyzData, 1);
-  NERduino.getSHTdata(humidData, 1);
-
   uint8_t accelBuf[6] = {
     xyzData[0].XData.rawdata[0], xyzData[0].XData.rawdata[1],
     xyzData[0].YData.rawdata[0], xyzData[0].YData.rawdata[1],
     xyzData[0].ZData.rawdata[0], xyzData[0].ZData.rawdata[1]
   };
 
+  message_t *message;
+  message->id = ACCELEROMETER_ID;
+  message->length = 6;
+  memcpy(message->dataBuf, accelBuf, 6);
+  RtcGetTime(&message->timestamp);
+
+  LoggerBufferMessage(message);
+}
+
+
+/**
+ * @brief Log the data from the Nerduino humidity/temp sensor
+ */
+void logTempSensorData() {
+  HumidData_t humidData[1];
+  NERduino.getSHTdata(humidData, 1);
   uint8_t humidBuf[4] = {
     humidData[0].TempData.rawdata[0], humidData[0].TempData.rawdata[1],
     humidData[0].HumidData.rawdata[0], humidData[0].HumidData.rawdata[1]
   };
+
+  message_t *message;
+  message->id = TEMP_HUMID_ID;
+  message->length = 4;
+  memcpy(message->dataBuf, humidBuf, 4);
+  RtcGetTime(&message->timestamp);
+
+  LoggerBufferMessage(message);
 }
 
 
@@ -196,8 +231,20 @@ void logAnalogs() {
     analog3Value & 255, (analog3Value >> 8) & 255, (analog3Value >> 16) & 255, (analog3Value >> 24) & 255
   };
 
-  LoggerBufferMessage(ANALOG1_LOG_ID, 4, analog1Buf);
-  LoggerBufferMessage(STRAIN_GAUGE_LOG_ID, 8, strainGaugeBuf);
+  message_t *message1;
+  message1->id = ANALOG1_LOG_ID;
+  message1->length = 4;
+  memcpy(message1->dataBuf, analog1Buf, 4);
+  RtcGetTime(&message1->timestamp);
+
+  message_t *message2;
+  message2->id = STRAIN_GAUGE_LOG_ID;
+  message2->length = 8;
+  memcpy(message2->dataBuf, strainGaugeBuf, 8);
+  RtcGetTime(&message2->timestamp);
+
+  LoggerBufferMessage(message1);
+  LoggerBufferMessage(message2);
 }
 
 
@@ -206,28 +253,36 @@ void logAnalogs() {
  * 
  * @param msg received CAN message
  */
-void incomingCANCallback(const CAN_message_t &msg)
-{
-  // only log if the message id is in the LOG_IDS list or LOG_ALL is enabled
-  int foundId = 0;
-  if (LOG_ALL) {
-    foundId = 1;
+void incomingCANCallback(const CAN_message_t &msg) {
+  message_t *message;
+  message->id = msg.id;
+  message->length = msg.len;
+  memcpy(message->dataBuf, msg.buf, msg.len);
+  RtcGetTime(&message->timestamp);
+
+  // Log if global logging is enabled or search through loggable message IDs
+  if (LOG_ALL_MESSAGES) {
+    LoggerBufferMessage(message);
   } else {
-    for (int i = 0; i < NUM_IDS; i++) {
+    for (int i = 0; i < NUM_LOG_IDS; i++) {
       if (LOG_IDS[i] == msg.id) {
-        foundId = 1;
+        LoggerBufferMessage(message);
         break;
       }
     }
   }
 
-  // exit the function if we shouldn't log message
-  if (!foundId) {
-    return;
+  // Send if global XBee sending is enabled or search through sendable message IDs
+  if (SEND_XBEE_ALL_MESSAGES) {
+    XBeeSendMessage(message);
+  } else {
+    for (int i = 0; i < NUM_SEND_XBEE_IDS; i++) {
+      if (SEND_XBEE_IDS[i] == msg.id) {
+        XBeeSendMessage(message);
+        break;
+      }
+    }
   }
-
-  // add message to log buffer
-  LoggerBufferMessage(msg.id, msg.len, msg.buf);
 }
 
 
@@ -239,8 +294,7 @@ void incomingCANCallback(const CAN_message_t &msg)
  * @param buf Data buffer to send
  * @return int - Error code (Negative on failure, other on success)
  */
-int sendMessage(uint32_t id, uint8_t len, const uint8_t *buf)
-{
+int sendMessage(uint32_t id, uint8_t len, const uint8_t *buf) {
   CAN_message_t msg;
   msg.id = id;
   msg.len = len;

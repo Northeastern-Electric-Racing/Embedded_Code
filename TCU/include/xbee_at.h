@@ -1,65 +1,73 @@
 /**
  * @file xbee_at.h
- * @author Peter Rydzynski
- * @brief Utilities to send and receive data with the Xbee wireless modules
- * @date 2022-05-16
+ * @brief Utilities to send and receive data with the XBee wireless modules
  * 
- * @details Xbees have two device modes, API and AT. This file defines AT mode, which
+ * @details XBees have two device modes, API and AT. This file defines AT mode, which
  * acts as a raw serial bridge between the two communicating modules. API mode, on
  * the other hand, defines packet structures for more functionality (and more complexity).
  * See the teensy 4.1 docs for an impelementation of API mode.
  *
  */
 
+#ifndef XBEE_AT_H
+#define XBEE_AT_H
+
 #include <Arduino.h>
+#include "message.h"
 
-/* Error codes for the function return values */
-#define XBEE_SUCCESS              0
-#define XBEE_ERROR_RX_EMPTY       1
-#define XBEE_ERROR_TX_FULL        2
-#define XBEE_ERROR_MAX_CALLBACKS  3
-#define XBEE_ERROR_RECEIVE_MODE   4
-#define XBEE_ERROR_RECEIVE_FORMAT 5
-#define XBEE_ERROR_CONNECTION     6
 
-/* Maximum length of a received message over the Xbee connection */
+/* Maximum length of a received message over the XBee connection */
 #define MAX_READ_LENGTH 100
 
-/* Format for callback functions on data reception */
-typedef void (*XbeeCallback) (uint8_t *buf, int length);
+/* Return status codes for XBee functions. */
+typedef enum {
+  XB_SUCCESS              = 0,
+  XB_ERROR_RX_EMPTY       = 1,
+  XB_ERROR_TX_FULL        = 2,
+  XB_ERROR_MAX_CALLBACKS  = 3,
+  XB_ERROR_RECEIVE_MODE   = 4,
+  XB_ERROR_RECEIVE_FORMAT = 5,
+  XB_ERROR_CONNECTION     = 6
+} XBEE_STATUS;
+
+
+/* Format for callback functions on data reception. */
+typedef void (*XBeeCallback) (uint8_t *buf, int length);
 
 /**
- * @brief Initializes the Xbee connection
+ * @brief Initializes the XBee connection
  * 
  * @param serialPort Serial port
  * @param baudRate Baud rate
+ * @return XBEE_STATUS
  */
-void XbeeInit(HardwareSerial *serialPort, uint32_t baudRate);
+XBEE_STATUS XBeeInit(HardwareSerial *serialPort, uint32_t baudRate);
 
 /**
  * @brief Registers a callback to be notified when data is received.
  * 
  * @param callback Function to register
- * @return int status code (0 on success, other on failure)
+ * @return XBEE_STATUS
  */
-int XbeeRegisterCallback(XbeeCallback callback);
+XBEE_STATUS XBeeRegisterCallback(XBeeCallback callback);
 
 /**
- * @brief Sends data over the Xbee connection
+ * @brief Sends data over the XBee connection
  * 
- * @param buf Data buffer to send
- * @param len Length of the data to send
- * @return Actual amount of data sent
+ * @param message pointer to the message
+ * @return XBEE_STATUS
  */
-int XbeeSendData(uint8_t *buf, uint32_t len);
+XBEE_STATUS XBeeSendMessage(message_t *message);
 
 /**
- * @brief Receives data from the xbee connection. 
+ * @brief Receives data from the XBee connection. 
  *     NOTE: Only usable if we have not registered a callback.
  * 
  * @param buf Data buffer to store recevied data
  * @param maxLen Max length of data to store in the buffer
- * @return Actual amount of data received
+ * @param receivedLength return variable for amount of data received
+ * @return XBEE_STATUS
  */
-int XbeeReceiveData(uint8_t *buf, uint32_t maxLen);
+XBEE_STATUS XBeeReceiveMessage(uint8_t *buf, uint32_t maxLen, uint32_t *receivedLength);
 
+#endif

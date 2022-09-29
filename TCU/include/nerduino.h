@@ -13,7 +13,6 @@
 #include <Arduino.h>
 #include "adxl312.h"
 #include "sht30.h"
-#include "timer.h"
 
 //Teensy Pinout
 #define RELAY_PIN       36          //implementation of RELAY_PIN is as simple as digitalWrite(RELAY_PIN,HIGH or LOW);

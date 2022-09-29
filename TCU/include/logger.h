@@ -1,54 +1,46 @@
 /**
  * @file logger.h
- * @author Peter Rydzynski
  * @brief Defines logging utility functions for the Nerduino SD card
- * @date 2022-05-18
  * 
  */
 
+#ifndef LOGGER_H
+#define LOGGER_H
+
 #include <stdint.h>
+#include "message.h"
 
-// Error codes for function return values
-#define LOGGER_SUCCESS           0
-#define LOGGER_ERROR_BUFFER_FULL 1
-#define LOGGER_ERROR_SD_CARD     2
-#define LOGGER_ERROR_NO_WRITE    3
-#define LOGGER_ERROR_NO_INIT     4
-
-
-typedef struct {
-  char timestamp[25]; // timestamp in YYYY-MM-DDT00:00:00.000Z format
-  uint32_t id;
-  uint8_t length;
-  uint8_t dataBuf[8]; // max number of bytes is 8
-} message_format_t;
+/* Return status codes for Logger functions. */
+typedef enum {
+  LGR_SUCCESS           = 0,
+  LGR_ERROR_BUFFER_FULL = 1,
+  LGR_ERROR_SD_CARD     = 2,
+  LGR_ERROR_NO_WRITE    = 3
+} LOGGER_STATUS;
 
 
 /**
  * @brief Initializes the SD logging functionality.
  * 
  * @param logFrequency Minimum rate at which to log the buffered messages
- * @return int Status code
+ * @return LOGGER_STATUS
  */
-int LoggerInit(uint32_t logFrequency);
+LOGGER_STATUS LoggerInit(uint32_t logFrequency);
 
 
 /**
- * @brief Adds the given data plus a generated timestamp to the message buffer.
- *        Uses a time since startup if the RTC is not in use, or the real time otherwise.
+ * @brief Adds the given message to the log buffer.
  * 
- * @param id Message id
- * @param len Message length
- * @param buf Data bytes (Array of length `len`)
- * @return int Status code
+ * @param message pointer to the message
+ * @return LOGGER_STATUS
  */
-int LoggerBufferMessage(uint32_t id, uint8_t len, const uint8_t *buf);
+LOGGER_STATUS LoggerBufferMessage(message_t *message);
 
 
 /**
  * @brief Writes the messages currently buffered to the SD card. 
  * 
- * @return int Status code
+ * @return LOGGER_STATUS
  */
 int LoggerWrite();
 
@@ -59,3 +51,5 @@ int LoggerWrite();
  * @return true when active, false otherwise
  */
 bool LoggerActive();
+
+#endif

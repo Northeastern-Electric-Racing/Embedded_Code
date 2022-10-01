@@ -18,6 +18,9 @@
 #define ACCEL_LOG_ID 0x300
 #define HUMID_LOG_ID 0x301
 
+#define ANALOG_PIN A0       // Pin 14 on teensy
+#define ANALOG_LOG_ID 0x302
+
 
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> myCan; // main CAN object
 WDT_T4<WDT1> wdt;
@@ -73,6 +76,8 @@ void setup() {
   myCan.enableFIFO(); 
   myCan.enableFIFOInterrupt(); 
   myCan.onReceive(incomingCANCallback);
+
+  pinMode(ANALOG_PIN, INPUT);
   
   // XbeeInit(&Serial1, 115200);
 
@@ -142,8 +147,14 @@ void logSensorData() {
     humidData[0].HumidData.rawdata[0], humidData[0].HumidData.rawdata[1]
   };
 
+  int analogValue = analogRead(ANALOG_PIN); // Value of 0 to 1023 for 0 to 5V
+  uint8_t analogBuf[2] = {
+    analogValue & 255, (analogValue >> 8) & 255, // Creates a little endian, 2 byte buffer to store a value from 0 to 1023
+  };
+
   LoggerBufferMessage(ACCEL_LOG_ID, 6, accelBuf);
   LoggerBufferMessage(HUMID_LOG_ID, 4, humidBuf);
+  LoggerBufferMessage(ANALOG_LOG_ID, 2, analogBuf);
 }
 
 /**

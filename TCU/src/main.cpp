@@ -14,7 +14,7 @@
 
 #define MIN_LOG_FREQUENCY 1000 // the max time length between logs (in ms)
 
-#define ACCEL_HUMID_LOG_FREQUENCY 100 // time between logging accel/humid data
+#define ACCEL_HUMID_LOG_FREQUENCY 10 // time between logging accel/humid data
 #define ACCEL_LOG_ID 0x300
 #define HUMID_LOG_ID 0x301
 

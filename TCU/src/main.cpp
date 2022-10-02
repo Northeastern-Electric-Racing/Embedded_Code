@@ -147,14 +147,16 @@ void logSensorData() {
     humidData[0].HumidData.rawdata[0], humidData[0].HumidData.rawdata[1]
   };
 
-  int analogValue = analogRead(ANALOG_PIN); // Value of 0 to 1023 for 0 to 5V
-  uint8_t analogBuf[2] = {
-    analogValue & 255, (analogValue >> 8) & 255, // Creates a little endian, 2 byte buffer to store a value from 0 to 1023
+  // Get current value and multiple by 10^6 to store in an int variable
+  int analogValue = analogRead(ANALOG_PIN) - 509;
+  int adjustedValue = analogValue * 74054.326212; // 0.00488 / 0.066 * 10^6 scale factor
+  uint8_t analogBuf[4] = {
+    adjustedValue & 255, (adjustedValue >> 8) & 255, (adjustedValue >> 16) & 255, (adjustedValue >> 24) & 255
   };
 
   LoggerBufferMessage(ACCEL_LOG_ID, 6, accelBuf);
   LoggerBufferMessage(HUMID_LOG_ID, 4, humidBuf);
-  LoggerBufferMessage(ANALOG_LOG_ID, 2, analogBuf);
+  LoggerBufferMessage(ANALOG_LOG_ID, 4, analogBuf);
 }
 
 /**

@@ -7,8 +7,6 @@
 /* Format constants */
 #define START_TOKEN 'T'
 #define END_TOKEN '\r'
-#define MESSAGE_FORMAT "%c%.10lu%.3hu%.3x%.1hhu%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%c\0"
-#define MESSAGE_LENGTH sizeof(MESSAGE_FORMAT) / sizeof(uint8_t)
 
 
 static XBeeCallback callbacks[MAX_CALLBACK_COUNT];

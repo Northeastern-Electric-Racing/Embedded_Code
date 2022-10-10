@@ -154,7 +154,7 @@ void loop() {
 #if ENABLE_TEST_LOGGING == 1 
   static unsigned long writeTime = millis();
   static uint8_t writeData = 0;
-  if (millis() - writeTime > 10) {
+  if (millis() - writeTime > 100) {
     const uint8_t buf[] = {writeData, writeData, writeData, writeData};
     message_t *message;
     message->id = 0x01;

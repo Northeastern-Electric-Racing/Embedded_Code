@@ -18,12 +18,12 @@
 #define ACCEL_LOG_ID 0x300
 #define HUMID_LOG_ID 0x301
 
-#define ANALOG1_PIN A0       // Pin 14 on teensy
-#define ANALOG1_LOG_ID 0x302
+#define ANALOG1_PIN A0 // Pin 14 on teensy
 #define ANALOG2_PIN A1       
-#define ANALOG2_LOG_ID 0x303
-#define ANALOG3_PIN A2      
-#define ANALOG3_LOG_ID 0x304
+#define ANALOG3_PIN A2 
+
+#define ANALOG1_LOG_ID      0x302  
+#define STRAIN_GAUGE_LOG_ID 0x303
 
 #define LED_BLINK_DELAY_MS 500
 
@@ -185,22 +185,19 @@ void logSensorData() {
  */
 void logAnalogs() {
   int analog1Value = (analogRead(ANALOG1_PIN) - 509) * 74054.326212; // 0.00488 / 0.066 * 10^6 scale factor
-  int analog2Value = analogRead(ANALOG2_PIN);
-  int analog3Value = analogRead(ANALOG3_PIN);
+  int analog2Value = analogRead(ANALOG2_PIN) * 3225.80645; // convert to 3.3V with 10^6 scale factor
+  int analog3Value = analogRead(ANALOG3_PIN) * 3225.80645;
 
   uint8_t analog1Buf[4] = {
     analog1Value & 255, (analog1Value >> 8) & 255, (analog1Value >> 16) & 255, (analog1Value >> 24) & 255
   };
-  uint8_t analog2Buf[2] = {
-    analog2Value & 255, (analog2Value >> 8) & 255
-  };
-  uint8_t analog3Buf[2] = {
-    analog3Value & 255, (analog3Value >> 8) & 255
+  uint8_t strainGaugeBuf[8] = {
+    analog2Value & 255, (analog2Value >> 8) & 255, (analog2Value >> 16) & 255, (analog2Value >> 24) & 255,
+    analog3Value & 255, (analog3Value >> 8) & 255, (analog3Value >> 16) & 255, (analog3Value >> 24) & 255
   };
 
   LoggerBufferMessage(ANALOG1_LOG_ID, 4, analog1Buf);
-  LoggerBufferMessage(ANALOG2_LOG_ID, 2, analog2Buf);
-  LoggerBufferMessage(ANALOG3_LOG_ID, 2, analog3Buf);
+  LoggerBufferMessage(STRAIN_GAUGE_LOG_ID, 8, strainGaugeBuf);
 }
 
 

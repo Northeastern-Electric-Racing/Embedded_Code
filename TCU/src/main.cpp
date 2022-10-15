@@ -18,14 +18,20 @@
 #define ACCEL_LOG_ID 0x300
 #define HUMID_LOG_ID 0x301
 
-#define ANALOG_PIN A0       // Pin 14 on teensy
-#define ANALOG_LOG_ID 0x302
+#define ANALOG1_PIN A0       // Pin 14 on teensy
+#define ANALOG1_LOG_ID 0x302
+#define ANALOG2_PIN A1       
+#define ANALOG2_LOG_ID 0x303
+#define ANALOG3_PIN A2      
+#define ANALOG3_LOG_ID 0x304
+
+#define LED_BLINK_DELAY_MS 500
 
 
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> myCan; // main CAN object
 WDT_T4<WDT1> wdt;
 
-bool loggable = false;
+int blinkLedState = LOW;
 
 
 // CAN Ids of the messages to log to SD card (only considered if LOG_ALL is 0)
@@ -55,6 +61,25 @@ const int NUM_IDS = sizeof(LOG_IDS) / sizeof(uint32_t);
 int sendMessage(uint32_t id, uint8_t len, const uint8_t *buf); 
 void incomingCANCallback(const CAN_message_t &msg);
 void logSensorData();
+void logAnalogs();
+
+
+/**
+ * @brief Blinks the LED when logging, does nothing when not logging
+ * 
+ */
+static void blinkLED() {
+  static uint32_t lastLedBlinkTime = 0;
+  if (millis() - lastLedBlinkTime > LED_BLINK_DELAY_MS) {
+    if (LoggerActive() && blinkLedState == LOW) {
+      blinkLedState = HIGH;
+    } else {
+      blinkLedState = LOW;
+    }
+    digitalWrite(LED_BUILTIN, blinkLedState);
+    lastLedBlinkTime = millis();
+  }
+}
 
 
 /**
@@ -77,7 +102,10 @@ void setup() {
   myCan.enableFIFOInterrupt(); 
   myCan.onReceive(incomingCANCallback);
 
-  pinMode(ANALOG_PIN, INPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(ANALOG1_PIN, INPUT);
+  pinMode(ANALOG2_PIN, INPUT);
+  pinMode(ANALOG3_PIN, INPUT);
   
   // XbeeInit(&Serial1, 115200);
 
@@ -96,6 +124,7 @@ void setup() {
 void loop() {
   wdt.feed();
   myCan.events();
+  blinkLED();
 
   if (LoggerWrite() == LOGGER_ERROR_SD_CARD) {
     LoggerInit(MIN_LOG_FREQUENCY);
@@ -106,6 +135,7 @@ void loop() {
   static uint32_t dataLastRecorded = 0;
   if (millis() - dataLastRecorded > ACCEL_HUMID_LOG_FREQUENCY) {
     logSensorData();
+    logAnalogs();
     dataLastRecorded = millis();
   }
 
@@ -146,18 +176,33 @@ void logSensorData() {
     humidData[0].TempData.rawdata[0], humidData[0].TempData.rawdata[1],
     humidData[0].HumidData.rawdata[0], humidData[0].HumidData.rawdata[1]
   };
+}
 
-  // Get current value and multiple by 10^6 to store in an int variable
-  int analogValue = analogRead(ANALOG_PIN) - 509;
-  int adjustedValue = analogValue * 74054.326212; // 0.00488 / 0.066 * 10^6 scale factor
-  uint8_t analogBuf[4] = {
-    adjustedValue & 255, (adjustedValue >> 8) & 255, (adjustedValue >> 16) & 255, (adjustedValue >> 24) & 255
+
+/**
+ * @brief Log data from connected analog sensors
+ * 
+ */
+void logAnalogs() {
+  int analog1Value = (analogRead(ANALOG1_PIN) - 509) * 74054.326212; // 0.00488 / 0.066 * 10^6 scale factor
+  int analog2Value = analogRead(ANALOG2_PIN);
+  int analog3Value = analogRead(ANALOG3_PIN);
+
+  uint8_t analog1Buf[4] = {
+    analog1Value & 255, (analog1Value >> 8) & 255, (analog1Value >> 16) & 255, (analog1Value >> 24) & 255
+  };
+  uint8_t analog2Buf[2] = {
+    analog2Value & 255, (analog2Value >> 8) & 255
+  };
+  uint8_t analog3Buf[2] = {
+    analog3Value & 255, (analog3Value >> 8) & 255
   };
 
-  LoggerBufferMessage(ACCEL_LOG_ID, 6, accelBuf);
-  LoggerBufferMessage(HUMID_LOG_ID, 4, humidBuf);
-  LoggerBufferMessage(ANALOG_LOG_ID, 4, analogBuf);
+  LoggerBufferMessage(ANALOG1_LOG_ID, 4, analog1Buf);
+  LoggerBufferMessage(ANALOG2_LOG_ID, 2, analog2Buf);
+  LoggerBufferMessage(ANALOG3_LOG_ID, 2, analog3Buf);
 }
+
 
 /**
  * @brief Handles incoming CAN messages, adding certain ones to the logging message buffer.

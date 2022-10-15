@@ -19,8 +19,8 @@
 #define HUMID_LOG_ID 0x301
 
 #define ANALOG1_PIN A0 // Pin 14 on teensy
-#define ANALOG2_PIN A1       
-#define ANALOG3_PIN A2 
+#define ANALOG2_PIN A6       
+#define ANALOG3_PIN A7 
 
 #define ANALOG1_LOG_ID      0x302  
 #define STRAIN_GAUGE_LOG_ID 0x303

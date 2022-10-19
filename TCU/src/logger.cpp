@@ -147,13 +147,23 @@ int LoggerInit(uint32_t logFrequency) {
 
 
 /**
+ * @brief Finds whether the logger is currently logging messages
+ * 
+ * @return true when active, false otherwise
+ */
+bool LoggerActive() {
+  return initialized;
+}
+
+
+/**
  * @brief Writes the messages currently buffered to the SD card. 
  * 
  * @return int Status code
  */
 int LoggerWrite() {
   if (!initialized) {
-    return LOGGER_ERROR_SD_CARD;
+    return LOGGER_ERROR_NO_INIT;
   }
 
   // find appropriate buffer to use
@@ -241,7 +251,7 @@ int LoggerWrite() {
  */
 int LoggerBufferMessage(uint32_t id, uint8_t len, const uint8_t *buf) {
   if (!initialized) {
-    return LOGGER_ERROR_SD_CARD;
+    return LOGGER_ERROR_NO_INIT;
   }
 
   noInterrupts();

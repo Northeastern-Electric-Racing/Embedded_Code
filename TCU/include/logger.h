@@ -13,6 +13,7 @@
 #define LOGGER_ERROR_BUFFER_FULL 1
 #define LOGGER_ERROR_SD_CARD     2
 #define LOGGER_ERROR_NO_WRITE    3
+#define LOGGER_ERROR_NO_INIT     4
 
 
 typedef struct {
@@ -50,3 +51,11 @@ int LoggerBufferMessage(uint32_t id, uint8_t len, const uint8_t *buf);
  * @return int Status code
  */
 int LoggerWrite();
+
+
+/**
+ * @brief Finds whether the logger is currently logging messages
+ * 
+ * @return true when active, false otherwise
+ */
+bool LoggerActive();

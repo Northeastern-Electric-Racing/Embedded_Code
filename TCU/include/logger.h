@@ -42,7 +42,7 @@ LOGGER_STATUS LoggerBufferMessage(message_t *message);
  * 
  * @return LOGGER_STATUS
  */
-int LoggerWrite();
+LOGGER_STATUS LoggerWrite();
 
 
 /**

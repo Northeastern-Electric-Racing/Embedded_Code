@@ -176,6 +176,7 @@ LOGGER_STATUS LoggerWrite() {
       int writeLength = logFile.print(messageBuf[i].timestamp.seconds);
       // checks for error on write (assumes rest are fine if this passes)
       if (writeLength == 0) {
+        DPRINTLN(F("Could not write to SD ... Reseting"));
         reset();
         return LOGGER_STATUS::LGR_ERROR_SD_CARD;
       }

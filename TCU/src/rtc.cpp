@@ -39,7 +39,6 @@ RTC_STATUS RtcGetTime(rtc_time_t *currentTime) {
     currentTime->seconds = startUpTime.seconds + (millisSinceStart / 1000);
     currentTime->millis = millisSinceStart % 1000;
     
-
     if (startUpTime.seconds == 0) {
         return RTC_STATUS::RTC_NOT_STARTED;
     }

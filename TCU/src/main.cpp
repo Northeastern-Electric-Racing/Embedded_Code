@@ -11,7 +11,7 @@
 #include "debug.h"
 
 
-#define ENABLE_TEST_LOGGING    1 // set to 1 to log the test messages in the main loop()
+#define ENABLE_TEST_LOGGING    0 // set to 1 to log the test messages in the main loop()
 #define LOG_ALL_MESSAGES       0 // set to 1 to log all CAN messages, 0 to filter
 #define SEND_XBEE_ALL_MESSAGES 0 // set to 1 to send all CAN messages, 0 to filter
 
@@ -59,10 +59,13 @@ const uint32_t LOG_IDS[] = {
   0x202, 
   0xC0,
   0x36};
-const int NUM_IDS = sizeof(LOG_IDS) / sizeof(uint32_t);
+const int NUM_LOG_IDS = sizeof(LOG_IDS) / sizeof(uint32_t);
 
 // CAN Ids of the messages to send via XBee (only considered if SEND_XBEE_ALL_MESSAGES is 0)
-const uint32_t SEND_XBEE_IDS[] = {0xA5, 0x202};
+const uint32_t SEND_XBEE_IDS[] = {
+  0xA5, 
+  0x202
+};
 const int NUM_SEND_XBEE_IDS = sizeof(SEND_XBEE_IDS) / sizeof(uint32_t);
 
 
@@ -232,20 +235,20 @@ void logAnalogs() {
     analog3Value & 255, (analog3Value >> 8) & 255, (analog3Value >> 16) & 255, (analog3Value >> 24) & 255
   };
 
-  message_t *message1;
-  message1->id = ANALOG1_LOG_ID;
-  message1->length = 4;
-  memcpy(message1->dataBuf, analog1Buf, 4);
-  RtcGetTime(&message1->timestamp);
+  message_t message1;
+  message1.id = ANALOG1_LOG_ID;
+  message1.length = 4;
+  memcpy(message1.dataBuf, analog1Buf, 4);
+  RtcGetTime(&message1.timestamp);
 
-  message_t *message2;
-  message2->id = STRAIN_GAUGE_LOG_ID;
-  message2->length = 8;
-  memcpy(message2->dataBuf, strainGaugeBuf, 8);
-  RtcGetTime(&message2->timestamp);
+  message_t message2;
+  message2.id = STRAIN_GAUGE_LOG_ID;
+  message2.length = 8;
+  memcpy(message2.dataBuf, strainGaugeBuf, 8);
+  RtcGetTime(&message2.timestamp);
 
-  LoggerBufferMessage(message1);
-  LoggerBufferMessage(message2);
+  LoggerBufferMessage(&message1);
+  LoggerBufferMessage(&message2);
 }
 
 

@@ -32,11 +32,13 @@ void pedalsProcess()
     FaultStatus_t pedalFault = NOT_FAULTED;
     pedalFault = pedals.readBrake();
     pedalFault = pedals.readAccel();
+    /*
     if(pedalFault == FAULTED)
     {
         Serial.println("ACCEL FAULT");
         isShutdown = true;
     }
+    */
 }
 
 

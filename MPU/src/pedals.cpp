@@ -61,7 +61,11 @@ FaultStatus_t Pedals::readBrake()
 {
 	//Begin or continue the pedal reading process
 	uint16_t pedalVal = brakes.readValue();
-	
+
+	uint8_t canBuf[2] = {pedalVal >> 8, pedalVal & 0xFF};
+
+	sendMessage(0xB1, 2, canBuf);
+
 	//If the pedal reading process is NOT finished, return NOT_FAULTED because it hasn't finished collecting data
 	if(pedalVal == NOT_DONE_READING) return NOT_FAULTED;
 

@@ -16,6 +16,12 @@ typedef enum {
 } RTC_STATUS;
 
 
+/* Struct to wrap together timing data */
+typedef struct {
+  uint32_t seconds;
+  uint32_t millis;
+} rtc_time_t;
+
 /**
  * @brief Initializes the RTC functionality.
  * 
@@ -29,7 +35,7 @@ RTC_STATUS RtcInit();
  * @param currentTime Return variable for current time
  * @return RTC_STATUS 
  */
-RTC_STATUS RtcGetTime(uint64_t *currentTime);
+RTC_STATUS RtcGetTime(rtc_time_t *currentTime);
 
 /**
  * @brief Gets the current RTC time as a string in the format YYYY-MM-DDT00:00:00.000Z

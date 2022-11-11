@@ -53,17 +53,16 @@ uint32_t minLogFrequency;
  */
 static void setFileName() {
   uint32_t fileNum = 0;
-  uint64_t *currentTime;
-  RTC_STATUS timeStatus = RtcGetTime(currentTime);
-  if (timeStatus == RTC_STATUS::RTC_NOT_STARTED) {
-    fileNum = *currentTime / 1000;
+  rtc_time_t currentTime;
+  RTC_STATUS timeStatus = RtcGetTime(&currentTime);
+  if (timeStatus == RTC_STATUS::RTC_SUCCESS) {
+    fileNum = currentTime.seconds;
   }
 
-  snprintf(fileName, FILE_NAME_SIZE, "log-%lu.txt\0", fileNum);
-
+  snprintf(fileName, FILE_NAME_SIZE, "log-%lu.txt", fileNum);
   while (SD.exists(fileName)) {
     fileNum++;
-    snprintf(fileName, FILE_NAME_SIZE, "log-%lu.txt\0", fileNum); 
+    snprintf(fileName, FILE_NAME_SIZE, "log-%lu.txt", fileNum); 
   }
 }
 
@@ -174,12 +173,13 @@ LOGGER_STATUS LoggerWrite() {
 
     // write all buffered messages to the SD card
     for (int i = 0; i < bufLength; i++) {
-      int writeLength = logFile.print(messageBuf[i].timestamp);
+      int writeLength = logFile.print(messageBuf[i].timestamp.seconds);
       // checks for error on write (assumes rest are fine if this passes)
       if (writeLength == 0) {
         reset();
         return LOGGER_STATUS::LGR_ERROR_SD_CARD;
       }
+      logFile.printf("%.3lu", messageBuf[i].timestamp.millis);
       logFile.print(F(" "));
       logFile.print(messageBuf[i].id);
       logFile.print(F(" "));

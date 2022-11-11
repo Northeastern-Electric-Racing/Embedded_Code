@@ -13,7 +13,7 @@
 
 #define ENABLE_TEST_LOGGING    1 // set to 1 to log the test messages in the main loop()
 #define LOG_ALL_MESSAGES       0 // set to 1 to log all CAN messages, 0 to filter
-#define SEND_XBEE_ALL_MESSAGES 0 // set to 1 to log all CAN messages, 0 to filter
+#define SEND_XBEE_ALL_MESSAGES 0 // set to 1 to send all CAN messages, 0 to filter
 
 #define BAUD_RATE 1000000U // 250 kbps 
 #define MAX_MB_NUM 16 // maximum number of CAN mailboxes to use 
@@ -62,7 +62,7 @@ const uint32_t LOG_IDS[] = {
 const int NUM_IDS = sizeof(LOG_IDS) / sizeof(uint32_t);
 
 // CAN Ids of the messages to send via XBee (only considered if SEND_XBEE_ALL_MESSAGES is 0)
-const uint32_t SEND_XBEE_IDS[] = {};
+const uint32_t SEND_XBEE_IDS[] = {0xA5, 0x202};
 const int NUM_SEND_XBEE_IDS = sizeof(SEND_XBEE_IDS) / sizeof(uint32_t);
 
 
@@ -154,14 +154,15 @@ void loop() {
 #if ENABLE_TEST_LOGGING == 1 
   static unsigned long writeTime = millis();
   static uint8_t writeData = 0;
-  if (millis() - writeTime > 100) {
+  if (millis() - writeTime > 1000) {
     const uint8_t buf[] = {writeData, writeData, writeData, writeData};
-    message_t *message;
-    message->id = 0x01;
-    message->length = 4;
-    memcpy(message->dataBuf, buf, 4);
-    RtcGetTime(&message->timestamp);
-    LoggerBufferMessage(message);
+    message_t message;
+    message.id = 0x01;
+    message.length = 4;
+    memcpy(message.dataBuf, buf, 4);
+    RtcGetTime(&message.timestamp);
+    LoggerBufferMessage(&message);
+    XBeeSendMessage(&message);
 
     writeData++;
     writeData %= 20;
@@ -183,13 +184,13 @@ void logAccelerometerData() {
     xyzData[0].ZData.rawdata[0], xyzData[0].ZData.rawdata[1]
   };
 
-  message_t *message;
-  message->id = ACCELEROMETER_ID;
-  message->length = 6;
-  memcpy(message->dataBuf, accelBuf, 6);
-  RtcGetTime(&message->timestamp);
+  message_t message;
+  message.id = ACCELEROMETER_ID;
+  message.length = 6;
+  memcpy(message.dataBuf, accelBuf, 6);
+  RtcGetTime(&message.timestamp);
 
-  LoggerBufferMessage(message);
+  LoggerBufferMessage(&message);
 }
 
 
@@ -204,13 +205,13 @@ void logTempSensorData() {
     humidData[0].HumidData.rawdata[0], humidData[0].HumidData.rawdata[1]
   };
 
-  message_t *message;
-  message->id = TEMP_HUMID_ID;
-  message->length = 4;
-  memcpy(message->dataBuf, humidBuf, 4);
-  RtcGetTime(&message->timestamp);
+  message_t message;
+  message.id = TEMP_HUMID_ID;
+  message.length = 4;
+  memcpy(message.dataBuf, humidBuf, 4);
+  RtcGetTime(&message.timestamp);
 
-  LoggerBufferMessage(message);
+  LoggerBufferMessage(&message);
 }
 
 
@@ -254,19 +255,19 @@ void logAnalogs() {
  * @param msg received CAN message
  */
 void incomingCANCallback(const CAN_message_t &msg) {
-  message_t *message;
-  message->id = msg.id;
-  message->length = msg.len;
-  memcpy(message->dataBuf, msg.buf, msg.len);
-  RtcGetTime(&message->timestamp);
+  message_t message;
+  message.id = msg.id;
+  message.length = msg.len;
+  memcpy(message.dataBuf, msg.buf, msg.len);
+  RtcGetTime(&message.timestamp);
 
   // Log if global logging is enabled or search through loggable message IDs
   if (LOG_ALL_MESSAGES) {
-    LoggerBufferMessage(message);
+    LoggerBufferMessage(&message);
   } else {
     for (int i = 0; i < NUM_LOG_IDS; i++) {
       if (LOG_IDS[i] == msg.id) {
-        LoggerBufferMessage(message);
+        LoggerBufferMessage(&message);
         break;
       }
     }
@@ -274,11 +275,11 @@ void incomingCANCallback(const CAN_message_t &msg) {
 
   // Send if global XBee sending is enabled or search through sendable message IDs
   if (SEND_XBEE_ALL_MESSAGES) {
-    XBeeSendMessage(message);
+    XBeeSendMessage(&message);
   } else {
     for (int i = 0; i < NUM_SEND_XBEE_IDS; i++) {
       if (SEND_XBEE_IDS[i] == msg.id) {
-        XBeeSendMessage(message);
+        XBeeSendMessage(&message);
         break;
       }
     }

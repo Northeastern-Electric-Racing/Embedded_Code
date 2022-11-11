@@ -56,15 +56,21 @@ XBEE_STATUS XBeeRegisterCallback(XBeeCallback callback) {
 
 
 XBEE_STATUS XBeeSendMessage(message_t *message) {
-    char encodedMessage[36];
-    snprintf(&encodedMessage[0], 18, "%c%.13llu%.3x%.1hu", START_TOKEN, message->timestamp, message->id, message->length);
+    char encodedMessage[20 + message->length*2];
+    snprintf(&encodedMessage[0], 19, "%c%.10lu%.3lu%.3x%.1hu", START_TOKEN, message->timestamp.seconds, 
+        message->timestamp.millis, message->id, message->length);
     for (int i = 0; i < message->length; i++) {
-        snprintf(&encodedMessage[18 + 2*i], 2, "%.2x", message->dataBuf[i]);
+        snprintf(&encodedMessage[18 + 2*i], 3, "%.2x", message->dataBuf[i]);
     }
-    snprintf(&encodedMessage[18 + message->length*2], 2, "%c\0", END_TOKEN);
-
+    snprintf(&encodedMessage[18 + message->length*2], 2, "%c", END_TOKEN);
     (*port).print(encodedMessage);
+
+    DPRINT(F("Sending message: "));
+    DPRINTLN(encodedMessage);
     return XBEE_STATUS::XB_SUCCESS;
+
+
+
 }
 
 

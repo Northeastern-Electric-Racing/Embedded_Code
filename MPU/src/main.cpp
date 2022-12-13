@@ -30,7 +30,7 @@ void setup()
 
 void loop()
 {
-    //Serial.println(".");
+    Serial.println(".");
     myCan.events();
     gpioProcess();
     driverioProcess();

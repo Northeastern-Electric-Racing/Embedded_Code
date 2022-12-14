@@ -19,7 +19,7 @@ GPIO::~GPIO(){}
 
 bool GPIO::handleTSMS()
 {
-    Serial.println(tsms.isReady());
+    // Serial.println(tsms.isReady());
     if(!tsms.isReady())
     {
         motorController->raiseFault();

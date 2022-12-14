@@ -14,6 +14,7 @@ void setup()
     config.trigger = 5;         /* in seconds, 0->128 */
     config.timeout = 15;        /* in seconds, 0->128 */
     wdt.begin(config);
+    Serial.begin(57600);
 
     pedals = Pedals(&motorController, &bms);
     driverio = DriverIO(&motorController, &bms);
@@ -30,7 +31,7 @@ void setup()
 
 void loop()
 {
-    Serial.println(".");
+    //Serial.println(".");
     myCan.events();
     gpioProcess();
     driverioProcess();

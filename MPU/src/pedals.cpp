@@ -128,7 +128,7 @@ int16_t Pedals::calcCLTorqueLimit()
 		calculated = MAXIMUM_TORQUE / 10;
 	}
 	
-	/*Serial.print("Vdc: ");
+	Serial.print("Vdc: ");
 	Serial.print(dcVoltage);
 	Serial.print(", Idc: ");
 	Serial.print(dcCurrent);
@@ -139,7 +139,7 @@ int16_t Pedals::calcCLTorqueLimit()
 	Serial.print(calculated);
 
 	Serial.print(", ");
-	Serial.println(10 * calculated);*/
+	Serial.println(10 * calculated);
 
 	return calculated * 10;
 }

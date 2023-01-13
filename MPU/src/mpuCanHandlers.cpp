@@ -43,12 +43,10 @@ void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
 void canHandler_CANMSG_BMSCURRENTLIMITS(const CAN_message_t &msg)
 {
     setCANLineOK();
-    /*
     uint16_t dischargeCurrentLimit = (msg.buf[1] << 8) | msg.buf[0];
-    mpu.setCurrentLimit(dischargeCurrentLimit);
+    bms.setCurrentLimit(dischargeCurrentLimit);
     uint16_t chargeCurrentLimit = (msg.buf[3] << 8) | msg.buf[2];
-    mpu.setChargeCurrentLimit(chargeCurrentLimit);
-    */
+    bms.setChargeCurrentLimit(chargeCurrentLimit);
 }
 
 

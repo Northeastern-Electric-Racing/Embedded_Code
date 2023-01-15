@@ -37,7 +37,7 @@ class DriverIO
         LED tempLED {LED5_PIN};
         LED yLED {YLED_PIN};
         StartButton ssButton {SS_LED_PIN, SS_BUTT_PIN};
-        Switch reverseSwitch {REVERSE_SW_PIN};
+        Button revButton {REVERSE_SW_PIN};
         
         //For future development and integration with Raspberry Pi
         //DASHBOARD dashboard;

@@ -11,7 +11,7 @@ DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms)
     motorController = p_motorController;
     bms = p_bms;
 
-    motorController->setDirection(reverseSwitch.getSwitchState());
+    motorController->setDirection(false);
 }
 
 
@@ -67,12 +67,13 @@ void DriverIO::handleSSLED()
 
 void DriverIO::handleReverseSwitch()
 {
-    if(reverseSwitch.hasSwitchToggled())
-    {
-        motorController->setDirection(reverseSwitch.getSwitchState());
-        Serial.println(motorController->getDirection());
-        Serial.println(".");
-    }  
+    //Poll Button
+    revButton.checkButtonPin();
+
+    //If the button isn't pressed, do nothing
+    if(!revButton.isButtonPressed_Pulse()) return;
+
+    motorController->setDirection(!motorController->getDirection());
 }
 
 

@@ -11,7 +11,7 @@ DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms)
     motorController = p_motorController;
     bms = p_bms;
 
-    motorController->setDirection(reverseSwitch.getSwitchState());
+    motorController->setDirection(false);
 }
 
 
@@ -25,6 +25,7 @@ void DriverIO::handleSSButtonPress()
 
     //Poll Speaker if it is written high
     speaker.attemptToStopSpeaker();
+    //speaker.playSpeaker();
 
     //If the button isn't pressed, do nothing
     if(!ssButton.isButtonPressed_Pulse()) return;
@@ -52,50 +53,46 @@ void DriverIO::handleSSButtonPress()
 }
 
 
-void DriverIO::handleSSLED()
+void DriverIO::handleReverseButton()
 {
-    if(bms->getChargeMode())
-    {
-        ssButton.writeLED(!bms->isAIROpen());
-    }
-    else
-    {  
-        ssButton.writeLED(motorController->getIsOn());
-    }
+    //Poll Button
+    revButton.checkButtonPin();
+
+    //If the button isn't pressed, do nothing
+    if(!revButton.isButtonPressed_Pulse()) return;
+
+    motorController->setDirection(!motorController->getDirection());
 }
 
-
-void DriverIO::handleReverseSwitch()
+void DriverIO::wheelIO_cb(const CAN_message_t &msg)
 {
-    if(reverseSwitch.hasSwitchToggled())
+    static union
     {
-        motorController->setDirection(reverseSwitch.getSwitchState());
-        Serial.println(motorController->getDirection());
-        Serial.println(".");
-    }  
-}
+        uint8_t msg[8];
 
-
-void DriverIO::handleErrorLights()
-{
-    tempLED.updateBlink();
-
-    if(bms->isAvgTempCritical())
-    {
-        if(bms->isAvgTempShutdown())
+        struct
         {
-            tempLED.blinkEnable(false);
-            tempLED.writeLED(HIGH);
-        }
-        else tempLED.blinkEnable(true);
-    }
-    else
+            uint16_t pot1;
+            uint16_t pot2;
+            bool button1 : 1;
+            bool button2 : 1;
+            bool button3 : 1;
+            bool button4 : 1;
+            bool button5 : 1;
+            bool button6 : 1;
+            bool button7 : 1;
+            bool button8 : 1;
+            uint8_t dontcare1;
+            uint8_t dontcare2;
+            uint8_t dontcare3;
+        }io;
+    } wheelio;
+
+    for(uint8_t byte = 0; byte < 8; byte++)
     {
-        tempLED.blinkEnable(false);
-        tempLED.writeLED(LOW);
+        wheelio.msg[byte] = msg.buf[byte];
     }
 
-    //No updating of blinking for these LED's
-    socLED.writeLED(bms->isSoCCritical());
-    yLED.writeLED(((motorController->getTorque() > 1020) && motorController->getIsOn()) || bms->isCharging());
+    ssButton.setButtonState(wheelio.io.button1);
+    revButton.setButtonState(wheelio.io.button2);
 }

@@ -5,6 +5,8 @@
  */
 #include "mpu.h"
 
+#define CANMSG_WHEELIO 0x400
+
 /***************************************************************************/
 /**
  * CAN Handlers specific to MPU
@@ -13,18 +15,18 @@
  */
 /***************************************************************************/
 
+
 /**
  * @brief Handler for MC faults
  * 
  * @param msg
  */
-void canHandler_CANMSG_ERR_MCFAULT(const CAN_message_t &msg)
+void mcErr_cb(const CAN_message_t &msg)
 {
     //Serial.println("!!!!!!!!!!!!!!!!!!!!!!! MC ERROR !!!!!!!!!!!!!!!!!!!!");
 }
 
-
-void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
+void bmsAccStatus_cb(const CAN_message_t &msg)
 {
     bms.setSoC(msg.buf[6]);
 
@@ -34,14 +36,15 @@ void canHandler_CANMSG_BMSACCSTATUS(const CAN_message_t &msg)
     bms.setLiveVoltage(liveVoltage);
 }
 
-void canHandler_CANMSG_BMSDTCSTATUS(const CAN_message_t &msg)
+void bmsDTCStatus_cb(const CAN_message_t &msg)
 {
     bms.setAvgTemp(msg.buf[6]);
 }
 
 
-void canHandler_CANMSG_BMSCURRENTLIMITS(const CAN_message_t &msg)
+void bmsCurrentLimits_cb(const CAN_message_t &msg)
 {
+    Serial.println("CANOK");
     setCANLineOK();
     uint16_t dischargeCurrentLimit = (msg.buf[1] << 8) | msg.buf[0];
     bms.setCurrentLimit(dischargeCurrentLimit);
@@ -50,25 +53,25 @@ void canHandler_CANMSG_BMSCURRENTLIMITS(const CAN_message_t &msg)
 }
 
 
-void canHandler_CANMSG_MOTORMOTION(const CAN_message_t &msg)
+void motorMotion_cb(const CAN_message_t &msg)
 {
     //angular motor speed is found at bytes 2 and 3
     int16_t motorSpeed = ((msg.buf[3] << 8) | msg.buf[2]) / 10;
     motorController.setMotorSpeed(motorSpeed);
 }
 
-void canHandler_CANMSG_BMSCHARGINGSTATE(const CAN_message_t &msg)
+void bmsChargingState_cb(const CAN_message_t &msg)
 {
     bms.enableChargingMode();
 }
 
-void canHandler_CANMSG_MOTORETEMP3(const CAN_message_t &msg)
+void motorTemp3_cb(const CAN_message_t &msg)
 {
     int16_t motorTemp = (msg.buf[5] << 8) | msg.buf[4];
     motorController.setRadiatorTemp(motorTemp);
 }
 
-void canHandler_CANMSG_BMSCURRENTS(const CAN_message_t &msg)
+void bmsCurrents_cb(const CAN_message_t &msg)
 {
     setCANLineOK();
 
@@ -86,4 +89,39 @@ void canHandler_CANMSG_BMSCURRENTS(const CAN_message_t &msg)
     //Serial.println(currentDraw);
     //Serial.println(dischargeCurrentLimit);
     //6 and 7 are rolling avg current
+}
+
+void mpuCanCallback(const CAN_message_t &msg)
+{
+    switch(msg.id)
+    {    //using a switch statement for set CAN IDs
+        case CANMSG_MOTORETEMP3:
+            motorTemp3_cb(msg);
+            break;
+        case CANMSG_MOTORMOTION:
+            motorMotion_cb(msg);
+            break;
+        case CANMSG_ERR_MCFAULT:
+            mcErr_cb(msg);
+            break;
+        case CANMSG_BMSDTCSTATUS:
+            bmsDTCStatus_cb(msg);
+            break;
+        case CANMSG_BMSACCSTATUS:
+            bmsAccStatus_cb(msg);
+            break;
+        case CANMSG_BMSCURRENTLIMITS:
+            bmsCurrentLimits_cb(msg);
+            break;
+        case CANMSG_BMSCHARGINGSTATE:
+            bmsChargingState_cb(msg);
+            break;
+        case CANMSG_BMSCURRENTS:
+            bmsCurrents_cb(msg);
+            break;
+        case CANMSG_WHEELIO:
+            driverio.wheelIO_cb(msg);
+        default:
+            break;
+    }
 }

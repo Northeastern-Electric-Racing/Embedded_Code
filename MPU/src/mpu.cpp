@@ -16,9 +16,7 @@ void driverioProcess()
 {
     // Serial.println("DriverIO process...");
     driverio.handleSSButtonPress();
-    driverio.handleSSLED();
-    driverio.handleReverseSwitch();
-    driverio.handleErrorLights();
+    driverio.handleReverseButton();
 }
 
 
@@ -65,7 +63,7 @@ bool isCANLineOK()
 
 void setCANLineOK()
 {
-    canTest_wait.startTimer(1500);
+    canTest_wait.startTimer(2000);
 }
 
 

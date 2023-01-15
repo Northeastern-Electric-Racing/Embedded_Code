@@ -122,7 +122,7 @@ bool OrionBMS::getChargeMode()
     if(isInChargeMode.isTimerExpired())
     {
         airOpen = 1;
-        sendMessage(CANMSG_MC_SETPARAMETER, 8, OPEN_AIR_MSG);
+        sendMessageCAN1(CANMSG_MC_SETPARAMETER, 8, OPEN_AIR_MSG);
     }
     return !isInChargeMode.isTimerExpired();
 }
@@ -131,7 +131,7 @@ bool OrionBMS::getChargeMode()
 void OrionBMS::toggleAIR()
 {
     airOpen = !airOpen;
-    sendMessage(CANMSG_MC_SETPARAMETER, 8, airOpen ? OPEN_AIR_MSG : CLOSE_AIR_MSG);
+    sendMessageCAN1(CANMSG_MC_SETPARAMETER, 8, airOpen ? OPEN_AIR_MSG : CLOSE_AIR_MSG);
 }
 
 

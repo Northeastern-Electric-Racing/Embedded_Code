@@ -65,7 +65,7 @@ bool isCANLineOK()
 
 void setCANLineOK()
 {
-    canTest_wait.startTimer(1500);
+    canTest_wait.startTimer(2000);
 }
 
 

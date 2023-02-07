@@ -25,6 +25,7 @@ void DriverIO::handleSSButtonPress()
 
     //Poll Speaker if it is written high
     speaker.attemptToStopSpeaker();
+    //speaker.playSpeaker();
 
     //If the button isn't pressed, do nothing
     if(!ssButton.isButtonPressed_Pulse()) return;

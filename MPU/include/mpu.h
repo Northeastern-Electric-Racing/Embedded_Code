@@ -12,6 +12,7 @@
 #include "pedals.h"
 #include "orionbms.h"
 #include "Watchdog_t4.h"
+#include "canMsgHandler.h"
 
 extern DriverIO driverio;
 extern GPIO gpio;
@@ -91,5 +92,10 @@ void bmsCurrentProcess(int16_t currentDraw);
  */
 bool verifyMotorSpinning();
 
+/**
+ * @brief Callback for processing CAN messages based on ID
+ * 
+ */
+void mpuCanCallback(const CAN_message_t &msg);
 
 #endif

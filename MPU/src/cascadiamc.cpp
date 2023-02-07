@@ -14,7 +14,7 @@ void CascadiaMC::disableMCLockout()
 {
     while(!motorCommand_wait.isTimerExpired()){}
 
-    sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcOff); // release lockout / OFF
+    sendMessageCAN1(CANMSG_ACCELERATIONCTRLINFO, 8, mcOff); // release lockout / OFF
     Serial.println("UNLOCKED");
     motorCommand_wait.startTimer(CAN_CMD_DELAY);
     isMCLocked = false;
@@ -39,7 +39,7 @@ void CascadiaMC::writeMCState()
     Serial.println("");
 #endif
 
-    sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcMsg.canMsg);
+    sendMessageCAN1(CANMSG_ACCELERATIONCTRLINFO, 8, mcMsg.canMsg);
 
     motorCommand_wait.startTimer(CAN_CMD_DELAY);
 }
@@ -97,7 +97,7 @@ void CascadiaMC::clearFault()
 {
     int time = millis() + 250;
     while(millis() < time) {
-        sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
+        sendMessageCAN1(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
         delay(5);
     }
     isFaulted = false;

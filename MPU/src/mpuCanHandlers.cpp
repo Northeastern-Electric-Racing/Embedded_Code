@@ -91,11 +91,6 @@ void bmsCurrents_cb(const CAN_message_t &msg)
     //6 and 7 are rolling avg current
 }
 
-void wheelIO_cb(const CAN_message_t &msg)
-{
-
-}
-
 void mpuCanCallback(const CAN_message_t &msg)
 {
     switch(msg.id)
@@ -125,7 +120,7 @@ void mpuCanCallback(const CAN_message_t &msg)
             bmsCurrents_cb(msg);
             break;
         case CANMSG_WHEELIO:
-            wheelIO_cb(msg);
+            driverio.wheelIO_cb(msg);
         default:
             break;
     }

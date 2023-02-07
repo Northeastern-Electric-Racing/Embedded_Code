@@ -33,11 +33,8 @@ class DriverIO
         OrionBMS *bms;
 
         Speaker speaker {SPEAKER_PIN};
-        LED socLED {LED4_PIN};
-        LED tempLED {LED5_PIN};
-        LED yLED {YLED_PIN};
-        StartButton ssButton {SS_LED_PIN, SS_BUTT_PIN};
-        Button revButton {REVERSE_SW_PIN};
+        Button ssButton;
+        Button revButton;
         
         //For future development and integration with Raspberry Pi
         //DASHBOARD dashboard;
@@ -58,22 +55,12 @@ class DriverIO
         void handleSSButtonPress();
 
         /**
-         * @brief Handles the state of the Start/Stop LED
-         * 
-         */
-        void handleSSLED();
-
-        /**
          * @brief Detects a change in the direction of the forward/reverse switch
          * 
          */
         void handleReverseButton();
 
-        /**
-         * @brief Uses the current BMS state and lights the LEDs up accordingly
-         * 
-         */
-        void handleErrorLights();
+        void wheelIO_cb(const CAN_message_t &msg);
 };
 
 #endif

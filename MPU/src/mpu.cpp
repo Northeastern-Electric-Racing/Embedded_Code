@@ -17,7 +17,7 @@ void driverioProcess()
     // Serial.println("DriverIO process...");
     driverio.handleSSButtonPress();
     driverio.handleSSLED();
-    driverio.handleReverseSwitch();
+    driverio.handleReverseButton();
     driverio.handleErrorLights();
 }
 

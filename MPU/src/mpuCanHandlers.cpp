@@ -5,6 +5,8 @@
  */
 #include "mpu.h"
 
+#define CANMSG_WHEELIO 0x400
+
 /***************************************************************************/
 /**
  * CAN Handlers specific to MPU
@@ -89,10 +91,15 @@ void bmsCurrents_cb(const CAN_message_t &msg)
     //6 and 7 are rolling avg current
 }
 
+void wheelIO_cb(const CAN_message_t &msg)
+{
+
+}
+
 void mpuCanCallback(const CAN_message_t &msg)
 {
     switch(msg.id)
-    {                                                   //using a switch statement for set CAN IDs
+    {    //using a switch statement for set CAN IDs
         case CANMSG_MOTORETEMP3:
             motorTemp3_cb(msg);
             break;
@@ -117,6 +124,8 @@ void mpuCanCallback(const CAN_message_t &msg)
         case CANMSG_BMSCURRENTS:
             bmsCurrents_cb(msg);
             break;
+        case CANMSG_WHEELIO:
+            wheelIO_cb(msg);
         default:
             break;
     }

@@ -67,7 +67,7 @@ class DriverIO
          * @brief Detects a change in the direction of the forward/reverse switch
          * 
          */
-        void handleReverseSwitch();
+        void handleReverseButton();
 
         /**
          * @brief Uses the current BMS state and lights the LEDs up accordingly

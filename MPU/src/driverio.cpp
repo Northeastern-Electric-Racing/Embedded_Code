@@ -66,7 +66,7 @@ void DriverIO::handleSSLED()
 }
 
 
-void DriverIO::handleReverseSwitch()
+void DriverIO::handleReverseButton()
 {
     //Poll Button
     revButton.checkButtonPin();

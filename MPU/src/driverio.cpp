@@ -93,6 +93,6 @@ void DriverIO::wheelIO_cb(const CAN_message_t &msg)
         wheelio.msg[byte] = msg.buf[byte];
     }
 
-    ssButton.setButtonState(wheelio.io.button1);
-    revButton.setButtonState(wheelio.io.button2);
+    ssButton.setButtonState(wheelio.io.button8);
+    revButton.setButtonState(wheelio.io.button7);
 }

@@ -6,11 +6,8 @@
 #ifndef CASCADIAMC_H
 #define CASCADIAMC_H
 
-#define CAN_CMD_DELAY 5 // ms
-
 #include <nerduino.h>
-
-#define NOT_SPINNING_TORQUE_LIMIT   1500
+#include "mpuConfig.h"
 
 class CascadiaMC
 {
@@ -79,6 +76,13 @@ class CascadiaMC
          * @param p_isOn 
          */
         void togglePower();
+
+        /**
+         * @brief Set the desired power state into the MC message
+         * 
+         * @param state 
+         */
+        void setPower(bool state);
 
         /**
          * @brief Get if the MC is on

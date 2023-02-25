@@ -3,12 +3,18 @@
  * @author Nick DePatie
  * @brief Entry Point for Program
  */
+
 #include <nerduino.h>
 #include "mpu.h"
+#include "mpuConfig.h"
+
+enum mpu_states mpu_state;
+uint8_t drive_state = OFF;
 
 void setup()
 {
     NERduino.begin();
+    mpu_state = BOOT;
     initializeCAN(CANLINE_1, BAUD_RATE, &(*mpuCanCallback));
     WDT_timings_t config;
     config.trigger = 5;         /* in seconds, 0->128 */
@@ -36,5 +42,6 @@ void loop()
     pedalsProcess();
     motorController.writeMCState();
     checkShutdownStatus();
+    sendMPUStatus();
     wdt.feed();
 }

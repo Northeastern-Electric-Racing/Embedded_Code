@@ -8,6 +8,7 @@
 #define ORIONBMS_H
 
 #include <nerduino.h>
+#include "mpuConfig.h"
 
 #define CRITICAL_CELLTEMP           40      //degrees celcius
 #define SHUTDOWN_CELLTEMP           55      //degrees celcius

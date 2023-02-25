@@ -87,7 +87,7 @@ int16_t Pedals::calcTorque(double torqueScale)
 
 	pedalTorque = torqueScale * MAXIMUM_TORQUE;
 
-	int16_t torqueLim = 100;//calcCLTorqueLimit();
+	int16_t torqueLim = calcCLTorqueLimit();
 
 	// Scale torque to match BMS current limit
 	if (pedalTorque > torqueLim) {
@@ -127,14 +127,14 @@ int16_t Pedals::calcCLTorqueLimit()
 	if ((calculated < 0) | (calculated > (MAXIMUM_TORQUE / 10))) {
 		calculated = MAXIMUM_TORQUE / 10;
 	}
-	
+
 	Serial.print("Vdc: ");
 	Serial.print(dcVoltage);
 	Serial.print(", Idc: ");
 	Serial.print(dcCurrent);
 	Serial.print(", wm: ");
 	Serial.println(motorSpeed);
-	
+
 	Serial.print("CL Limit: ");
 	Serial.print(calculated);
 

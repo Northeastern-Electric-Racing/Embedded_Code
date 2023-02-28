@@ -7,6 +7,7 @@
 #include "rtc.h"
 #include "message.h"
 #include "xbee_at.h"
+#include "gnss.h"
 #include "logger.h"
 #include "debug.h"
 
@@ -15,21 +16,29 @@
 #define LOG_ALL_MESSAGES       0 // set to 1 to log all CAN messages, 0 to filter
 #define SEND_XBEE_ALL_MESSAGES 0 // set to 1 to send all CAN messages, 0 to filter
 
-#define BAUD_RATE 1000000U // 250 kbps 
+#define XBEE_SERIAL    Serial2
+#define XBEE_BAUD_RATE 115200
+#define GNSS_SERIAL    Serial1
+#define GNSS_BAUD_RATE 38400
+
+#define CAN_BAUD_RATE 1000000U // 1 Mbps
 #define MAX_MB_NUM 16 // maximum number of CAN mailboxes to use 
 
 #define MIN_LOG_FREQUENCY 1000 // the max time length between logs (in ms)
-
 #define SENSOR_LOG_FREQUENCY 100 // time between recording Nerduino sensor data
-#define ACCELEROMETER_ID 0x300
-#define TEMP_HUMID_ID 0x301
+#define GNSS_LOG_FREQUENCY 500 // time between GNSS logs
 
 #define ANALOG1_PIN A0 // Pin 14 on teensy
 #define ANALOG2_PIN A6       
 #define ANALOG3_PIN A7 
 
+#define ACCELEROMETER_ID    0x300
+#define TEMP_HUMID_ID       0x301
 #define ANALOG1_LOG_ID      0x302  
 #define STRAIN_GAUGE_LOG_ID 0x303
+#define GNSS_1_ID           0x304
+#define GNSS_2_ID           0x305
+#define GNSS_3_ID           0x306
 
 #define LED_BLINK_DELAY_MS 500
 
@@ -58,13 +67,24 @@ const uint32_t LOG_IDS[] = {
   0x0AC, 
   0x202, 
   0xC0,
-  0x36};
+  0x36,
+  0xB1,
+  0x300,
+  0x301,
+  0x302,
+  0x303,
+  0x304,
+  0x305,
+  0x306
+};
 const int NUM_LOG_IDS = sizeof(LOG_IDS) / sizeof(uint32_t);
 
 // CAN Ids of the messages to send via XBee (only considered if SEND_XBEE_ALL_MESSAGES is 0)
 const uint32_t SEND_XBEE_IDS[] = {
   0xA5, 
-  0x202
+  0x202,
+  0x300,
+  0x301
 };
 const int NUM_SEND_XBEE_IDS = sizeof(SEND_XBEE_IDS) / sizeof(uint32_t);
 
@@ -75,24 +95,10 @@ void incomingCANCallback(const CAN_message_t &msg);
 void logAccelerometerData();
 void logTempSensorData();
 void logAnalogs();
-
-
-/**
- * @brief Blinks the LED when logging, does nothing when not logging
- * 
- */
-static void blinkLED() {
-  static uint32_t lastLedBlinkTime = 0;
-  if (millis() - lastLedBlinkTime > LED_BLINK_DELAY_MS) {
-    if (LoggerActive() && blinkLedState == LOW) {
-      blinkLedState = HIGH;
-    } else {
-      blinkLedState = LOW;
-    }
-    digitalWrite(LED_BUILTIN, blinkLedState);
-    lastLedBlinkTime = millis();
-  }
-}
+void logGnssData();
+void blinkLED();
+void tryLog(message_t *message);
+void tryXbee(message_t *message);
 
 
 /**
@@ -100,17 +106,16 @@ static void blinkLED() {
  * 
  */
 void setup() {
-  Serial.begin(9600); 
+  Serial.begin(9600); // must be done first
   delay(100);
 
   RtcInit();
   LoggerInit(MIN_LOG_FREQUENCY);
 
   NERduino.begin();
-  delay(3000); // TODO: Do we need this delay
 
   myCan.begin();
-  myCan.setBaudRate(BAUD_RATE);
+  myCan.setBaudRate(CAN_BAUD_RATE);
   myCan.setMaxMB(MAX_MB_NUM);
   myCan.enableFIFO(); 
   myCan.enableFIFOInterrupt(); 
@@ -121,7 +126,8 @@ void setup() {
   pinMode(ANALOG2_PIN, INPUT);
   pinMode(ANALOG3_PIN, INPUT);
   
-  XBeeInit(&Serial1, 115200);
+  GnssInit(GNSS_SERIAL, GNSS_BAUD_RATE);
+  XBeeInit(&XBEE_SERIAL, XBEE_BAUD_RATE);
 
   WDT_timings_t config;
   config.trigger = 5; /* in seconds, 0->128 */
@@ -144,13 +150,20 @@ void loop() {
     DPRINTLN(F("Reinitializing logger due to internal error")); 
   }
 
-  // logging the extra sensor data from the accelerometer and temp/humid sensor
+  // logging extra sensor data
   static uint32_t dataLastRecorded = 0;
   if (millis() - dataLastRecorded > SENSOR_LOG_FREQUENCY) {
     logAccelerometerData();
     logTempSensorData();
-    logAnalogs();
+    // logAnalogs();
     dataLastRecorded = millis();
+  }
+
+  // logging GNSS data
+  static uint32_t gnssLastRecorded = 0;
+  if (millis() - gnssLastRecorded > GNSS_LOG_FREQUENCY) {
+    logGnssData();
+    gnssLastRecorded = millis();
   }
 
   // USED FOR TESTING WHEN NOT CONNECTED TO CAN
@@ -176,6 +189,50 @@ void loop() {
 
 
 /**
+ * @brief Handles incoming CAN messages, adding certain ones to the logging message buffer.
+ * 
+ * @param msg received CAN message
+ */
+void incomingCANCallback(const CAN_message_t &msg) {
+  message_t message;
+  message.id = msg.id;
+  message.length = msg.len;
+  memcpy(message.dataBuf, msg.buf, msg.len);
+  RtcGetTime(&message.timestamp);
+  tryLog(&message);
+  tryXbee(&message);
+}
+
+
+/**
+ * @brief Sends a CAN message using the given parameters
+ * 
+ * @param id CAN id (assumed to be 11 bit)
+ * @param len Length of message
+ * @param buf Data buffer to send
+ * @return int - Error code (Negative on failure, other on success)
+ */
+int sendMessage(uint32_t id, uint8_t len, const uint8_t *buf) {
+  CAN_message_t msg;
+  msg.id = id;
+  msg.len = len;
+  uint8_t *buf1;
+
+  for (int i = 0; i < 8; i++) {
+    if (i < len) {
+      buf1 = const_cast<uint8_t*>(buf + i);
+      msg.buf[i] = *buf1;
+    }
+    else {
+      msg.buf[i] = 0; // copies buf to message, padding with 0s if length isn't 8
+    }
+  }
+
+  return myCan.write(msg);
+}
+
+
+/**
  * @brief Log the data from the Nerduino accelerometer
  */
 void logAccelerometerData() {
@@ -193,7 +250,8 @@ void logAccelerometerData() {
   memcpy(message.dataBuf, accelBuf, 6);
   RtcGetTime(&message.timestamp);
 
-  LoggerBufferMessage(&message);
+  tryLog(&message);
+  tryXbee(&message);
 }
 
 
@@ -214,7 +272,8 @@ void logTempSensorData() {
   memcpy(message.dataBuf, humidBuf, 4);
   RtcGetTime(&message.timestamp);
 
-  LoggerBufferMessage(&message);
+  tryLog(&message);
+  tryXbee(&message);
 }
 
 
@@ -247,42 +306,94 @@ void logAnalogs() {
   memcpy(message2.dataBuf, strainGaugeBuf, 8);
   RtcGetTime(&message2.timestamp);
 
-  LoggerBufferMessage(&message1);
-  LoggerBufferMessage(&message2);
+  tryLog(&message1);
+  tryXbee(&message1);
+  tryLog(&message2);
+  tryXbee(&message2);
+}
+
+/**
+ * @brief Log data from the GNSS module
+ * 
+ */
+void logGnssData() {
+  int32_t latitude = GnssGetLatitude();
+  int32_t longitude = GnssGetLongitude();
+  int32_t fixStatus = GnssGetFixOk();
+  int32_t altitude = GnssGetAltitude();
+  int32_t groundSpeed = GnssGetGroundSpeed();
+  int32_t heading = GnssGetHeading();
+
+  uint8_t data1[8] = {
+    latitude & 255, (latitude >> 8) & 255, (latitude >> 16) & 255, (latitude >> 24) & 255,
+    longitude & 255, (longitude >> 8) & 255, (longitude >> 16) & 255, (longitude >> 24) & 255
+  };
+  uint8_t data2[8] = {
+    fixStatus & 255, (fixStatus >> 8) & 255, (fixStatus >> 16) & 255, (fixStatus >> 24) & 255,
+    altitude & 255, (altitude >> 8) & 255, (altitude >> 16) & 255, (altitude >> 24) & 255
+  };
+  uint8_t data3[8] = {
+    groundSpeed & 255, (groundSpeed >> 8) & 255, (groundSpeed >> 16) & 255, (groundSpeed >> 24) & 255,
+    heading & 255, (heading >> 8) & 255, (heading >> 16) & 255, (heading >> 24) & 255
+  };
+
+  message_t message1;
+  message1.id = GNSS_1_ID;
+  message1.length = 8;
+  memcpy(message1.dataBuf, data1, 8);
+  RtcGetTime(&message1.timestamp);
+
+  message_t message2;
+  message2.id = GNSS_2_ID;
+  message2.length = 8;
+  memcpy(message2.dataBuf, data2, 8);
+  RtcGetTime(&message2.timestamp);
+
+  message_t message3;
+  message3.id = GNSS_3_ID;
+  message3.length = 8;
+  memcpy(message3.dataBuf, data3, 8);
+  RtcGetTime(&message3.timestamp);
+
+  tryLog(&message1);
+  tryXbee(&message1);
+  tryLog(&message2);
+  tryXbee(&message2);
+  tryLog(&message3);
+  tryXbee(&message3);
 }
 
 
 /**
- * @brief Handles incoming CAN messages, adding certain ones to the logging message buffer.
+ * @brief Blinks the LED when logging, does nothing when not logging
  * 
- * @param msg received CAN message
  */
-void incomingCANCallback(const CAN_message_t &msg) {
-  message_t message;
-  message.id = msg.id;
-  message.length = msg.len;
-  memcpy(message.dataBuf, msg.buf, msg.len);
-  RtcGetTime(&message.timestamp);
+void blinkLED() {
+  static uint32_t lastLedBlinkTime = 0;
+  if (millis() - lastLedBlinkTime > LED_BLINK_DELAY_MS) {
+    if (LoggerActive() && blinkLedState == LOW) {
+      blinkLedState = HIGH;
+    } else {
+      blinkLedState = LOW;
+    }
+    digitalWrite(LED_BUILTIN, blinkLedState);
+    lastLedBlinkTime = millis();
+  }
+}
 
-  // Log if global logging is enabled or search through loggable message IDs
+
+/**
+ * @brief Log if global logging is enabled or ID is specified in LOG_IDS.
+ * 
+ * @param message Message to log
+ */
+void tryLog(message_t *message) {
   if (LOG_ALL_MESSAGES) {
-    LoggerBufferMessage(&message);
+    LoggerBufferMessage(message);
   } else {
     for (int i = 0; i < NUM_LOG_IDS; i++) {
-      if (LOG_IDS[i] == msg.id) {
-        LoggerBufferMessage(&message);
-        break;
-      }
-    }
-  }
-
-  // Send if global XBee sending is enabled or search through sendable message IDs
-  if (SEND_XBEE_ALL_MESSAGES) {
-    XBeeSendMessage(&message);
-  } else {
-    for (int i = 0; i < NUM_SEND_XBEE_IDS; i++) {
-      if (SEND_XBEE_IDS[i] == msg.id) {
-        XBeeSendMessage(&message);
+      if (LOG_IDS[i] == message->id) {
+        LoggerBufferMessage(message);
         break;
       }
     }
@@ -291,28 +402,19 @@ void incomingCANCallback(const CAN_message_t &msg) {
 
 
 /**
- * @brief Sends a CAN message using the given parameters
+ * @brief Send over XBee if global sending is enabled or ID is specified in SEND_XBEE_IDS.
  * 
- * @param id CAN id (assumed to be 11 bit)
- * @param len Length of message
- * @param buf Data buffer to send
- * @return int - Error code (Negative on failure, other on success)
+ * @param message Message to send
  */
-int sendMessage(uint32_t id, uint8_t len, const uint8_t *buf) {
-  CAN_message_t msg;
-  msg.id = id;
-  msg.len = len;
-  uint8_t *buf1;
-
-  for (int i = 0; i < 8; i++) {
-    if (i < len) {
-      buf1 = const_cast<uint8_t*>(buf + i);
-      msg.buf[i] = *buf1;
-    }
-    else {
-      msg.buf[i] = 0; // copies buf to message, padding with 0s if length isn't 8
+void tryXbee(message_t *message) {
+  if (SEND_XBEE_ALL_MESSAGES) {
+    XBeeSendMessage(message);
+  } else {
+    for (int i = 0; i < NUM_SEND_XBEE_IDS; i++) {
+      if (SEND_XBEE_IDS[i] == message->id) {
+        XBeeSendMessage(message);
+        break;
+      }
     }
   }
-
-  return myCan.write(msg);
 }

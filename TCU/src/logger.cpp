@@ -16,16 +16,17 @@
  * 
  */
 
-#include "logger.h"
-#include "debug.h"
 #include <Arduino.h>
-#include <TimeLib.h>
 #include <SD.h>
 
-#define MAX_BUFFERED_MESSAGES 50 // max number of buffered CAN messages before logging to SD card
-#define MAX_LOG_FILE_SIZE 100000000U // 100 Megabytes
+#include "logger.h"
+#include "rtc.h"
+#include "debug.h"
 
-#define FILE_NAME_SIZE 19 // 19 digits as 10 for timestamp, 8 for text, 1 for termination
+#define MAX_BUFFERED_MESSAGES 50 // max number of buffered CAN messages before logging to SD card
+#define MAX_LOG_FILE_SIZE 50000000U // 50 Megabytes
+
+#define FILE_NAME_SIZE 19 // 10 for timestamp, 8 for text, 1 for termination
 
 
 File logFile; // file logging object
@@ -34,8 +35,8 @@ char fileName[FILE_NAME_SIZE]; // format is log-1652888997.txt
 // Buffer information (use 2 buffers to prevent overwrites during logging delays)
 int buf1Length = 0;
 int buf2Length = 0;
-message_format_t messageBuf1[MAX_BUFFERED_MESSAGES]; 
-message_format_t messageBuf2[MAX_BUFFERED_MESSAGES]; 
+message_t messageBuf1[MAX_BUFFERED_MESSAGES]; 
+message_t messageBuf2[MAX_BUFFERED_MESSAGES]; 
 bool usingBuf1 = true;
 
 bool initialized = false; // flag to verify logging has been initialized
@@ -43,19 +44,6 @@ bool initialized = false; // flag to verify logging has been initialized
 // Timing information
 uint32_t lastLogTime;
 uint32_t minLogFrequency;
-uint32_t startUpTimeMillis;
-uint32_t startUpTimeRTC;
-
-
-/**
- * @brief Wrapper function to pass to time sync function
- * 
- * @return time_t 
- */
-static time_t getTeensy3Time()
-{
-  return Teensy3Clock.get();
-}
 
 
 /**
@@ -65,31 +53,17 @@ static time_t getTeensy3Time()
  */
 static void setFileName() {
   uint32_t fileNum = 0;
-  if (startUpTimeRTC > 0) {
-    fileNum = startUpTimeRTC;
+  rtc_time_t currentTime;
+  RTC_STATUS timeStatus = RtcGetTime(&currentTime);
+  if (timeStatus == RTC_STATUS::RTC_SUCCESS) {
+    fileNum = currentTime.seconds;
   }
 
-  snprintf(fileName, FILE_NAME_SIZE, "log-%lu.txt\0", fileNum);
-
+  snprintf(fileName, FILE_NAME_SIZE, "log-%lu.txt", fileNum);
   while (SD.exists(fileName)) {
     fileNum++;
-    snprintf(fileName, FILE_NAME_SIZE, "log-%lu.txt\0", fileNum); 
+    snprintf(fileName, FILE_NAME_SIZE, "log-%lu.txt", fileNum); 
   }
-}
-
-
-/**
- * @brief Get the date/time in the format YYYY-MM-DDT00:00:00.000Z
- * 
- * @param timestamp Char pointer to hold return value
- */
-static void getTimestamp(char *timestamp) {
-  uint32_t millisSinceStart = millis() - startUpTimeMillis;
-  uint32_t currentTimeSec = startUpTimeRTC + (millisSinceStart / 1000);
-  uint32_t extraMillis = millisSinceStart % 1000;
-
-  snprintf(timestamp, 25, "%.4d-%.2d-%.2dT%.2d:%.2d:%.2d.%.3luZ\0", year(currentTimeSec), month(currentTimeSec), 
-          day(currentTimeSec), hour(currentTimeSec), minute(currentTimeSec), second(currentTimeSec), extraMillis);
 }
 
 
@@ -102,37 +76,19 @@ static void reset() {
   initialized = false;
   buf1Length = 0;
   buf2Length = 0;
-  memset((void *)messageBuf1, 0, MAX_BUFFERED_MESSAGES * sizeof(message_format_t));
-  memset((void *)messageBuf2, 0, MAX_BUFFERED_MESSAGES * sizeof(message_format_t));
+  memset((void *)messageBuf1, 0, MAX_BUFFERED_MESSAGES * sizeof(message_t));
+  memset((void *)messageBuf2, 0, MAX_BUFFERED_MESSAGES * sizeof(message_t));
   usingBuf1 = true;
   interrupts()
 }
 
 
-/**
- * @brief Initializes the SD logging functionality.
- * 
- * @param logFrequency Minimum rate at which to log the buffered messages
- * @return int Status code
- */
-int LoggerInit(uint32_t logFrequency) {
+LOGGER_STATUS LoggerInit(uint32_t logFrequency) {
   if (!SD.begin(BUILTIN_SDCARD)) {
     DPRINTLN(F("Error initializing SD card logging"));
-    return LOGGER_ERROR_SD_CARD;
+    return LOGGER_STATUS::LGR_ERROR_SD_CARD;
   }
-
-  // Init the RTC
-  setSyncProvider(getTeensy3Time);
-  if (timeStatus() == timeSet) {
-    DPRINTLN(F("RTC has set the system time")); 
-    startUpTimeRTC = now();
-  } else {
-    DPRINTLN(F("Unable to sync with the RTC"));
-    startUpTimeRTC = 0;
-  }
-  startUpTimeMillis = millis();
   
-  // set the file name 
   setFileName();
   DPRINT(F("Setup complete. File name is "));
   DPRINTLN(fileName);
@@ -142,37 +98,55 @@ int LoggerInit(uint32_t logFrequency) {
   logFile = SD.open(fileName, FILE_WRITE);
   
   initialized = true;
-  return LOGGER_SUCCESS;
+  return LOGGER_STATUS::LGR_SUCCESS;
 }
 
 
-/**
- * @brief Finds whether the logger is currently logging messages
- * 
- * @return true when active, false otherwise
- */
 bool LoggerActive() {
   return initialized;
 }
 
 
-/**
- * @brief Writes the messages currently buffered to the SD card. 
- * 
- * @return int Status code
- */
-int LoggerWrite() {
+LOGGER_STATUS LoggerBufferMessage(message_t *message) {
   if (!initialized) {
-    return LOGGER_ERROR_NO_INIT;
+    return LOGGER_STATUS::LGR_ERROR_SD_CARD;
+  }
+
+  noInterrupts();
+  // find appropriate buffer to use
+  message_t *messageBuf = usingBuf1 ? messageBuf1 : messageBuf2; 
+  int bufLength = usingBuf1 ? buf1Length : buf2Length;
+
+  if (bufLength >= MAX_BUFFERED_MESSAGES) {
+    DPRINTLN(F("Tried to write to already full buffer"));
+    return LOGGER_STATUS::LGR_ERROR_BUFFER_FULL;
+  }
+
+  messageBuf[bufLength] = *message;
+
+  if (usingBuf1) {
+    buf1Length++;
+  } else {
+    buf2Length++;
+  }
+  interrupts();
+
+  return LOGGER_STATUS::LGR_SUCCESS;
+}
+
+
+LOGGER_STATUS LoggerWrite() {
+  if (!initialized) {
+    return LOGGER_STATUS::LGR_ERROR_SD_CARD;
   }
 
   // find appropriate buffer to use
-  message_format_t *messageBuf = usingBuf1 ? messageBuf1 : messageBuf2; 
+  message_t *messageBuf = usingBuf1 ? messageBuf1 : messageBuf2; 
   int bufLength = usingBuf1 ? buf1Length : buf2Length;
 
   // only write on certain conditions
   if ((millis() - lastLogTime) <= minLogFrequency && bufLength < MAX_BUFFERED_MESSAGES) {
-    return LOGGER_ERROR_NO_WRITE;
+    return LOGGER_STATUS::LGR_ERROR_NO_WRITE;
   }
 
   usingBuf1 = !usingBuf1; // Switch main log buffer during write process
@@ -199,12 +173,14 @@ int LoggerWrite() {
 
     // write all buffered messages to the SD card
     for (int i = 0; i < bufLength; i++) {
-      int writeLength = logFile.print(messageBuf[i].timestamp);
+      int writeLength = logFile.print(messageBuf[i].timestamp.seconds);
       // checks for error on write (assumes rest are fine if this passes)
       if (writeLength == 0) {
+        DPRINTLN(F("Could not write to SD ... Reseting"));
         reset();
-        return LOGGER_ERROR_SD_CARD;
+        return LOGGER_STATUS::LGR_ERROR_SD_CARD;
       }
+      logFile.printf("%.3lu", messageBuf[i].timestamp.millis);
       logFile.print(F(" "));
       logFile.print(messageBuf[i].id);
       logFile.print(F(" "));
@@ -230,52 +206,11 @@ int LoggerWrite() {
       buf1Length = 0;
     }
     logFile.flush();
-    return LOGGER_SUCCESS;
+    return LOGGER_STATUS::LGR_SUCCESS;
   } 
   else {
     DPRINTLN(F("Could not open file on SD card"));
     reset();
-    return LOGGER_ERROR_SD_CARD;
+    return LOGGER_STATUS::LGR_ERROR_SD_CARD;
   }
 }
-
-
-/**
- * @brief Adds the given data plus a generated timestamp to the message buffer.
- *        Uses a time since startup if the RTC is not in use, or the real time otherwise.
- * 
- * @param id Message id
- * @param len Message length
- * @param buf Data bytes (Array of length `len`)
- * @return int Status code
- */
-int LoggerBufferMessage(uint32_t id, uint8_t len, const uint8_t *buf) {
-  if (!initialized) {
-    return LOGGER_ERROR_NO_INIT;
-  }
-
-  noInterrupts();
-  message_format_t *messageBuf = usingBuf1 ? messageBuf1 : messageBuf2; 
-  int bufLength = usingBuf1 ? buf1Length : buf2Length;
-
-  if (bufLength >= MAX_BUFFERED_MESSAGES) {
-    DPRINTLN(F("Tried to write to already full buffer"));
-    return LOGGER_ERROR_BUFFER_FULL;
-  }
-
-  // add data to message buffer
-  getTimestamp(messageBuf[bufLength].timestamp);
-  messageBuf[bufLength].id = id;
-  messageBuf[bufLength].length = len;
-  memcpy(messageBuf[bufLength].dataBuf, buf, len);
-
-  if (usingBuf1) {
-    buf1Length++;
-  } else {
-    buf2Length++;
-  }
-  interrupts();
-
-  return LOGGER_SUCCESS;
-}
-

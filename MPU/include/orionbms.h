@@ -21,6 +21,15 @@ enum
     AIR_OPEN
 };
 
+typedef enum
+{
+    BOOT_STATE,       //State when BMS first starts up, used to initialize everything that needs configuring
+    READY_STATE,      //State when car is not on/BMS is not really doing anything
+    CHARGING_STATE,   //State when car is on and is charging (Filling battery)
+    FAULTED_STATE,    //State when BMS has detected a catastrophic fault and we need to hault operations
+    NUM_STATES
+}BMSState_t;
+
 class OrionBMS
 {
     private:
@@ -31,7 +40,8 @@ class OrionBMS
         int16_t currentDraw;
         int16_t liveVoltage;
 
-        uint8_t failsafeCode;
+        uint8_t bmsStatus;
+        uint32_t faultStatus;
         Timer boostRecharge_wait;
 
         Timer isInChargeMode;
@@ -57,6 +67,13 @@ class OrionBMS
         void setSoC(uint8_t p_SoC);
 
         /**
+         * @brief Set the current BMS Status (boot, fault, etc)
+         * 
+         * @param p_BMSStatus
+         */
+        void setBMSStatus(uint8_t p_BMSStatus);
+
+        /**
          * @brief Set the current average temperature
          * 
          * @param p_avgTemp 
@@ -66,9 +83,9 @@ class OrionBMS
         /**
          * @brief Set the current failsafe code (Code not processed, only saved)
          * 
-         * @param p_failsafeCode 
+         * @param p_faultStatus
          */
-        void setFailsafeCode(uint8_t p_failsafeCode);
+        void setFaultStatus(uint8_t p_faultStatus);
 
         /**
          * @brief Retrieves the current SoC of the batteries

@@ -36,15 +36,16 @@ void bmsAccStatus_cb(const CAN_message_t &msg)
     bms.setLiveVoltage(liveVoltage);
 }
 
-void bmsDTCStatus_cb(const CAN_message_t &msg)
+void bmsStatus_cb(const CAN_message_t &msg)
 {
-    bms.setAvgTemp(msg.buf[6]);
+    bms.setBMSStatus(msg.buf[0]);
+    bms.setFaultStatus((msg.buf[1]) << 24 | (msg.buf[2]) << 16 | (msg.buf[3]) << 8 | (msg.buf[4]));
+    bms.setAvgTemp(msg.buf[5]);
 }
 
 
 void bmsCurrentLimits_cb(const CAN_message_t &msg)
 {
-    Serial.println("CANOK");
     setCANLineOK();
     uint16_t dischargeCurrentLimit = (msg.buf[1] << 8) | msg.buf[0];
     bms.setCurrentLimit(dischargeCurrentLimit);
@@ -58,11 +59,6 @@ void motorMotion_cb(const CAN_message_t &msg)
     //angular motor speed is found at bytes 2 and 3
     int16_t motorSpeed = ((msg.buf[3] << 8) | msg.buf[2]) / 10;
     motorController.setMotorSpeed(motorSpeed);
-}
-
-void bmsChargingState_cb(const CAN_message_t &msg)
-{
-    bms.enableChargingMode();
 }
 
 void motorTemp3_cb(const CAN_message_t &msg)
@@ -104,17 +100,14 @@ void mpuCanCallback(const CAN_message_t &msg)
         case CANMSG_ERR_MCFAULT:
             mcErr_cb(msg);
             break;
-        case CANMSG_BMSDTCSTATUS:
-            bmsDTCStatus_cb(msg);
+        case CANMSG_BMSSTATUS:
+            bmsStatus_cb(msg);
             break;
         case CANMSG_BMSACCSTATUS:
             bmsAccStatus_cb(msg);
             break;
         case CANMSG_BMSCURRENTLIMITS:
             bmsCurrentLimits_cb(msg);
-            break;
-        case CANMSG_BMSCHARGINGSTATE:
-            bmsChargingState_cb(msg);
             break;
         case CANMSG_BMSCURRENTS:
             bmsCurrents_cb(msg);

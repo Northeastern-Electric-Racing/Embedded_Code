@@ -35,7 +35,6 @@ void DriverIO::handleButtonState()
 
     if (motorController->checkFault())
     {
-        Serial.println("Motor controller not ready!!!");
         motorController->setPower(false);
         mpu_state = FAULT;
         return;
@@ -119,5 +118,4 @@ void DriverIO::wheelIO_cb(const CAN_message_t &msg)
 
     incrButton.setButtonState(wheelio.io.button2);
     decrButton.setButtonState(wheelio.io.button4);
-    Serial.println("WHEEL MSG RECEIVED!!");
 }

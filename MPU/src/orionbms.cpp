@@ -16,15 +16,31 @@ void OrionBMS::setSoC(uint8_t p_SoC)
 }
 
 
+void OrionBMS::enableChargingMode()
+{
+    isInChargeMode.startTimer(2000);
+}
+
+
+void OrionBMS::setBMSStatus(uint8_t p_BMSStatus)
+{
+    bmsStatus = p_BMSStatus;
+    
+    if (bmsStatus == CHARGING_STATE) {
+        enableChargingMode();
+    }
+}
+
+
 void OrionBMS::setAvgTemp(uint8_t p_avgTemp)
 {
     avgTemp = p_avgTemp;
 }
 
 
-void OrionBMS::setFailsafeCode(uint8_t p_failsafeCode)
+void OrionBMS::setFaultStatus(uint8_t p_faultStatus)
 {
-    failsafeCode = p_failsafeCode;
+    faultStatus = p_faultStatus;
 }
 
 
@@ -108,12 +124,6 @@ void OrionBMS::setLiveVoltage(int16_t p_voltage)
 int16_t OrionBMS::getLiveVoltage()
 {
     return liveVoltage;
-}
-
-
-void OrionBMS::enableChargingMode()
-{
-    isInChargeMode.startTimer(2000);
 }
 
 

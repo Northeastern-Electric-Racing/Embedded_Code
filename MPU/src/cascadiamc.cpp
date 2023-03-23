@@ -47,20 +47,13 @@ void CascadiaMC::writeMCState()
 
 void CascadiaMC::toggleDirection()
 {
-    if (mcMsg.config.isOn) {
-        togglePower();
-    }
     mcMsg.config.isForward = !mcMsg.config.isForward;
 }
 
 void CascadiaMC::setDirection(bool p_direction)
 {
-    if (mcMsg.config.isOn) {
-        togglePower();
-    }
     mcMsg.config.isForward = p_direction;
 }
-
 
 void CascadiaMC::togglePower()
 {
@@ -68,18 +61,24 @@ void CascadiaMC::togglePower()
     isMCLocked = true;
 }
 
+void CascadiaMC::setPower(bool state)
+{
+    if(mcMsg.config.isOn == state) return;
+
+    isMCLocked = true;
+
+    mcMsg.config.isOn = state;
+}
 
 bool CascadiaMC::getIsOn()
 {
     return mcMsg.config.isOn;
 }
 
-
 bool CascadiaMC::getDirection()
 {
     return mcMsg.config.isForward;
 }
-
 
 void CascadiaMC::changeTorque(uint16_t p_accelTorque)
 {

@@ -3,7 +3,6 @@
 
 DriverIO::DriverIO(){}
 
-
 DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms)
 {
     powerToggle_wait.cancelTimer();
@@ -14,78 +13,100 @@ DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms)
     motorController->setDirection(false);
 }
 
-
 DriverIO::~DriverIO(){}
 
-
-void DriverIO::handleSSButtonPress()
+void DriverIO::handleSpeaker()
 {
-    //Poll Button
-    ssButton.checkButtonPin();
-
-    //Poll Speaker if it is written high
     speaker.attemptToStopSpeaker();
-    //speaker.playSpeaker();
+}
 
-    //If the button isn't pressed, do nothing
-    if(!ssButton.isButtonPressed_Pulse()) return;
+void DriverIO::handleReverse()
+{
+    motorController->setDirection(drive_state != REVERSE);
+}
+
+void DriverIO::handleButtonState()
+{
+    bool state_changed = false;
+
+    //Poll Button
+    incrButton.checkButtonPin();
+    decrButton.checkButtonPin();
+
+    if (motorController->checkFault())
+    {
+        Serial.println("Motor controller not ready!!!");
+        motorController->setPower(false);
+        mpu_state = FAULT;
+        return;
+    }
 
     //If the BMS is charging
-    if(bms->getChargeMode())
+    if((incrButton.isButtonPressed_Pulse() ||
+        decrButton.isButtonPressed_Pulse()) && 
+        bms->getChargeMode())
     {
         bms->toggleAIR();
         powerToggle_wait.startTimer(1500);
+        mpu_state = CHARGING;
         return;
     }
-
-    //If the motor controller is on OR the motor is off and it is ready to go
-    if(motorController->getIsOn() || 
-        (!motorController->getIsOn() && !motorController->checkFault()))
+    else
     {
-        motorController->togglePower();    //Writes the power state of the motor to the MC message to be sent
-        if(motorController->getIsOn())
-        {
-            speaker.playSpeaker();
-        }
-        powerToggle_wait.startTimer(1500);
-        return;
+        mpu_state = DRIVE;
     }
-}
 
+    //If the BMS is not charging
+    if(incrButton.isButtonPressed() && changeStateTimer.isTimerExpired())
+    {
+        drive_state = (drive_state + 1) % MAX_DRIVE_STATES;
+        Serial.println("Increment!");
+        changeStateTimer.startTimer(CHANGE_STATE_TIME);
+        state_changed = true;
+    }
+    if(decrButton.isButtonPressed() && changeStateTimer.isTimerExpired())
+    {
+        drive_state = ((drive_state - 1) % MAX_DRIVE_STATES);
+        if (drive_state == 255) drive_state = REVERSE;
 
-void DriverIO::handleReverseButton()
-{
-    //Poll Button
-    revButton.checkButtonPin();
+        Serial.println("Decrement!");
+        changeStateTimer.startTimer(CHANGE_STATE_TIME);
+        state_changed = true;
+    }
 
-    //If the button isn't pressed, do nothing
-    if(!revButton.isButtonPressed_Pulse()) return;
+    bool motor_power = !(drive_state == OFF || mpu_state != DRIVE);
 
-    motorController->setDirection(!motorController->getDirection());
+    motorController->setPower(motor_power);
+
+    if(state_changed && ((drive_state == PIT) || (drive_state == REVERSE)))
+    {
+        speaker.playSpeaker();
+    }
+    powerToggle_wait.startTimer(POWER_TOGGLE_WAIT);
 }
 
 void DriverIO::wheelIO_cb(const CAN_message_t &msg)
 {
-    static union
+    union
     {
         uint8_t msg[8];
 
         struct
         {
-            uint16_t pot1;
-            uint16_t pot2;
-            bool button1 : 1;
-            bool button2 : 1;
-            bool button3 : 1;
-            bool button4 : 1;
+            uint16_t pot_l;
+            uint16_t pot_r;
             bool button5 : 1;
             bool button6 : 1;
-            bool button7 : 1;
-            bool button8 : 1;
-            uint8_t dontcare1;
-            uint8_t dontcare2;
-            uint8_t dontcare3;
-        }io;
+            bool button3 : 1;
+            uint8_t x1   : 1;
+            bool paddle_r : 1;
+            bool paddle_l : 1;
+            bool button4 : 1;
+            bool button2 : 1;
+            uint8_t x2;
+            uint8_t x3;
+            uint8_t x4;
+        } io;
     } wheelio;
 
     for(uint8_t byte = 0; byte < 8; byte++)
@@ -93,6 +114,10 @@ void DriverIO::wheelIO_cb(const CAN_message_t &msg)
         wheelio.msg[byte] = msg.buf[byte];
     }
 
-    ssButton.setButtonState(wheelio.io.button8);
-    revButton.setButtonState(wheelio.io.button7);
+    wheelio.io.pot_l = SWITCHBYTES(wheelio.io.pot_l);
+    wheelio.io.pot_r = SWITCHBYTES(wheelio.io.pot_r);
+
+    incrButton.setButtonState(wheelio.io.button2);
+    decrButton.setButtonState(wheelio.io.button4);
+    Serial.println("WHEEL MSG RECEIVED!!");
 }

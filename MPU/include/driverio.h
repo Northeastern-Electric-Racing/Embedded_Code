@@ -9,6 +9,7 @@
 #define DRIVERIO_H
 
 #include <nerduino.h>
+#include "mpuConfig.h"
 #include "cascadiamc.h"
 #include "orionbms.h"
 #include "driverioHW.h"
@@ -33,13 +34,18 @@ class DriverIO
         OrionBMS *bms;
 
         Speaker speaker {SPEAKER_PIN};
-        Button ssButton;
-        Button revButton;
-        
+        Button incrButton;
+        Button decrButton;
+
         //For future development and integration with Raspberry Pi
         //DASHBOARD dashboard;
 
         Timer powerToggle_wait;
+        Timer changeStateTimer;
+
+        bool canTransitionToOff();
+
+        bool canTransitionToOn();
 
     public:
         DriverIO();
@@ -49,17 +55,28 @@ class DriverIO
         ~DriverIO();
 
         /**
-         * @brief Debounces the Start/Stop button and toggles the power depending on if the button was pushed
+         * @brief Debounces the increment and decrement buttons
          * 
          */
-        void handleSSButtonPress();
+        void handleButtonState();
 
         /**
-         * @brief Detects a change in the direction of the forward/reverse switch
+         * @brief Handles whether the speaker is playing or not
          * 
          */
-        void handleReverseButton();
+        void handleSpeaker();
 
+        /**
+         * @brief Handles if  we want to go in reverse 
+         * 
+         */
+        void handleReverse();
+
+        /**
+         * @brief 
+         * 
+         * @param msg 
+         */
         void wheelIO_cb(const CAN_message_t &msg);
 };
 

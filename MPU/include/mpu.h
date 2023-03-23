@@ -98,4 +98,10 @@ bool verifyMotorSpinning();
  */
 void mpuCanCallback(const CAN_message_t &msg);
 
+/**
+ * @brief Broadcasts a message about the internal states of the MPU
+ * 
+ */
+void sendMPUStatus();
+
 #endif

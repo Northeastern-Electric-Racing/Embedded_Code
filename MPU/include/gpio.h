@@ -7,6 +7,7 @@
 #define GPIO_H
 
 #include <nerduino.h>
+#include "mpuConfig.h"
 #include "gpioHW.h"
 #include "cascadiamc.h"
 #include "orionbms.h"
@@ -14,8 +15,6 @@
 #define SS_READY_SEN        39
 #define PUMP_PIN            8
 #define RADIATORFAN_PIN     28
-
-#define MAX_FANSPEED_TEMP   70   //degrees celcius
 
 class GPIO
 {

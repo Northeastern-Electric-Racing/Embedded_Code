@@ -8,10 +8,7 @@
 #define DRIVERIOHW_H
 
 #include <nerduino.h>
-
-#define SPEAKER_DURATION        1500    //in milliseconds
-#define LED_BLINK_TIME          1000    //in milliseconds
-#define BUTTON_DEBOUNCE_TIME    50      //in milliseconds
+#include "mpuConfig.h"
 
 typedef enum ButtonState_t
 {

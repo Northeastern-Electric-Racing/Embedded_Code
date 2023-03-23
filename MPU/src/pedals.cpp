@@ -127,14 +127,14 @@ int16_t Pedals::calcCLTorqueLimit()
 	if ((calculated < 0) | (calculated > (MAXIMUM_TORQUE / 10))) {
 		calculated = MAXIMUM_TORQUE / 10;
 	}
-	
+
 	Serial.print("Vdc: ");
 	Serial.print(dcVoltage);
 	Serial.print(", Idc: ");
 	Serial.print(dcCurrent);
 	Serial.print(", wm: ");
 	Serial.println(motorSpeed);
-	
+
 	Serial.print("CL Limit: ");
 	Serial.print(calculated);
 

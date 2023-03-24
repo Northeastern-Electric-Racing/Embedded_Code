@@ -5,7 +5,8 @@
  */
 #include "mpu.h"
 
-#define CANMSG_WHEELIO 0x400
+#define CANMSG_WHEELIO      0x400
+#define CANMSG_BMSSTATUS    0x002
 
 /***************************************************************************/
 /**

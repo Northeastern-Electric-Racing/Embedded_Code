@@ -48,8 +48,8 @@ enum nero_states
     PT_LANE_MODE,
     EFFICIENCY_MODE,
     SPEED_MODE,
-    DEBUG_MODE,
     REVERSE_MODE,
+    DEBUG_MODE,
     CHARGING_MODE,
     MAX_NERO_STATES
 };

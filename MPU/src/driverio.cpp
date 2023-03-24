@@ -37,6 +37,7 @@ void DriverIO::handleButtonState()
     {
         motorController->setPower(false);
         mpu_state = FAULT;
+        drive_state = OFF;
         return;
     }
 

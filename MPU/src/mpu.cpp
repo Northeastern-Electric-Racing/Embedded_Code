@@ -11,14 +11,12 @@ bool ssReady = false;
 Timer canTest_wait;
 Timer spinningCheck_wait;
 
-
 void driverioProcess()
 {
     // Serial.println("DriverIO process...");
-    driverio.handleSSButtonPress();
-    driverio.handleSSLED();
-    driverio.handleReverseSwitch();
-    driverio.handleErrorLights();
+    driverio.handleButtonState();
+    driverio.handleReverse();
+    driverio.handleSpeaker();
 }
 
 
@@ -65,7 +63,7 @@ bool isCANLineOK()
 
 void setCANLineOK()
 {
-    canTest_wait.startTimer(1500);
+    canTest_wait.startTimer(2000);
 }
 
 
@@ -112,4 +110,54 @@ bool verifyMotorSpinning()
         }
     }
     return true;
+}
+
+void sendMPUStatus()
+{
+    union
+    {
+        uint8_t msg[1] = {0};
+
+        struct
+        {
+            uint8_t driveState;
+        } info;
+    } mpu_msg;
+
+    //TODO: Fix this bandaid fix to address the mismatch between MPU states and
+    // desired NERO states
+    switch (mpu_state)
+    {
+        case BOOT:
+            mpu_msg.info.driveState = OFF_MODE;
+            break;
+
+        case DRIVE:
+            switch (drive_state)
+            {
+                case OFF:
+                case PIT:
+                case EFFICIENCY:
+                case SPEED:
+                    mpu_msg.info.driveState = drive_state;
+                    break;
+                
+                case REVERSE:
+                    mpu_msg.info.driveState = REVERSE_MODE;
+            };
+            break;
+
+        case CHARGING:
+            mpu_msg.info.driveState = CHARGING_MODE;
+            break;
+
+        case FAULT:
+            mpu_msg.info.driveState = OFF_MODE;
+            break;
+
+        default:
+            break;
+    };
+
+    sendMessageCAN1(MPU_STATUS_ID, 1, mpu_msg.msg);
 }

@@ -16,15 +16,31 @@ void OrionBMS::setSoC(uint8_t p_SoC)
 }
 
 
+void OrionBMS::enableChargingMode()
+{
+    isInChargeMode.startTimer(2000);
+}
+
+
+void OrionBMS::setBMSStatus(uint8_t p_BMSStatus)
+{
+    bmsStatus = p_BMSStatus;
+    
+    if (bmsStatus == CHARGING_STATE) {
+        enableChargingMode();
+    }
+}
+
+
 void OrionBMS::setAvgTemp(uint8_t p_avgTemp)
 {
     avgTemp = p_avgTemp;
 }
 
 
-void OrionBMS::setFailsafeCode(uint8_t p_failsafeCode)
+void OrionBMS::setFaultStatus(uint8_t p_faultStatus)
 {
-    failsafeCode = p_failsafeCode;
+    faultStatus = p_faultStatus;
 }
 
 
@@ -111,18 +127,12 @@ int16_t OrionBMS::getLiveVoltage()
 }
 
 
-void OrionBMS::enableChargingMode()
-{
-    isInChargeMode.startTimer(2000);
-}
-
-
 bool OrionBMS::getChargeMode()
 {
     if(isInChargeMode.isTimerExpired())
     {
         airOpen = 1;
-        sendMessage(CANMSG_MC_SETPARAMETER, 8, OPEN_AIR_MSG);
+        sendMessageCAN1(CANMSG_MC_SETPARAMETER, 8, OPEN_AIR_MSG);
     }
     return !isInChargeMode.isTimerExpired();
 }
@@ -131,7 +141,7 @@ bool OrionBMS::getChargeMode()
 void OrionBMS::toggleAIR()
 {
     airOpen = !airOpen;
-    sendMessage(CANMSG_MC_SETPARAMETER, 8, airOpen ? OPEN_AIR_MSG : CLOSE_AIR_MSG);
+    sendMessageCAN1(CANMSG_MC_SETPARAMETER, 8, airOpen ? OPEN_AIR_MSG : CLOSE_AIR_MSG);
 }
 
 

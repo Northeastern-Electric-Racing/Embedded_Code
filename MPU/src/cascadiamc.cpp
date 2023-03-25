@@ -14,7 +14,7 @@ void CascadiaMC::disableMCLockout()
 {
     while(!motorCommand_wait.isTimerExpired()){}
 
-    sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcOff); // release lockout / OFF
+    sendMessageCAN1(CANMSG_ACCELERATIONCTRLINFO, 8, mcOff); // release lockout / OFF
     Serial.println("UNLOCKED");
     motorCommand_wait.startTimer(CAN_CMD_DELAY);
     isMCLocked = false;
@@ -39,7 +39,7 @@ void CascadiaMC::writeMCState()
     Serial.println("");
 #endif
 
-    sendMessage(CANMSG_ACCELERATIONCTRLINFO, 8, mcMsg.canMsg);
+    sendMessageCAN1(CANMSG_ACCELERATIONCTRLINFO, 8, mcMsg.canMsg);
 
     motorCommand_wait.startTimer(CAN_CMD_DELAY);
 }
@@ -47,20 +47,13 @@ void CascadiaMC::writeMCState()
 
 void CascadiaMC::toggleDirection()
 {
-    if (mcMsg.config.isOn) {
-        togglePower();
-    }
     mcMsg.config.isForward = !mcMsg.config.isForward;
 }
 
 void CascadiaMC::setDirection(bool p_direction)
 {
-    if (mcMsg.config.isOn) {
-        togglePower();
-    }
     mcMsg.config.isForward = p_direction;
 }
-
 
 void CascadiaMC::togglePower()
 {
@@ -68,18 +61,24 @@ void CascadiaMC::togglePower()
     isMCLocked = true;
 }
 
+void CascadiaMC::setPower(bool state)
+{
+    if(mcMsg.config.isOn == state) return;
+
+    isMCLocked = true;
+
+    mcMsg.config.isOn = state;
+}
 
 bool CascadiaMC::getIsOn()
 {
     return mcMsg.config.isOn;
 }
 
-
 bool CascadiaMC::getDirection()
 {
     return mcMsg.config.isForward;
 }
-
 
 void CascadiaMC::changeTorque(uint16_t p_accelTorque)
 {
@@ -97,7 +96,7 @@ void CascadiaMC::clearFault()
 {
     int time = millis() + 250;
     while(millis() < time) {
-        sendMessage(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
+        sendMessageCAN1(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
         delay(5);
     }
     isFaulted = false;

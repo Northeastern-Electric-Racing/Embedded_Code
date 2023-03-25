@@ -8,10 +8,7 @@
 #define DRIVERIOHW_H
 
 #include <nerduino.h>
-
-#define SPEAKER_DURATION        1500    //in milliseconds
-#define LED_BLINK_TIME          1000    //in milliseconds
-#define BUTTON_DEBOUNCE_TIME    50      //in milliseconds
+#include "mpuConfig.h"
 
 typedef enum ButtonState_t
 {
@@ -34,10 +31,10 @@ class Button
     private:
         ButtonState_t state = NOT_PRESSED;
         Timer debounce;
-        uint8_t pin;
+        bool isPressed = false;
 
     public:
-        Button(uint8_t pinNumber);
+        Button();
         virtual ~Button();
 
         /**
@@ -61,67 +58,15 @@ class Button
          * @return false
          */
         bool isButtonPressed_Pulse();
-};
-
-
-class Switch
-{
-    private:
-        uint8_t pin;
-        bool previousReading;
-
-    public:
-        Switch(uint8_t pinNumber);
-        
-        ~Switch();
 
         /**
-         * @brief Get the current reading of the switch pin
+         * @brief Set the current state of the button
+         * @note Used for monitoring buttons over CAN
          * 
-         * @return true 
-         * @return false 
+         * @param buttonState 
          */
-        bool getSwitchState();
-
-        /**
-         * @brief Return whether the switch state has been flipped since the last reading
-         * 
-         * @return true 
-         * @return false 
-         */
-        bool hasSwitchToggled();
+        void setButtonState(bool buttonState);
 };
-
-
-class LED
-{
-    private:
-        Timer blinkTimer;
-        uint8_t pin;
-        bool isBlinkEnabled = false;
-
-        /**
-         * @brief Internal state of LED while blinking for toggling state
-         */
-        bool blinkState = LOW;
-
-    public:
-        LED(uint8_t pinNumber);
-
-        virtual ~LED();
-
-        /**
-         * @note if the LED's blinking is enabled, this function does nothing and is overridden by blinking
-         * 
-         * @param state 
-         */
-        void writeLED(bool state);
-
-        void blinkEnable(bool state);
-
-        void updateBlink();
-};
-
 
 class Speaker
 {
@@ -145,14 +90,6 @@ class Speaker
          * @brief Attempts to stop speaker based on the internal timer
          */
         void attemptToStopSpeaker();
-};
-
-
-class StartButton: public Button, public LED
-{
-    public:
-        StartButton(uint8_t ledPinNumber, uint8_t buttonPinNumber);
-        ~StartButton();
 };
 
 #endif

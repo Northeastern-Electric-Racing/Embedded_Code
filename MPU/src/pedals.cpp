@@ -64,7 +64,7 @@ FaultStatus_t Pedals::readBrake()
 
 	uint8_t canBuf[2] = {pedalVal >> 8, pedalVal & 0xFF};
 
-	sendMessage(0xB1, 2, canBuf);
+	sendMessageCAN1(0xB1, 2, canBuf);
 
 	//If the pedal reading process is NOT finished, return NOT_FAULTED because it hasn't finished collecting data
 	if(pedalVal == NOT_DONE_READING) return NOT_FAULTED;
@@ -127,20 +127,21 @@ int16_t Pedals::calcCLTorqueLimit()
 	if ((calculated < 0) | (calculated > (MAXIMUM_TORQUE / 10))) {
 		calculated = MAXIMUM_TORQUE / 10;
 	}
-	
+
+	/*
 	Serial.print("Vdc: ");
 	Serial.print(dcVoltage);
 	Serial.print(", Idc: ");
 	Serial.print(dcCurrent);
 	Serial.print(", wm: ");
 	Serial.println(motorSpeed);
-	
+
 	Serial.print("CL Limit: ");
 	Serial.print(calculated);
 
 	Serial.print(", ");
 	Serial.println(10 * calculated);
-
+	*/
 	return calculated * 10;
 }
 

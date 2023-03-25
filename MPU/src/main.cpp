@@ -3,13 +3,19 @@
  * @author Nick DePatie
  * @brief Entry Point for Program
  */
+
 #include <nerduino.h>
 #include "mpu.h"
+#include "mpuConfig.h"
+
+enum mpu_states mpu_state;
+uint8_t drive_state = OFF;
 
 void setup()
 {
     NERduino.begin();
-    initializeCAN(1);           //The "1" parameter is useless for now, in the future the parameter is which CAN line to initialize
+    mpu_state = BOOT;
+    initializeCAN(CANLINE_1, BAUD_RATE, &(*mpuCanCallback));
     WDT_timings_t config;
     config.trigger = 5;         /* in seconds, 0->128 */
     config.timeout = 15;        /* in seconds, 0->128 */
@@ -31,12 +37,11 @@ void setup()
 
 void loop()
 {
-    //Serial.println(".");
-    myCan.events();
     gpioProcess();
     driverioProcess();
     pedalsProcess();
     motorController.writeMCState();
     checkShutdownStatus();
+    sendMPUStatus();
     wdt.feed();
 }

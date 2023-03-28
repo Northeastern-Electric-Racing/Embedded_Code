@@ -41,20 +41,35 @@ void DriverIO::handleButtonState()
         return;
     }
 
+    if (isCharging)
+    {
+        Serial.println("CHARGING!!");
+    }
+
     //If the BMS is charging
-    if((incrButton.isButtonPressed_Pulse() ||
-        decrButton.isButtonPressed_Pulse()) && 
-        bms->getChargeMode())
+    if((incrButton.isButtonPressed() ||
+        decrButton.isButtonPressed()) && 
+        bms->getChargeMode() &&
+        changeStateTimer.isTimerExpired())
     {
         bms->toggleAIR();
-        powerToggle_wait.startTimer(1500);
-        mpu_state = CHARGING;
+        changeStateTimer.startTimer(CHANGE_STATE_TIME);
+        isCharging = !isCharging;
+        mpu_state = isCharging ? CHARGING : OFF;
+        drive_state = OFF;
+        Serial.println("TOGGLE CHARGING!!!");
+        return;
+    }
+    else if (isCharging)
+    {
         return;
     }
     else
     {
         mpu_state = DRIVE;
     }
+
+    return;
 
     //If the BMS is not charging
     if(incrButton.isButtonPressed() && changeStateTimer.isTimerExpired())

@@ -39,6 +39,7 @@
 #define GNSS_1_ID           0x304
 #define GNSS_2_ID           0x305
 #define GNSS_3_ID           0x306
+#define LOGGING_STATUS_ID   0X307
 
 #define LED_BLINK_DELAY_MS 500
 
@@ -75,7 +76,8 @@ const uint32_t LOG_IDS[] = {
   0x303,
   0x304,
   0x305,
-  0x306
+  0x306,
+  0x307
 };
 const int NUM_LOG_IDS = sizeof(LOG_IDS) / sizeof(uint32_t);
 
@@ -84,7 +86,11 @@ const uint32_t SEND_XBEE_IDS[] = {
   0xA5, 
   0x202,
   0x300,
-  0x301
+  0x301,
+  0x304,
+  0x305,
+  0x306,
+  0x307
 };
 const int NUM_SEND_XBEE_IDS = sizeof(SEND_XBEE_IDS) / sizeof(uint32_t);
 
@@ -96,7 +102,7 @@ void logAccelerometerData();
 void logTempSensorData();
 void logAnalogs();
 void logGnssData();
-void blinkLED();
+void checkLoggingStatus();
 void tryLog(message_t *message);
 void tryXbee(message_t *message);
 
@@ -122,9 +128,9 @@ void setup() {
   myCan.onReceive(incomingCANCallback);
 
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(ANALOG1_PIN, INPUT);
-  pinMode(ANALOG2_PIN, INPUT);
-  pinMode(ANALOG3_PIN, INPUT);
+  // pinMode(ANALOG1_PIN, INPUT);
+  // pinMode(ANALOG2_PIN, INPUT);
+  // pinMode(ANALOG3_PIN, INPUT);
   
   GnssInit(GNSS_SERIAL, GNSS_BAUD_RATE);
   XBeeInit(&XBEE_SERIAL, XBEE_BAUD_RATE);
@@ -143,7 +149,7 @@ void setup() {
 void loop() {
   wdt.feed();
   myCan.events();
-  blinkLED();
+  checkLoggingStatus();
 
   if (LoggerWrite() == LOGGER_STATUS::LGR_ERROR_SD_CARD) {
     LoggerInit(MIN_LOG_FREQUENCY);
@@ -365,18 +371,39 @@ void logGnssData() {
 
 
 /**
- * @brief Blinks the LED when logging, does nothing when not logging
+ * @brief Blinks the LED when logging, does nothing when not logging.
+ * Also sends a log status CAN message.
  * 
  */
-void blinkLED() {
+void checkLoggingStatus() {
   static uint32_t lastLedBlinkTime = 0;
   if (millis() - lastLedBlinkTime > LED_BLINK_DELAY_MS) {
-    if (LoggerActive() && blinkLedState == LOW) {
+    if (LoggerActive()) {
+
+      if (blinkLedState == LOW) {
+        blinkLedState = HIGH;
+      }
+    } else {
+      blinkLedState = LOW;
+    }
+    if (blinkLedState == LOW) {
       blinkLedState = HIGH;
     } else {
       blinkLedState = LOW;
     }
+    
+    // send logging status message
+    message_t message;
+    message.id = LOGGING_STATUS_ID;
+    message.length = 1;
+    uint8_t data[1] = { blinkLedState };
+    memcpy(message.dataBuf, data, 1);
+    RtcGetTime(&message.timestamp);
+    tryLog(&message);
+    tryXbee(&message);
+
     digitalWrite(LED_BUILTIN, blinkLedState);
+    
     lastLedBlinkTime = millis();
   }
 }

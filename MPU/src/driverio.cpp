@@ -69,8 +69,6 @@ void DriverIO::handleButtonState()
         mpu_state = DRIVE;
     }
 
-    return;
-
     //If the BMS is not charging
     if(incrButton.isButtonPressed() && changeStateTimer.isTimerExpired())
     {

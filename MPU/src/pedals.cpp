@@ -87,7 +87,7 @@ int16_t Pedals::calcTorque(double torqueScale)
 
 	pedalTorque = torqueScale * MAXIMUM_TORQUE;
 
-	int16_t torqueLim = calcCLTorqueLimit();
+	int16_t torqueLim = calcCLTorqueLimit(); //2300
 
 	// Scale torque to match BMS current limit
 	if (pedalTorque > torqueLim) {

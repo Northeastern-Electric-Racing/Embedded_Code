@@ -1,40 +1,38 @@
 #include "gpioHW.h"
 
-RadiatorFan::RadiatorFan(){}
+PDU::PDU(){}
 
-RadiatorFan::RadiatorFan(uint8_t pinNum)
+PDU::~PDU(){}
+
+void PDU::sendPDUMsg()
 {
-    pin = pinNum;
-    pinMode(pin, OUTPUT);
-    enableFan(false);
+    sendMessageCAN1(CANMSG_PDU_ID, 4, pdu.msg);
 }
 
-RadiatorFan::~RadiatorFan(){}
-
-void RadiatorFan::enableFan(bool status)
+void PDU::enableRadiatorFan(bool status)
 {
-    isEnabled = status;
-    digitalWrite(pin, isEnabled);
+    pdu.fields.radiator_fan_dty = status;
+    sendPDUMsg();
 }
 
-
-CoolingPump::CoolingPump(){}
-
-CoolingPump::CoolingPump(uint8_t pinNum)
+void PDU::enableAccFans(bool r_status, bool l_status)
 {
-    pin = pinNum;
-    pinMode(pin, OUTPUT);
-    enablePump(false);
+    pdu.fields.right_acc_fan = r_status;
+    pdu.fields.left_acc_fan = l_status;
+    sendPDUMsg();
 }
 
-CoolingPump::~CoolingPump(){}
-
-void CoolingPump::enablePump(bool status)
+void PDU::enableCoolingPump(bool status)
 {
-    isEnabled = status;
-    digitalWrite(pin, isEnabled);
+    pdu.fields.cooling_pump = status;
+    sendPDUMsg();
 }
 
+void PDU::enableBrakeLight(bool status)
+{
+    pdu.fields.brake_light = status;
+    sendPDUMsg();
+}
 
 TSMS::TSMS(){}
 

@@ -8,46 +8,40 @@
 
 #include <nerduino.h>
 
-class RadiatorFan
+#define CANMSG_PDU_ID 0x666
+
+class PDU
 {
     private:
-        bool isEnabled = true;
-        uint8_t pin;
+        union
+        {
+            uint8_t msg[5] = {0, 0, 0, 0, 0};
+
+            struct
+            {
+                bool brake_light;
+                bool cooling_pump;
+                bool left_acc_fan;
+                bool right_acc_fan;
+                uint8_t radiator_fan_dty;
+            } fields;
+        } pdu;
+
+        void sendPDUMsg();
 
     public:
-        RadiatorFan();
-        RadiatorFan(uint8_t pinNum);
-        ~RadiatorFan();
+        PDU();
 
-        /**
-         * @brief Enables/disables the fan entirely
-         * 
-         * @param status 
-         */
-        void enableFan(bool status);
+        ~PDU();
+
+        void enableRadiatorFan(bool status);
+
+        void enableAccFans(bool r_status, bool l_status);
+
+        void enableCoolingPump(bool status);
+
+        void enableBrakeLight(bool status);
 };
-
-
-class CoolingPump
-{
-    private:
-        bool isEnabled = true;
-        uint8_t pin;
-
-    public:
-        CoolingPump();
-        CoolingPump(uint8_t pinNum);
-
-        ~CoolingPump();
-
-        /**
-         * @brief Enables/disables the pump
-         * 
-         * @param status 
-         */
-        void enablePump(bool status);
-};
-
 
 class TSMS  //TSMS stands for "Tractive System Main Switch"
 {

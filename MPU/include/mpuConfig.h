@@ -9,7 +9,7 @@
 // DriverIO Parameters
 #define SPEAKER_DURATION        1500    //in milliseconds
 #define LED_BLINK_TIME          1000    //in milliseconds
-#define BUTTON_DEBOUNCE_TIME    50      //in milliseconds
+#define BUTTON_DEBOUNCE_TIME    50     //in milliseconds
 #define CHANGE_STATE_TIME       400     //ms
 #define POWER_TOGGLE_WAIT       1500    //ms
 

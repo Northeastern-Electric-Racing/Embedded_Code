@@ -37,6 +37,8 @@ class DriverIO
         Button incrButton;
         Button decrButton;
 
+        bool isCharging = false;
+
         //For future development and integration with Raspberry Pi
         //DASHBOARD dashboard;
 

@@ -44,6 +44,10 @@ FaultStatus_t Pedals::readAccel()
 	//Calculate the correct amount of torque to command using precentage pressed value
 	appliedTorque = calcTorque(multiplier);
 
+	if (drive_state == PIT || drive_state == REVERSE) {
+		appliedTorque = appliedTorque/2;
+	}
+
 	//Load the commanded torque to be sent to the motor controller
 	motorController->changeTorque(appliedTorque);
 

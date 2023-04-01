@@ -59,6 +59,9 @@ void motorMotion_cb(const CAN_message_t &msg)
 {
     //angular motor speed is found at bytes 2 and 3
     int16_t motorSpeed = ((msg.buf[3] << 8) | msg.buf[2]) / 10;
+    if (drive_state == REVERSE || drive_state == PIT) {
+        motorSpeed = min(motorSpeed, 5);
+    }
     motorController.setMotorSpeed(motorSpeed);
 }
 

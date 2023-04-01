@@ -20,21 +20,10 @@ GPIO::GPIO(CascadiaMC *p_motorController, OrionBMS *p_bms, PDU *p_pdu)
 GPIO::~GPIO(){}
 
 
-bool GPIO::handleTSMS()
+bool GPIO::getTSMS()
 {
     // Serial.println(tsms.isReady());
-    if(!tsms.isReady())
-    {
-        motorController->raiseFault();
-        return false;
-    }
-    if(tsms.isPowerCycled() && tsms.isReady())
-    {
-        motorController->clearFault();
-        Serial.println("Clearing!");
-        return true;
-    }
-    return false;
+    return tsms.isReady();
 }
 
 void GPIO::handlePump()

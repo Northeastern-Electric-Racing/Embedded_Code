@@ -35,7 +35,7 @@ class GPIO
          * @brief Handles the case for the TSMS switching states
          * 
          */
-        bool handleTSMS();
+        bool getTSMS();
 
         /**
          * @brief Handles the logic behind starting/stopping the pump

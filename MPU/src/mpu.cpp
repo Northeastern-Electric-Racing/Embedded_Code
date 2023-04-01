@@ -8,13 +8,14 @@ OrionBMS bms;
 WDT_T4<WDT1> wdt;
 bool isShutdown = false;
 bool ssReady = false;
+bool tsms_status = false;
 Timer canTest_wait;
 Timer spinningCheck_wait;
 
 void driverioProcess()
 {
     // Serial.println("DriverIO process...");
-    driverio.handleButtonState();
+    driverio.handleButtonState(tsms_status);
     driverio.handleReverse();
     driverio.handleSpeaker();
 }
@@ -42,7 +43,7 @@ void pedalsProcess()
 
 void gpioProcess()
 {
-    bool faultReset = gpio.handleTSMS();
+    tsms_status = gpio.getTSMS();
     gpio.handlePump();
     gpio.handleRadiatorFan();
 

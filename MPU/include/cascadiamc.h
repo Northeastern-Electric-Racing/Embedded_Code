@@ -110,12 +110,6 @@ class CascadiaMC
         uint16_t getTorque();
 
         /**
-         * @brief Clears the Fault for Failing to Generate High Voltage
-         * 
-         */
-        void clearFault();
-
-        /**
          * @brief Raises the Fault for Failing to Generate High Voltage
          * 
          */

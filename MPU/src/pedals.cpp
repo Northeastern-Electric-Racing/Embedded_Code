@@ -50,7 +50,7 @@ FaultStatus_t Pedals::readAccel()
 			appliedTorque = 0;
 		}
 		else {
-			appliedTorque = appliedTorque * (5 - (4.5 + mph / 10));
+			appliedTorque = appliedTorque * (5 - (4.5 + (mph / 10)));
 		} 
 	}
 

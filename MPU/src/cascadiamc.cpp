@@ -92,17 +92,6 @@ uint16_t CascadiaMC::getTorque()
 }
 
 
-void CascadiaMC::clearFault()
-{
-    int time = millis() + 250;
-    while(millis() < time) {
-        sendMessageCAN1(CANMSG_MC_SETPARAMETER, 8, FAULT_CLEAR);
-        delay(5);
-    }
-    isFaulted = false;
-}
-
-
 void CascadiaMC::raiseFault()
 {
     if (isFaulted == false) {

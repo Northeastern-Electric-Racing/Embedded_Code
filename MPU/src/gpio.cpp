@@ -25,12 +25,6 @@ bool GPIO::handleTSMS()
         motorController->raiseFault();
         return false;
     }
-    if(tsms.isPowerCycled() && tsms.isReady())
-    {
-        motorController->clearFault();
-        Serial.println("Clearing!");
-        return true;
-    }
     return false;
 }
 

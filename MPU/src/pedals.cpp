@@ -45,7 +45,13 @@ FaultStatus_t Pedals::readAccel()
 	appliedTorque = calcTorque(multiplier);
 
 	if (drive_state == PIT || drive_state == REVERSE) {
-		appliedTorque = appliedTorque/2;
+		int16_t mph = (motorController->getMotorSpeed() * 0.013048225);
+		if (mph > 5) {
+			appliedTorque = 0;
+		}
+		else {
+			appliedTorque = appliedTorque * (5 - (4.5 + mph / 10));
+		} 
 	}
 
 	//Load the commanded torque to be sent to the motor controller

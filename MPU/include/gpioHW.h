@@ -9,10 +9,15 @@
 #include <nerduino.h>
 
 #define CANMSG_PDU_ID 0x666
+#define BRAKELIGHT_WAIT_MS  250
 
 class PDU
 {
     private:
+
+        bool prev_brakelight_status = false;
+        Timer brakelight_timer;
+
         union
         {
             uint8_t msg[5] = {0, 0, 0, 0, 0};

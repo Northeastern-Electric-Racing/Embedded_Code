@@ -30,8 +30,15 @@ void PDU::enableCoolingPump(bool status)
 
 void PDU::enableBrakeLight(bool status)
 {
+    if (!brakelight_timer.isTimerExpired() && prev_brakelight_status == true)
+        return;
+
     pdu.fields.brake_light = status;
     sendPDUMsg();
+
+    if (status == true) brakelight_timer.startTimer(BRAKELIGHT_WAIT_MS);
+
+    prev_brakelight_status = status;
 }
 
 TSMS::TSMS(){}

@@ -11,6 +11,7 @@
 #include "mpuConfig.h"
 #include "cascadiamc.h"
 #include "orionbms.h"
+#include "gpioHW.h"
 #include "pedalHW.h"
 
 //Pins
@@ -28,11 +29,10 @@ class Pedals
 
         CascadiaMC *motorController;
         OrionBMS *bms;
+        PDU *pdu;
 
         PedalHW brakes;
         PedalHW accelerator;
-
-        BRAKELIGHT_HW brakeLight;
 
         uint8_t brakePins[2] = {BRAKE1_PIN, BRAKE2_PIN};
         uint8_t accelPins[2] = {ACCEL1_PIN, ACCEL2_PIN};
@@ -64,7 +64,7 @@ class Pedals
     public:
         Pedals();
 
-        Pedals(CascadiaMC *p_motorController, OrionBMS *p_bms);
+        Pedals(CascadiaMC *p_motorController, OrionBMS *p_bms, PDU *p_pdu);
 
         ~Pedals();
 

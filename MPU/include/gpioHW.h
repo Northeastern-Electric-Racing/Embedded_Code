@@ -43,6 +43,8 @@ class PDU
         void enableBrakeLight(bool status);
 };
 
+extern PDU pdu;
+
 class TSMS  //TSMS stands for "Tractive System Main Switch"
 {
     private:

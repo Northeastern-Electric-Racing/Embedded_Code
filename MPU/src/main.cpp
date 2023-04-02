@@ -22,9 +22,10 @@ void setup()
     wdt.begin(config);
     Serial.begin(57600);
 
-    pedals = Pedals(&motorController, &bms);
+    pdu = PDU();
+    pedals = Pedals(&motorController, &bms, &pdu);
     driverio = DriverIO(&motorController, &bms);
-    gpio = GPIO(&motorController, &bms);
+    gpio = GPIO(&motorController, &bms, &pdu);
     pinMode(RELAY_PIN, OUTPUT);
     writeFaultLatch(NOT_FAULTED);
 

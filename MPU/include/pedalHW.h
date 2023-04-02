@@ -78,26 +78,4 @@ class PedalHW
         FaultStatus_t isFaulted();
 };
 
-class BRAKELIGHT_HW
-{
-    private:
-        //Brake light writing timer
-        Timer brakeLightWait;
-        uint8_t brakeLightPin;
-
-    public:
-        BRAKELIGHT_HW();
-
-        BRAKELIGHT_HW(uint8_t pinNumber);
-
-        ~BRAKELIGHT_HW();
-
-        /**
-         * @brief Writes the brakelight to a specific state
-         * @note This function is intended to be activated constantly in the main loop, as the timing logic depends on retrying
-         * @param state 
-         */
-        void writeBrakeLight(bool state);
-};
-
 #endif

@@ -12,20 +12,17 @@ void PDU::sendPDUMsg()
 void PDU::enableRadiatorFan(bool status)
 {
     pdu.fields.radiator_fan_dty = status;
-    sendPDUMsg();
 }
 
 void PDU::enableAccFans(bool r_status, bool l_status)
 {
     pdu.fields.right_acc_fan = r_status;
     pdu.fields.left_acc_fan = l_status;
-    sendPDUMsg();
 }
 
 void PDU::enableCoolingPump(bool status)
 {
     pdu.fields.cooling_pump = status;
-    sendPDUMsg();
 }
 
 void PDU::enableBrakeLight(bool status)
@@ -34,7 +31,6 @@ void PDU::enableBrakeLight(bool status)
         return;
 
     pdu.fields.brake_light = status;
-    sendPDUMsg();
 
     if (status == true) brakelight_timer.startTimer(BRAKELIGHT_WAIT_MS);
 

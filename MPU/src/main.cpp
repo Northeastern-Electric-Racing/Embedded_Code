@@ -42,6 +42,7 @@ void loop()
     driverioProcess();
     pedalsProcess();
     motorController.writeMCState();
+    pdu.sendPDUMsg();
     checkShutdownStatus();
     sendMPUStatus();
     wdt.feed();

@@ -32,8 +32,6 @@ class PDU
             } fields;
         } pdu;
 
-        void sendPDUMsg();
-
     public:
         PDU();
 
@@ -46,6 +44,8 @@ class PDU
         void enableCoolingPump(bool status);
 
         void enableBrakeLight(bool status);
+
+        void sendPDUMsg();
 };
 
 extern PDU pdu;

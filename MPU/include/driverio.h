@@ -60,7 +60,7 @@ class DriverIO
          * @brief Debounces the increment and decrement buttons
          * 
          */
-        void handleButtonState();
+        void handleButtonState(bool tsms_status);
 
         /**
          * @brief Handles whether the speaker is playing or not

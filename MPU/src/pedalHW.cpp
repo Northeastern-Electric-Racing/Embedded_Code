@@ -66,27 +66,3 @@ FaultStatus_t PedalHW::isFaulted()
 {
     return readingFault;
 }
-
-
-BRAKELIGHT_HW::BRAKELIGHT_HW(){}
-
-BRAKELIGHT_HW::~BRAKELIGHT_HW(){}
-
-BRAKELIGHT_HW::BRAKELIGHT_HW(uint8_t pinNumber)
-{
-    brakeLightPin = pinNumber;
-    pinMode(pinNumber, OUTPUT);
-	digitalWrite(pinNumber, HIGH);
-}
-
-void BRAKELIGHT_HW::writeBrakeLight(bool state)
-{
-    if(brakeLightWait.isTimerExpired())
-    {
-        digitalWrite(brakeLightPin, state);
-        if(state == HIGH)
-        {
-            brakeLightWait.startTimer(BRAKELIGHT_MIN_TIME_ON);
-        }
-    }
-}

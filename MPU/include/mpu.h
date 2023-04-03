@@ -24,6 +24,7 @@ extern WDT_T4<WDT1> wdt;
 
 extern bool isShutdown;
 extern bool ssReady;
+extern bool tsms_status;
 
 extern Timer canTest_wait;
 extern Timer spinningCheck_wait;

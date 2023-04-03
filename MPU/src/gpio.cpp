@@ -1,47 +1,39 @@
 #include "gpio.h"
 
+PDU pdu;
+
 GPIO::GPIO(){}
 
 
-GPIO::GPIO(CascadiaMC *p_motorController, OrionBMS *p_bms)
+GPIO::GPIO(CascadiaMC *p_motorController, OrionBMS *p_bms, PDU *p_pdu)
 {
-    radiatorFan = RadiatorFan(RADIATORFAN_PIN);
-    coolingPump = CoolingPump(PUMP_PIN);
     tsms = TSMS(SS_READY_SEN);
 
     motorController = p_motorController;
     bms = p_bms;
+    pdu = p_pdu;
+
+    pdu->enableAccFans(true, true);
 }
 
 
 GPIO::~GPIO(){}
 
 
-bool GPIO::handleTSMS()
+bool GPIO::getTSMS()
 {
     // Serial.println(tsms.isReady());
-    if(!tsms.isReady())
-    {
-        motorController->raiseFault();
-        return false;
-    }
-    if(tsms.isPowerCycled() && tsms.isReady())
-    {
-        motorController->clearFault();
-        Serial.println("Clearing!");
-        return true;
-    }
-    return false;
+    return tsms.isReady();
 }
 
 void GPIO::handlePump()
 {
-    coolingPump.enablePump(motorController->getIsOn());
+    pdu->enableCoolingPump(motorController->getIsOn());
 }
 
 void GPIO::handleRadiatorFan()
 {
     int16_t temp = motorController->getRadiatorTemp() / 10;
 
-    radiatorFan.enableFan(temp > MAX_FANSPEED_TEMP);
+    pdu->enableRadiatorFan(temp > MAX_FANSPEED_TEMP);
 }

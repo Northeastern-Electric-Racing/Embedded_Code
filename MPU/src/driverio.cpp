@@ -25,7 +25,7 @@ void DriverIO::handleReverse()
     motorController->setDirection(drive_state != REVERSE);
 }
 
-void DriverIO::handleButtonState()
+void DriverIO::handleButtonState(bool tsms_status)
 {
     bool state_changed = false;
 
@@ -33,7 +33,7 @@ void DriverIO::handleButtonState()
     incrButton.checkButtonPin();
     decrButton.checkButtonPin();
 
-    if (motorController->checkFault())
+    if (tsms_status == false)
     {
         motorController->setPower(false);
         mpu_state = FAULT;
@@ -130,6 +130,6 @@ void DriverIO::wheelIO_cb(const CAN_message_t &msg)
     wheelio.io.pot_l = SWITCHBYTES(wheelio.io.pot_l);
     wheelio.io.pot_r = SWITCHBYTES(wheelio.io.pot_r);
 
-    incrButton.setButtonState(wheelio.io.button2);
-    decrButton.setButtonState(wheelio.io.button4);
+    decrButton.setButtonState(wheelio.io.button2);
+    incrButton.setButtonState(wheelio.io.button4);
 }

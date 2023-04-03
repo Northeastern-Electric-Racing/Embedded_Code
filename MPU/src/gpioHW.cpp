@@ -1,40 +1,41 @@
 #include "gpioHW.h"
 
-RadiatorFan::RadiatorFan(){}
+PDU::PDU(){}
 
-RadiatorFan::RadiatorFan(uint8_t pinNum)
+PDU::~PDU(){}
+
+void PDU::sendPDUMsg()
 {
-    pin = pinNum;
-    pinMode(pin, OUTPUT);
-    enableFan(false);
+    sendMessageCAN1(CANMSG_PDU_ID, 4, pdu.msg);
 }
 
-RadiatorFan::~RadiatorFan(){}
-
-void RadiatorFan::enableFan(bool status)
+void PDU::enableRadiatorFan(bool status)
 {
-    isEnabled = status;
-    digitalWrite(pin, isEnabled);
+    pdu.fields.radiator_fan_dty = status;
 }
 
-
-CoolingPump::CoolingPump(){}
-
-CoolingPump::CoolingPump(uint8_t pinNum)
+void PDU::enableAccFans(bool r_status, bool l_status)
 {
-    pin = pinNum;
-    pinMode(pin, OUTPUT);
-    enablePump(false);
+    pdu.fields.right_acc_fan = r_status;
+    pdu.fields.left_acc_fan = l_status;
 }
 
-CoolingPump::~CoolingPump(){}
-
-void CoolingPump::enablePump(bool status)
+void PDU::enableCoolingPump(bool status)
 {
-    isEnabled = status;
-    digitalWrite(pin, isEnabled);
+    pdu.fields.cooling_pump = status;
 }
 
+void PDU::enableBrakeLight(bool status)
+{
+    if (!brakelight_timer.isTimerExpired() && prev_brakelight_status == true)
+        return;
+
+    pdu.fields.brake_light = status;
+
+    if (status == true) brakelight_timer.startTimer(BRAKELIGHT_WAIT_MS);
+
+    prev_brakelight_status = status;
+}
 
 TSMS::TSMS(){}
 

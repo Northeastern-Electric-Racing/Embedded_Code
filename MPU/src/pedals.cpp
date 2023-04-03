@@ -4,17 +4,16 @@
 Pedals::Pedals(){}
 
 
-Pedals::Pedals(CascadiaMC *p_motorController, OrionBMS *p_bms)
+Pedals::Pedals(CascadiaMC *p_motorController, OrionBMS *p_bms, PDU *p_pdu)
 {
-	pinMode(BRAKELIGHT_PIN, OUTPUT);
-	digitalWrite(BRAKELIGHT_PIN, HIGH);
-
 	motorController = p_motorController;
 	bms = p_bms;
+	pdu = p_pdu;
+
+	pdu->enableBrakeLight(brakePressed);
 
 	accelerator = PedalHW(ACCELERATOR_ERROR_PERCENT, MAX_ACCEL_ERRORS, accelPins);
 	brakes = PedalHW(BRAKES_ERROR_PERCENT, MAX_BRAKE_ERRORS, brakePins);
-	brakeLight = BRAKELIGHT_HW(BRAKELIGHT_PIN);
 }
 
 
@@ -75,7 +74,7 @@ FaultStatus_t Pedals::readBrake()
 	//Set brakePressed to whether or not the brake value is greater than the braking threshold
 	brakePressed = pedalVal > ANALOG_BRAKE_THRESH ? HIGH : LOW;
 
-	brakeLight.writeBrakeLight(brakePressed);
+	pdu->enableBrakeLight(brakePressed);
 
 	return brakes.isFaulted();
 }

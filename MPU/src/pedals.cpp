@@ -43,21 +43,21 @@ FaultStatus_t Pedals::readAccel()
 
 	//Calculate the correct amount of torque to command using precentage pressed value
 	appliedTorque = calcTorque(multiplier);
+	float mph = (motorController->getMotorSpeed() * MOTOR_RPM_TO_MPH_CONST);
 
 	if (drive_state == PIT || drive_state == REVERSE) {
-		float_t mph = (motorController->getMotorSpeed() * 0.013048225);
-		if (mph > 5) {
-			appliedTorque = 0;
-		}
-		else {
-			appliedTorque = appliedTorque * (5 - (4.5 + (mph / 10)));
-		} 
+		//Results in a value from 0.5 to 0 (at least halving the max torque at all times in pit or reverse)
+		float torque_derating_factor = 0.5 + ((-0.5/PIT_MAX_SPEED) * mph);
+		appliedTorque = appliedTorque * torque_derating_factor;
 	}
 
 	//Load the commanded torque to be sent to the motor controller
 	motorController->changeTorque(appliedTorque);
 
 #ifdef DEBUG_PEDALS
+	Serial.print("Motor Speed:\t");
+	Serial.print(mph);
+	Serial.print("\t");
 	Serial.print("Acceleration:\t");
 	Serial.println(appliedTorque / 10); // prints out applied torque
 #endif

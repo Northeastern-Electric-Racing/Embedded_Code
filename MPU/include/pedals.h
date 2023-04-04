@@ -21,6 +21,9 @@
 #define BRAKE2_PIN                  21
 #define BRAKELIGHT_PIN              4
 
+#define MOTOR_RPM_TO_MPH_CONST      0.0013048225
+#define PIT_MAX_SPEED               10
+
 class Pedals
 {
     private:

@@ -77,7 +77,11 @@ const uint32_t LOG_IDS[] = {
   0x304,
   0x305,
   0x306,
-  0x307
+  0x307,
+  0x7,
+  0x8,
+  0x9,
+  0xA
 };
 const int NUM_LOG_IDS = sizeof(LOG_IDS) / sizeof(uint32_t);
 
@@ -90,7 +94,10 @@ const uint32_t SEND_XBEE_IDS[] = {
   0x304,
   0x305,
   0x306,
-  0x307
+  0x307,
+  0xA,
+  0x1,
+  0x2
 };
 const int NUM_SEND_XBEE_IDS = sizeof(SEND_XBEE_IDS) / sizeof(uint32_t);
 
@@ -258,6 +265,7 @@ void logAccelerometerData() {
 
   tryLog(&message);
   tryXbee(&message);
+  sendMessage(message.id, message.length, message.dataBuf);
 }
 
 
@@ -280,6 +288,7 @@ void logTempSensorData() {
 
   tryLog(&message);
   tryXbee(&message);
+  sendMessage(message.id, message.length, message.dataBuf);
 }
 
 
@@ -363,10 +372,13 @@ void logGnssData() {
 
   tryLog(&message1);
   tryXbee(&message1);
+  sendMessage(message1.id, message1.length, message1.dataBuf);
   tryLog(&message2);
   tryXbee(&message2);
+  sendMessage(message2.id, message2.length, message2.dataBuf);
   tryLog(&message3);
   tryXbee(&message3);
+  sendMessage(message3.id, message3.length, message3.dataBuf);
 }
 
 
@@ -401,6 +413,7 @@ void checkLoggingStatus() {
     RtcGetTime(&message.timestamp);
     tryLog(&message);
     tryXbee(&message);
+    sendMessage(message.id, message.length, message.dataBuf);
 
     digitalWrite(LED_BUILTIN, blinkLedState);
     

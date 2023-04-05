@@ -58,10 +58,12 @@ void bmsCurrentLimits_cb(const CAN_message_t &msg)
 void motorMotion_cb(const CAN_message_t &msg)
 {
     //angular motor speed is found at bytes 2 and 3
-    Serial.println("!!!!!!!Motor Data Received!!!!!!");
-    int16_t motorSpeed = ((msg.buf[3] << 8) | msg.buf[2]) / 10;
-    Serial.print(motorSpeed);
-    motorController.setMotorSpeed(motorSpeed);
+    int16_t motorSpeed = (msg.buf[3] << 8) | msg.buf[2];
+    if (motorSpeed >> 15 == -1) {
+        motorSpeed = motorSpeed - (1 << 16);
+    }
+
+    motorController.setMotorSpeed(-motorSpeed);
 }
 
 void motorTemp3_cb(const CAN_message_t &msg)

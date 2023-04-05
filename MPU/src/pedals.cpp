@@ -43,7 +43,7 @@ FaultStatus_t Pedals::readAccel()
 
 	//Calculate the correct amount of torque to command using precentage pressed value
 	appliedTorque = calcTorque(multiplier);
-	float mph = (motorController->getMotorSpeed() * MOTOR_RPM_TO_MPH_CONST);
+	float mph = abs((motorController->getMotorSpeed() * MOTOR_RPM_TO_MPH_CONST));
 
 	if (drive_state == PIT || drive_state == REVERSE) {
 		//Results in a value from 0.5 to 0 (at least halving the max torque at all times in pit or reverse)

@@ -39,6 +39,7 @@
 #define GNSS_1_ID           0x304
 #define GNSS_2_ID           0x305
 #define GNSS_3_ID           0x306
+#define SD_STATUS_ID        0x307
 
 #define LED_BLINK_DELAY_MS 500
 
@@ -47,6 +48,7 @@ FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> myCan; // main CAN object
 WDT_T4<WDT1> wdt;
 
 int blinkLedState = LOW;
+LOGGER_STATUS sdStatus = LOGGER_STATUS::LGR_SUCCESS;
 
 // CAN Ids of the messages to log to SD card (only considered if LOG_ALL is 0)
 const uint32_t LOG_IDS[] = {
@@ -110,7 +112,7 @@ void setup() {
   delay(100);
 
   RtcInit();
-  LoggerInit(MIN_LOG_FREQUENCY);
+  sdStatus = LoggerInit(MIN_LOG_FREQUENCY);
 
   NERduino.begin();
 
@@ -146,7 +148,7 @@ void loop() {
   blinkLED();
 
   if (LoggerWrite() == LOGGER_STATUS::LGR_ERROR_SD_CARD) {
-    LoggerInit(MIN_LOG_FREQUENCY);
+    sdStatus = LoggerInit(MIN_LOG_FREQUENCY);
     DPRINTLN(F("Reinitializing logger due to internal error")); 
   }
 
@@ -156,6 +158,13 @@ void loop() {
     logAccelerometerData();
     logTempSensorData();
     // logAnalogs();
+
+    message_t sd_message;
+    sd_message.id = SD_STATUS_ID;
+    sd_message.length = 1;
+    sd_message.dataBuf[0] = sdStatus;
+    sendMessage(sd_message.id, sd_message.length, sd_message.dataBuf);
+
     dataLastRecorded = millis();
   }
 
@@ -249,9 +258,11 @@ void logAccelerometerData() {
   message.length = 6;
   memcpy(message.dataBuf, accelBuf, 6);
   RtcGetTime(&message.timestamp);
-
   tryLog(&message);
   tryXbee(&message);
+
+  sendMessage(message.id, message.length, message.dataBuf);
+
 }
 
 

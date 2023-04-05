@@ -127,20 +127,20 @@ void setup() {
 
   NERduino.begin();
 
+  pinMode(LED_BUILTIN, OUTPUT);
+  // pinMode(ANALOG1_PIN, INPUT);
+  // pinMode(ANALOG2_PIN, INPUT);
+  // pinMode(ANALOG3_PIN, INPUT);
+
+  GnssInit(GNSS_SERIAL, GNSS_BAUD_RATE);
+  XBeeInit(&XBEE_SERIAL, XBEE_BAUD_RATE);
+
   myCan.begin();
   myCan.setBaudRate(CAN_BAUD_RATE);
   myCan.setMaxMB(MAX_MB_NUM);
   myCan.enableFIFO(); 
   myCan.enableFIFOInterrupt(); 
   myCan.onReceive(incomingCANCallback);
-
-  pinMode(LED_BUILTIN, OUTPUT);
-  // pinMode(ANALOG1_PIN, INPUT);
-  // pinMode(ANALOG2_PIN, INPUT);
-  // pinMode(ANALOG3_PIN, INPUT);
-  
-  GnssInit(GNSS_SERIAL, GNSS_BAUD_RATE);
-  XBeeInit(&XBEE_SERIAL, XBEE_BAUD_RATE);
 
   WDT_timings_t config;
   config.trigger = 5; /* in seconds, 0->128 */
@@ -391,24 +391,23 @@ void checkLoggingStatus() {
   static uint32_t lastLedBlinkTime = 0;
   if (millis() - lastLedBlinkTime > LED_BLINK_DELAY_MS) {
     if (LoggerActive()) {
-
       if (blinkLedState == LOW) {
         blinkLedState = HIGH;
+      } else {
+        blinkLedState = LOW;
       }
     } else {
       blinkLedState = LOW;
     }
-    if (blinkLedState == LOW) {
-      blinkLedState = HIGH;
-    } else {
-      blinkLedState = LOW;
-    }
-    
+
     // send logging status message
     message_t message;
     message.id = LOGGING_STATUS_ID;
     message.length = 1;
-    uint8_t data[1] = { blinkLedState };
+    uint8_t data[1] = { 0 };
+    if (LoggerActive()) {
+      data[0] = 1;
+    }
     memcpy(message.dataBuf, data, 1);
     RtcGetTime(&message.timestamp);
     tryLog(&message);

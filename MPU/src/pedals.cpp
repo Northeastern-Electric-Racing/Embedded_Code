@@ -47,12 +47,12 @@ FaultStatus_t Pedals::readAccel()
 
 	if (drive_state == PIT || drive_state == REVERSE) {
 		//Results in a value from 0.5 to 0 (at least halving the max torque at all times in pit or reverse)
-		// float torque_derating_factor = 0.5 + ((-0.5/PIT_MAX_SPEED) * mph);
-		if (mph > 5) {
+		if (mph > PIT_MAX_SPEED) {
 			appliedTorque = 0;
 		}
 		else {
-			appliedTorque = appliedTorque * (5 - (4.5 + (mph / 10)));
+			float torque_derating_factor = 0.5 + ((-0.5/PIT_MAX_SPEED) * mph);
+			appliedTorque = appliedTorque * torque_derating_factor;
 		} 
 	}
 

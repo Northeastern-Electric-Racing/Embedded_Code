@@ -58,10 +58,7 @@ void bmsCurrentLimits_cb(const CAN_message_t &msg)
 void motorMotion_cb(const CAN_message_t &msg)
 {
     //angular motor speed is found at bytes 2 and 3
-    int16_t motorSpeed = (msg.buf[3] << 8) | msg.buf[2];
-    if (motorSpeed >> 15 == -1) {
-        motorSpeed = motorSpeed - (1 << 16);
-    }
+    int16_t motorSpeed = (int16_t)(msg.buf[3] << 8) | msg.buf[2];
 
     motorController.setMotorSpeed(-motorSpeed);
 }

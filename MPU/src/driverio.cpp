@@ -96,6 +96,11 @@ void DriverIO::handleButtonState(bool tsms_status)
         speaker.playSpeaker();
     }
     powerToggle_wait.startTimer(POWER_TOGGLE_WAIT);
+
+    if(state_changed)
+    {
+        motorController->setPower(false);
+    }
 }
 
 void DriverIO::wheelIO_cb(const CAN_message_t &msg)

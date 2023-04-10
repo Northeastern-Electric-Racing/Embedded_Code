@@ -51,7 +51,7 @@ FaultStatus_t Pedals::readAccel()
 			appliedTorque = 0;
 		}
 		else {
-			float torque_derating_factor = 0.5 + ((-0.5/PIT_MAX_SPEED) * mph);
+			float torque_derating_factor = (0.5 + ((-0.5/PIT_MAX_SPEED) * mph)) / 10;
 			appliedTorque = appliedTorque * torque_derating_factor;
 		} 
 	}
@@ -60,12 +60,11 @@ FaultStatus_t Pedals::readAccel()
 	motorController->changeTorque(appliedTorque);
 
 #ifdef DEBUG_PEDALS
-   Serial.println(drive_state);
 	Serial.print("Motor Speed:\t");
 	Serial.print(mph);
 	Serial.print("\t");
 	Serial.print("Acceleration:\t");
-	Serial.println(appliedTorque / 10); // prints out applied torque
+	Serial.println(appliedTorque); // prints out applied torque
 #endif
 	//Return the current fault status of the accelerator, send fault if it wasn't caught earlier
 	return accelerator.isFaulted();

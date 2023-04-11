@@ -23,6 +23,7 @@
 
 #define MOTOR_RPM_TO_MPH_CONST      0.013048225
 #define PIT_MAX_SPEED               5
+#define ACCUMULATOR_SIZE            5
 
 class Pedals
 {
@@ -43,6 +44,7 @@ class Pedals
         int16_t clTorque; //Torque limit determined by current limit
 
         int16_t appliedTorque = 0; // applied motor torque
+        uint16_t torqueAccumulator[ACCUMULATOR_SIZE] = {0}; // accumulator for torque averaging when in pit lane or reverse
 
         /**
          * @brief Calculates what torque to send to the motor controller

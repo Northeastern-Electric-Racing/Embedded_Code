@@ -43,17 +43,30 @@ FaultStatus_t Pedals::readAccel()
 
 	//Calculate the correct amount of torque to command using precentage pressed value
 	appliedTorque = calcTorque(multiplier);
-	float mph = abs((motorController->getMotorSpeed() * MOTOR_RPM_TO_MPH_CONST));
+	float mph = fabs((motorController->getMotorSpeed() * MOTOR_RPM_TO_MPH_CONST));
 
 	if (drive_state == PIT || drive_state == REVERSE) {
+		uint16_t newVal;
 		//Results in a value from 0.5 to 0 (at least halving the max torque at all times in pit or reverse)
 		if (mph > PIT_MAX_SPEED) {
-			appliedTorque = 0;
+			newVal = 0;
 		}
 		else {
-			float torque_derating_factor = (0.5 + ((-0.5/PIT_MAX_SPEED) * mph)) / 10;
-			appliedTorque = appliedTorque * torque_derating_factor;
-		} 
+			float torque_derating_factor = fabs(0.5 + ((-0.5/PIT_MAX_SPEED) * mph));
+			newVal = appliedTorque * torque_derating_factor;
+		}
+		uint16_t ave = 0;
+		uint16_t temp[ACCUMULATOR_SIZE];
+		std::copy_n(torqueAccumulator, ACCUMULATOR_SIZE, temp);
+		for (int i = 0; i < ACCUMULATOR_SIZE - 1; i++) {
+			temp[i + 1] = torqueAccumulator[i];
+			ave += torqueAccumulator[i+1];
+		}
+		ave += newVal;
+		ave /= ACCUMULATOR_SIZE;
+		temp[0] = newVal;
+		appliedTorque = ave;
+		std::copy_n(temp, ACCUMULATOR_SIZE, torqueAccumulator);
 	}
 
 	//Load the commanded torque to be sent to the motor controller
@@ -64,7 +77,13 @@ FaultStatus_t Pedals::readAccel()
 	Serial.print(mph);
 	Serial.print("\t");
 	Serial.print("Acceleration:\t");
-	Serial.println(appliedTorque); // prints out applied torque
+	Serial.print(appliedTorque); // prints out applied torque
+	Serial.print("Accumulator Values:\t");
+	for (int i = 0; i < ACCUMULATOR_SIZE; i++) {
+		Serial.print(torqueAccumulator[i]);
+		Serial.print("\t");
+	}
+
 #endif
 	//Return the current fault status of the accelerator, send fault if it wasn't caught earlier
 	return accelerator.isFaulted();
@@ -118,10 +137,10 @@ int16_t Pedals::calcTorque(double torqueScale)
 		pedalTorque = 0;
 	}
 
-	//Serial.print("Pedal: ");
-	//Serial.println(pedalTorque);
-	//Serial.print("C Limit:");
-	//Serial.println(torqueLim);
+	Serial.print("Pedal: ");
+	Serial.println(pedalTorque);
+	Serial.print("C Limit:");
+	Serial.println(torqueLim);
 
 	return pedalTorque;
 }
@@ -135,7 +154,7 @@ int16_t Pedals::calcCLTorqueLimit()
 
 	int16_t calculated = 102;
 
-	//calculated = (0.9 * (CL_TO_TOQRUE_CONST * (dcVoltage / 10) * dcCurrent)) / (motorSpeed + 1);
+	// calculated = (0.9 * (CL_TO_TOQRUE_CONST * (dcVoltage / 10) * dcCurrent)) / (motorSpeed + 1);
 	calculated = (0.9 * (CL_TO_TOQRUE_CONST * (dcVoltage / 10) * dcCurrent)) / (500 + 1);
 
 	if ((calculated < 0) | (calculated > (MAXIMUM_TORQUE / 10))) {

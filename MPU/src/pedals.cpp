@@ -65,7 +65,9 @@ FaultStatus_t Pedals::readAccel()
 		ave += newVal;
 		ave /= ACCUMULATOR_SIZE;
 		temp[0] = newVal;
-		appliedTorque = ave;
+		if(appliedTorque > ave) {
+			appliedTorque = ave;
+		}
 		std::copy_n(temp, ACCUMULATOR_SIZE, torqueAccumulator);
 	}
 
@@ -155,7 +157,7 @@ int16_t Pedals::calcCLTorqueLimit()
 	int16_t calculated = 102;
 
 	// calculated = (0.9 * (CL_TO_TOQRUE_CONST * (dcVoltage / 10) * dcCurrent)) / (motorSpeed + 1);
-	calculated = (0.9 * (CL_TO_TOQRUE_CONST * (dcVoltage / 10) * dcCurrent)) / (500 + 1);
+	calculated = (dcCurrent * dcVoltage) / (motorSpeed * CL_TO_TOQRUE_CONST);
 
 	if ((calculated < 0) | (calculated > (MAXIMUM_TORQUE / 10))) {
 		calculated = MAXIMUM_TORQUE / 10;

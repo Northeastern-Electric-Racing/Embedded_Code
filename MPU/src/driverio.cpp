@@ -3,14 +3,14 @@
 
 DriverIO::DriverIO(){}
 
-DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms, PDU *p_pdu, GPIO *p_gpio)
+DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms, GPIO *p_gpio, Pedals *p_pedals)
 {
     powerToggle_wait.cancelTimer();
 
     motorController = p_motorController;
     bms = p_bms;
-    pdu = p_pdu;
     gpio = p_gpio;
+    pedals = p_pedals;
 
     motorController->setDirection(false);
 }
@@ -34,6 +34,8 @@ void DriverIO::handleButtonState(bool tsms_status)
     //Poll Button
     incrButton.checkButtonPin();
     decrButton.checkButtonPin();
+    torqueDecreasePaddle.checkButtonPin();
+    torqueIncreasePaddle.checkButtonPin();
 
     if (tsms_status == false)
     {
@@ -87,6 +89,24 @@ void DriverIO::handleButtonState(bool tsms_status)
         Serial.println("Decrement!");
         changeStateTimer.startTimer(CHANGE_STATE_TIME);
         state_changed = true;
+    }
+    if(torqueIncreasePaddle.isButtonPressed())
+    {
+        float curr_torque_limit = pedals->getTorqueLimitPercentage() / 100;
+        if (curr_torque_limit < 1.0)
+        {
+            curr_torque_limit += 0.1;
+            pedals->setTorqueLimitPercentage(curr_torque_limit);
+        }
+    }
+    if(torqueDecreasePaddle.isButtonPressed())
+    {
+        float curr_torque_limit = pedals->getTorqueLimitPercentage() / 100;
+        if (curr_torque_limit > 0.0)
+        {
+            curr_torque_limit -= 0.1;
+            pedals->setTorqueLimitPercentage(curr_torque_limit);
+        }
     }
 
     bool motor_power = !(drive_state == OFF || mpu_state != DRIVE);

@@ -90,6 +90,13 @@ class Pedals
          * @return int representing the percentage of torque limiting
         */
         uint8_t getTorqueLimitPercentage();
+
+        /**
+         * @brief Sets the percentage of torque limiting
+         * 
+         * @param percentage 
+        */
+        void setTorqueLimitPercentage(float percentage);
 };
 
 #endif

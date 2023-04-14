@@ -158,3 +158,8 @@ uint8_t Pedals::getTorqueLimitPercentage()
 {
 	return torqueLimitPercentage * 100;
 }
+
+void Pedals::setTorqueLimitPercentage(float percentage)
+{
+	torqueLimitPercentage = percentage;
+}

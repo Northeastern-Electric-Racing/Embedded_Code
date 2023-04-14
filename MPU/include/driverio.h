@@ -14,6 +14,7 @@
 #include "orionbms.h"
 #include "driverioHW.h"
 #include "gpio.h"
+#include "pedals.h"
 
 //Pins
 #define LED4_PIN        3
@@ -35,6 +36,7 @@ class DriverIO
         OrionBMS *bms;
         PDU *pdu;
         GPIO *gpio;
+        Pedals *pedals;
 
         Speaker speaker {SPEAKER_PIN};
         Button incrButton;
@@ -62,7 +64,7 @@ class DriverIO
     public:
         DriverIO();
 
-        DriverIO(CascadiaMC *motorController, OrionBMS *p_bms, GPIO *p_gpio);
+        DriverIO(CascadiaMC *motorController, OrionBMS *p_bms, GPIO *p_gpio, Pedals *p_pedals);
 
         ~DriverIO();
 

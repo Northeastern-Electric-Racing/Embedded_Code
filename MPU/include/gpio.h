@@ -11,7 +11,6 @@
 #include "gpioHW.h"
 #include "cascadiamc.h"
 #include "orionbms.h"
-#include "driverio.h"
 
 #define SS_READY_SEN        39
 #define PUMP_PIN            8

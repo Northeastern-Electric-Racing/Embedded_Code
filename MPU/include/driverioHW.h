@@ -68,6 +68,26 @@ class Button
         void setButtonState(bool buttonState);
 };
 
+class Dial {
+    private:
+        int value = 0;
+        bool isPressed = false;
+
+    public:
+        Dial();
+        virtual ~Dial();
+
+        /**
+         * @brief sets the value of the dial
+         */
+        void setDialValue(int value);
+
+        /**
+         * @brief returns the value of the dial
+         */
+        int getDialValue();
+};
+
 class Speaker
 {
     private:

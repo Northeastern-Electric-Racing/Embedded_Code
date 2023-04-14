@@ -153,3 +153,8 @@ int16_t Pedals::calcCLRegenLimit()
 
 	return (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / (motorSpeed + 1);
 }
+
+uint8_t Pedals::getTorqueLimitPercentage()
+{
+	return torqueLimitPercentage * 100;
+}

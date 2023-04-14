@@ -3,12 +3,14 @@
 
 DriverIO::DriverIO(){}
 
-DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms)
+DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms, PDU *p_pdu, GPIO *p_gpio)
 {
     powerToggle_wait.cancelTimer();
 
     motorController = p_motorController;
     bms = p_bms;
+    pdu = p_pdu;
+    gpio = p_gpio;
 
     motorController->setDirection(false);
 }
@@ -137,4 +139,25 @@ void DriverIO::wheelIO_cb(const CAN_message_t &msg)
 
     decrButton.setButtonState(wheelio.io.button2);
     incrButton.setButtonState(wheelio.io.button4);
+    regenButton.setButtonState(wheelio.io.button6);
+    torqueIncreasePaddle.setButtonState(wheelio.io.paddle_r);
+    torqueDecreasePaddle.setButtonState(wheelio.io.paddle_l);
+    accumulatorFanDial.setDialValue(wheelio.io.pot_l);
+    motorFanDial.setDialValue(wheelio.io.pot_r);
+}
+
+void DriverIO::handleDialState()
+{
+    float motorFanPercentage = ((float)motorFanDial.getDialValue() / 4096.0);
+    if (motorFanPercentage < 0.1) motorFanPercentage = 0.0;
+    else if (motorFanPercentage > 0.9) motorFanPercentage = 1.0;
+    gpio->setRadiatorFanPercentage(motorFanPercentage);
+}
+
+uint8_t DriverIO::getAccumulatorFanDialPercentage() 
+{
+    float accumulatorFanPercentage = ((float)accumulatorFanDial.getDialValue() / 4096.0);
+    if (accumulatorFanPercentage < 0.1) accumulatorFanPercentage = 0.0;
+    else if (accumulatorFanPercentage > 0.9) accumulatorFanPercentage = 1.0;
+    return accumulatorFanPercentage * 100;
 }

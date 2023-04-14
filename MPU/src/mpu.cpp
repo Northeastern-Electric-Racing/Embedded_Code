@@ -117,11 +117,15 @@ void sendMPUStatus()
 {
     union
     {
-        uint8_t msg[1] = {0};
+        uint8_t msg[5] = {0};
 
         struct
         {
             uint8_t driveState;
+            uint8_t accumulatorFanPercentage;
+            uint8_t radiatorFanPercentage;
+            uint8_t torquePercentage;
+            uint8_t regenStrength;
         } info;
     } mpu_msg;
 
@@ -160,5 +164,10 @@ void sendMPUStatus()
             break;
     };
 
-    sendMessageCAN1(MPU_STATUS_ID, 1, mpu_msg.msg);
+    mpu_msg.info.accumulatorFanPercentage = driverio.getAccumulatorFanDialPercentage();
+    mpu_msg.info.radiatorFanPercentage = gpio.getMotorFanDialPercentage();
+    mpu_msg.info.torquePercentage = pedals.getTorqueLimitPercentage();
+    mpu_msg.info.regenStrength = 0;
+
+    sendMessageCAN1(MPU_STATUS_ID, 5, mpu_msg.msg);
 }

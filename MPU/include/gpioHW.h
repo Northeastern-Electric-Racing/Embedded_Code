@@ -15,6 +15,8 @@ class PDU
 {
     private:
 
+        uint8_t motor_temp_to_rad_duty[20] = {0};
+
         bool prev_brakelight_status = false;
         Timer brakelight_timer;
 
@@ -37,7 +39,7 @@ class PDU
 
         ~PDU();
 
-        void enableRadiatorFan(bool status);
+        void enableRadiatorFan(uint8_t status);
 
         void enableAccFans(bool r_status, bool l_status);
 

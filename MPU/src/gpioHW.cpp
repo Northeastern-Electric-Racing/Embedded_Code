@@ -9,9 +9,13 @@ void PDU::sendPDUMsg()
     sendMessageCAN1(CANMSG_PDU_ID, 4, pdu.msg);
 }
 
-void PDU::enableRadiatorFan(bool status)
+void PDU::enableRadiatorFan(uint8_t temp)
 {
-    pdu.fields.radiator_fan_dty = status;
+    uint8_t index = (temp) / 5; 
+
+    uint8_t fan_speed = motor_temp_to_rad_duty[index];
+
+    pdu.fields.radiator_fan_dty = fan_speed;
 }
 
 void PDU::enableAccFans(bool r_status, bool l_status)

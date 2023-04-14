@@ -41,6 +41,8 @@ class Pedals
 
         int16_t appliedTorque = 0; // applied motor torque
 
+        float torqueLimitPercentage = 1.0; // percentage of torque limiting
+
         /**
          * @brief Calculates what torque to send to the motor controller
          * 
@@ -81,6 +83,13 @@ class Pedals
          * @return If the accelerators are not faulted
          */
         FaultStatus_t readAccel();
+
+        /**
+         * @brief retrieves the value of the torque percentage
+         * 
+         * @return int representing the percentage of torque limiting
+        */
+        uint8_t getTorqueLimitPercentage();
 };
 
 #endif

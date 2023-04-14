@@ -103,6 +103,10 @@ int16_t Pedals::calcTorque(double torqueScale)
 		pedalTorque = 0;
 	}
 
+	if (drive_state == EFFICIENCY) {
+		pedalTorque = pedalTorque * torqueLimitPercentage;
+	}
+
 	//Serial.print("Pedal: ");
 	//Serial.println(pedalTorque);
 	//Serial.print("C Limit:");

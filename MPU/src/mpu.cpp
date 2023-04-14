@@ -16,6 +16,7 @@ void driverioProcess()
 {
     // Serial.println("DriverIO process...");
     driverio.handleButtonState(tsms_status);
+    driverio.handleDialState();
     driverio.handleReverse();
     driverio.handleSpeaker();
 }

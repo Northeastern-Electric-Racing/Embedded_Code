@@ -39,7 +39,7 @@ void GPIO::handleRadiatorFan()
         return;
     }
 
-    if (drive_state == EFFICIENCY) {
+    if (mpu_state == EFFICIENCY) {
         temp = temp * radiatorFanSpeedPercentage; 
     }
     pdu->enableRadiatorFan(temp);

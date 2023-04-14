@@ -103,7 +103,7 @@ int16_t Pedals::calcTorque(double torqueScale)
 		pedalTorque = 0;
 	}
 
-	if (mpu_state == EFFICIENCY) {
+	if (drive_state == EFFICIENCY) {
 		pedalTorque = pedalTorque * torqueLimitPercentage;
 	}
 

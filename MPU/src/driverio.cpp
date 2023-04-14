@@ -90,7 +90,7 @@ void DriverIO::handleButtonState(bool tsms_status)
         changeStateTimer.startTimer(CHANGE_STATE_TIME);
         state_changed = true;
     }
-    if(torqueIncreasePaddle.isButtonPressed() && mpu_state == EFFICIENCY)
+    if(torqueIncreasePaddle.isButtonPressed())
     {
         float curr_torque_limit = pedals->getTorqueLimitPercentage() / 100;
         if (curr_torque_limit < 1.0)

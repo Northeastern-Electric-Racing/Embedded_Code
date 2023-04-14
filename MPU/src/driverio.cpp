@@ -92,16 +92,16 @@ void DriverIO::handleButtonState(bool tsms_status)
     }
     if(torqueIncreasePaddle.isButtonPressed() && drive_state == EFFICIENCY)
     {
-        float curr_torque_limit = pedals->getTorqueLimitPercentage() / 100;
+        float curr_torque_limit = (float)pedals->getTorqueLimitPercentage() / 100;
         if (curr_torque_limit < 1.0)
         {
             curr_torque_limit += 0.1;
             pedals->setTorqueLimitPercentage(curr_torque_limit);
         }
     }
-    if(torqueDecreasePaddle.isButtonPressed())
+    if(torqueDecreasePaddle.isButtonPressed() && drive_state == EFFICIENCY)
     {
-        float curr_torque_limit = pedals->getTorqueLimitPercentage() / 100;
+        float curr_torque_limit = (float)pedals->getTorqueLimitPercentage() / 100;
         if (curr_torque_limit > 0.0)
         {
             curr_torque_limit -= 0.1;

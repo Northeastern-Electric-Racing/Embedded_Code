@@ -24,6 +24,11 @@
 class Pedals
 {
     private:
+        int REGEN_STRENGTHS[4] = {0, 100, 250, 500}; // N-m to be applied, in N-m * 10
+
+        uint32_t regenStartTime = 0;
+        bool regenActive = false;
+
         bool brakePressed = false;
         uint32_t timeBrake = 0;     // the time at which the brake was last pressed
 
@@ -42,6 +47,8 @@ class Pedals
         int16_t appliedTorque = 0; // applied motor torque
 
         float torqueLimitPercentage = 1.0; // percentage of torque limiting
+
+        Regen_Level_t regenLevel = ZILCH;
 
         /**
          * @brief Calculates what torque to send to the motor controller
@@ -97,6 +104,20 @@ class Pedals
          * @param percentage 
         */
         void setTorqueLimitPercentage(float percentage);
+
+        /**
+         * @brief Increments the level of regen torque
+         * 
+         * @param level 
+        */
+        void incrRegenLevel();
+
+        /**
+         * @brief Gets the level of regen torque
+         * 
+         * @param level
+        */
+        uint8_t getRegenLevel();
 };
 
 #endif

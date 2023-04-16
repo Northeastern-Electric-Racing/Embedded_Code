@@ -86,7 +86,7 @@ int16_t Pedals::calcTorque(double torqueScale)
 
 	pedalTorque = torqueScale * MAXIMUM_TORQUE;
 
-	int16_t torqueLim = calcCLTorqueLimit(); //2300
+	int16_t torqueLim = calcCLTorqueLimit(); //2200
 
 	// Scale torque to match BMS current limit
 	if (pedalTorque > torqueLim) {
@@ -105,6 +105,22 @@ int16_t Pedals::calcTorque(double torqueScale)
 
 	if (drive_state == EFFICIENCY) {
 		pedalTorque = pedalTorque * torqueLimitPercentage;
+		if (pedalTorque == 0) {
+			uint32_t currTime = millis();
+			int16_t regenTorqueLim = calcCLRegenLimit();
+			if (!regenActive) {
+				regenStartTime = currTime;
+			}
+			regenActive = true;
+			if (currTime - regenStartTime < REGEN_RAMP_TIME) {
+				pedalTorque = (((float)currTime - (float)regenStartTime) / REGEN_RAMP_TIME) * (min(REGEN_STRENGTHS[regenLevel], regenTorqueLim));
+			} else {
+				pedalTorque = -1 * min(REGEN_STRENGTHS[regenLevel], regenTorqueLim);
+			}
+		} else {
+			regenStartTime = 0;
+			regenActive = false;
+		}
 	}
 
 	//Serial.print("Pedal: ");
@@ -166,4 +182,31 @@ uint8_t Pedals::getTorqueLimitPercentage()
 void Pedals::setTorqueLimitPercentage(float percentage)
 {
 	torqueLimitPercentage = percentage;
+}
+
+void Pedals::incrRegenLevel()
+{
+	switch (regenLevel)
+	{
+	case ZILCH:
+		regenLevel = LIGHT;
+		break;
+	case LIGHT:
+		regenLevel = MEDIUM;
+		break;
+	case MEDIUM:
+		regenLevel = STRONG;
+		break;
+	case STRONG:
+		regenLevel = ZILCH;
+		break;
+	default:
+		regenLevel = ZILCH;
+		break;
+	}
+}
+
+uint8_t Pedals::getRegenLevel()
+{
+	return regenLevel;
 }

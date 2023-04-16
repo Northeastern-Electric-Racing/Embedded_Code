@@ -36,6 +36,7 @@ void DriverIO::handleButtonState(bool tsms_status)
     decrButton.checkButtonPin();
     torqueDecreasePaddle.checkButtonPin();
     torqueIncreasePaddle.checkButtonPin();
+    regenButton.checkButtonPin();
 
     if (tsms_status == false)
     {
@@ -74,6 +75,7 @@ void DriverIO::handleButtonState(bool tsms_status)
     }
 
     //If the BMS is not charging
+    // State buttons
     if(incrButton.isButtonPressed() && changeStateTimer.isTimerExpired())
     {
         drive_state = (drive_state + 1) % MAX_DRIVE_STATES;
@@ -90,22 +92,31 @@ void DriverIO::handleButtonState(bool tsms_status)
         changeStateTimer.startTimer(CHANGE_STATE_TIME);
         state_changed = true;
     }
-    if(torqueIncreasePaddle.isButtonPressed() && drive_state == EFFICIENCY)
-    {
-        float curr_torque_limit = (float)pedals->getTorqueLimitPercentage() / 100;
-        if (curr_torque_limit < 1.0)
+
+    // Efficiency mode buttons
+    if (drive_state == EFFICIENCY) {
+        if(torqueIncreasePaddle.isButtonPressed())
         {
-            curr_torque_limit += 0.1;
-            pedals->setTorqueLimitPercentage(curr_torque_limit);
+            float curr_torque_limit = (float)pedals->getTorqueLimitPercentage() / 100.0;
+            if (curr_torque_limit < 1.0)
+            {
+                curr_torque_limit += 0.1;
+                pedals->setTorqueLimitPercentage(curr_torque_limit);
+            }
         }
-    }
-    if(torqueDecreasePaddle.isButtonPressed() && drive_state == EFFICIENCY)
-    {
-        float curr_torque_limit = (float)pedals->getTorqueLimitPercentage() / 100;
-        if (curr_torque_limit > 0.0)
+
+        if(torqueDecreasePaddle.isButtonPressed())
         {
-            curr_torque_limit -= 0.1;
-            pedals->setTorqueLimitPercentage(curr_torque_limit);
+            float curr_torque_limit = (float)pedals->getTorqueLimitPercentage() / 100.0;
+            if (curr_torque_limit > 0.0)
+            {
+                curr_torque_limit -= 0.1;
+                pedals->setTorqueLimitPercentage(curr_torque_limit);
+            }
+        }
+
+        if(regenButton.isButtonPressed()) {
+            pedals->incrRegenLevel();
         }
     }
 

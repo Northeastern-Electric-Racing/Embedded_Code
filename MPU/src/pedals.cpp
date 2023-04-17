@@ -122,7 +122,7 @@ int16_t Pedals::calcTorque(double torqueScale)
 		}
 		else {
 			float torque_derating_factor = fabs(0.5 + ((-0.5/PIT_MAX_SPEED) * mph));
-			newVal = appliedTorque * torque_derating_factor;
+			newVal = pedalTorque * torque_derating_factor;
 		}
 		uint16_t ave = 0;
 		uint16_t temp[ACCUMULATOR_SIZE];
@@ -134,8 +134,8 @@ int16_t Pedals::calcTorque(double torqueScale)
 		ave += newVal;
 		ave /= ACCUMULATOR_SIZE;
 		temp[0] = newVal;
-		if(appliedTorque > ave) {
-			appliedTorque = ave;
+		if(pedalTorque > ave) {
+			pedalTorque = ave;
 		}
 		std::copy_n(temp, ACCUMULATOR_SIZE, torqueAccumulator);
 	}

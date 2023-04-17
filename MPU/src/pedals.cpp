@@ -157,7 +157,7 @@ int16_t Pedals::calcCLTorqueLimit()
 	int16_t calculated = 102;
 
 	// calculated = (0.9 * (CL_TO_TOQRUE_CONST * (dcVoltage / 10) * dcCurrent)) / (motorSpeed + 1);
-	calculated = (dcCurrent * dcVoltage) / (motorSpeed * CL_TO_TOQRUE_CONST);
+	calculated = (dcCurrent * dcVoltage * sqrt(3)) / (motorSpeed * CL_TO_TOQRUE_CONST);
 
 	if ((calculated < 0) | (calculated > (MAXIMUM_TORQUE / 10))) {
 		calculated = MAXIMUM_TORQUE / 10;

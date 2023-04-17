@@ -75,7 +75,7 @@ enum mpu_states
 };
 extern enum mpu_states mpu_state;
 
-typedef enum Regen_Level_t
+enum Regen_Level_t
 {
     ZILCH,
     LIGHT,

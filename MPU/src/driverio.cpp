@@ -78,6 +78,7 @@ void DriverIO::handleButtonState(bool tsms_status)
     // State buttons
     if(incrButton.isButtonPressed() && changeStateTimer.isTimerExpired())
     {
+        prev_state = drive_state;
         drive_state = (drive_state + 1) % MAX_DRIVE_STATES;
         Serial.println("Increment!");
         changeStateTimer.startTimer(CHANGE_STATE_TIME);
@@ -85,6 +86,7 @@ void DriverIO::handleButtonState(bool tsms_status)
     }
     if(decrButton.isButtonPressed() && changeStateTimer.isTimerExpired())
     {
+        prev_state = drive_state;
         drive_state = ((drive_state - 1) % MAX_DRIVE_STATES);
         if (drive_state == 255) drive_state = REVERSE;
 
@@ -124,7 +126,9 @@ void DriverIO::handleButtonState(bool tsms_status)
 
     motorController->setPower(motor_power);
 
-    if(state_changed && ((drive_state == PIT) || (drive_state == REVERSE)))
+    if(state_changed && 
+        prev_state == OFF && 
+        ((drive_state == PIT) || (drive_state == REVERSE)))
     {
         speaker.playSpeaker();
     }

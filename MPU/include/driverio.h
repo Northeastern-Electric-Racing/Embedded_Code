@@ -48,6 +48,7 @@ class DriverIO
         Button regenButton;
         Button torqueIncreasePaddle;
         Button torqueDecreasePaddle;
+        uint8_t prev_state = OFF;
 
         bool isCharging = false;
 

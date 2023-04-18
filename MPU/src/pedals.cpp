@@ -158,18 +158,18 @@ int16_t Pedals::calcTorque(double torqueScale)
 		}
 	}
 
-	Serial.print("Pedal: ");
-	Serial.println(pedalTorque);
-	Serial.print("C Limit:");
-	Serial.println(torqueLim);
-	Serial.print("Torque Limit Percentage");
-	Serial.println(torqueLimitPercentage);
-	Serial.print("Regen Torque Limit:");
-	Serial.println(regenTorqueLim);
-	Serial.print("Regen Level:");
-	Serial.println(REGEN_STRENGTHS[regenLevel]);
-	Serial.print("MPH: ");
-	Serial.println(mph);
+	// Serial.print("Pedal: ");
+	// Serial.println(pedalTorque);
+	// Serial.print("C Limit:");
+	// Serial.println(torqueLim);
+	// Serial.print("Torque Limit Percentage");
+	// Serial.println(torqueLimitPercentage);
+	// Serial.print("Regen Torque Limit:");
+	// Serial.println(regenTorqueLim);
+	// Serial.print("Regen Level:");
+	// Serial.println(REGEN_STRENGTHS[regenLevel]);
+	// Serial.print("MPH: ");
+	// Serial.println(mph);
 
 
 	return pedalTorque;
@@ -215,10 +215,10 @@ int16_t Pedals::calcCLRegenLimit()
 	int16_t dcChargeCurrent = abs(bms->getChargeCurrentLimit());
 	int16_t motorSpeed = abs(motorController->getMotorSpeed());
 
-	Serial.print("Vdc: ");
-	Serial.println(dcVoltage);
-	Serial.print("dcChargeCurrent: ");
-	Serial.println(dcChargeCurrent);
+	// Serial.print("Vdc: ");
+	// Serial.println(dcVoltage);
+	// Serial.print("dcChargeCurrent: ");
+	// Serial.println(dcChargeCurrent);
 
 	return (7.84 * dcVoltage * dcChargeCurrent) / (500 + 1);
 }

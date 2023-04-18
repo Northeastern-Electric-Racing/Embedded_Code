@@ -34,6 +34,7 @@ void GPIO::handlePump()
 void GPIO::handleRadiatorFan()
 {
     int16_t temp = motorController->getRadiatorTemp() / 10;
+    // int16_t temp = 70;
     if (temp > MAX_FANSPEED_TEMP) {
         pdu->enableRadiatorFan(temp);
         return;

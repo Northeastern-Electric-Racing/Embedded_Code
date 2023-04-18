@@ -6,7 +6,7 @@ PDU::~PDU(){}
 
 void PDU::sendPDUMsg()
 {
-    sendMessageCAN1(CANMSG_PDU_ID, 4, pdu.msg);
+    sendMessageCAN1(CANMSG_PDU_ID, 5, pdu.msg);
 }
 
 void PDU::enableRadiatorFan(uint8_t temp)
@@ -14,7 +14,8 @@ void PDU::enableRadiatorFan(uint8_t temp)
     uint8_t index = (temp) / 5; 
 
     uint8_t fan_speed = motor_temp_to_rad_duty[index];
-
+    Serial.print("Fan Speed: ");
+    Serial.println(fan_speed);
     pdu.fields.radiator_fan_dty = fan_speed;
 }
 

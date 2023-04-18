@@ -11,6 +11,8 @@
 #define LED_BLINK_TIME          1000    //in milliseconds
 #define BUTTON_DEBOUNCE_TIME    50     //in milliseconds
 #define CHANGE_STATE_TIME       400     //ms
+#define CHANGE_TORQUE_LIMIT_TIME 400    //ms
+#define CHANGE_REGEN_TIME       400     //ms
 #define POWER_TOGGLE_WAIT       1500    //ms
 
 // GPIO Parameters
@@ -29,7 +31,7 @@
 
 // regen braking constants
 #define START_TIME                  0       // delay from when brake is pressed to when regen starts
-#define REGEN_RAMP_TIME             1000    // regen ramp time (in ms)
+#define REGEN_RAMP_TIME             500    // regen ramp time (in ms)
 #define RAMP_TIME                   10      // time until the maximum regen torque is reached (in seconds)
 #define MAX_BRAKE_ERRORS            5
 #define MAX_ACCEL_ERRORS            5

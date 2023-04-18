@@ -168,7 +168,7 @@ void sendMPUStatus()
     mpu_msg.info.accumulatorFanPercentage = driverio.getAccumulatorFanDialPercentage();
     mpu_msg.info.radiatorFanPercentage = gpio.getMotorFanDialPercentage();
     mpu_msg.info.torquePercentage = pedals.getTorqueLimitPercentage();
-    mpu_msg.info.regenStrength = 0;
+    mpu_msg.info.regenStrength = pedals.getRegenLevel();
 
     sendMessageCAN1(MPU_STATUS_ID, 5, mpu_msg.msg);
 }

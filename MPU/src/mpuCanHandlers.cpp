@@ -73,11 +73,10 @@ void bmsCurrents_cb(const CAN_message_t &msg)
 {
     setCANLineOK();
 
-    uint16_t dischargeCurrentLimit = (msg.buf[0] << 8) | msg.buf[1];
-    if (dischargeCurrentLimit > 1000) dischargeCurrentLimit = (msg.buf[1] << 8) | msg.buf[0]; // MPU seems to be randomly flipping CAN byte order??
+    uint16_t dischargeCurrentLimit = (msg.buf[1] << 8) | msg.buf[0];
     bms.setCurrentLimit(dischargeCurrentLimit);
 
-    uint16_t chargeCurrentLimit = (msg.buf[2] << 8) | msg.buf[3];
+    uint16_t chargeCurrentLimit = (msg.buf[3] << 8) | msg.buf[2];
     bms.setChargeCurrentLimit(chargeCurrentLimit);
 
     int16_t currentDraw = (msg.buf[4] << 8) | msg.buf[5];

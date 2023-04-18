@@ -97,8 +97,9 @@ void DriverIO::handleButtonState(bool tsms_status)
 
     // Efficiency mode buttons
     if (drive_state == EFFICIENCY) {
-        if(torqueIncreasePaddle.isButtonPressed())
+        if(torqueIncreasePaddle.isButtonPressed() && changeTorqueLimitTimer.isTimerExpired())
         {
+            changeTorqueLimitTimer.startTimer(CHANGE_TORQUE_LIMIT_TIME);
             float curr_torque_limit = (float)pedals->getTorqueLimitPercentage() / 100.0;
             if (curr_torque_limit < 1.0)
             {
@@ -107,9 +108,12 @@ void DriverIO::handleButtonState(bool tsms_status)
             }
         }
 
-        if(torqueDecreasePaddle.isButtonPressed())
+        if(torqueDecreasePaddle.isButtonPressed() && changeTorqueLimitTimer.isTimerExpired())
         {
+            changeTorqueLimitTimer.startTimer(CHANGE_TORQUE_LIMIT_TIME);
             float curr_torque_limit = (float)pedals->getTorqueLimitPercentage() / 100.0;
+            Serial.print("Current Torque Limit: ");
+            Serial.println(curr_torque_limit);
             if (curr_torque_limit > 0.0)
             {
                 curr_torque_limit -= 0.1;
@@ -117,7 +121,8 @@ void DriverIO::handleButtonState(bool tsms_status)
             }
         }
 
-        if(regenButton.isButtonPressed()) {
+        if(regenButton.isButtonPressed() && changeRegenTimer.isTimerExpired()) {
+            changeRegenTimer.startTimer(CHANGE_REGEN_TIME);
             pedals->incrRegenLevel();
         }
     }
@@ -174,7 +179,7 @@ void DriverIO::wheelIO_cb(const CAN_message_t &msg)
 
     decrButton.setButtonState(wheelio.io.button2);
     incrButton.setButtonState(wheelio.io.button4);
-    regenButton.setButtonState(wheelio.io.button6);
+    regenButton.setButtonState(wheelio.io.button5);
     torqueIncreasePaddle.setButtonState(wheelio.io.paddle_r);
     torqueDecreasePaddle.setButtonState(wheelio.io.paddle_l);
     accumulatorFanDial.setDialValue(wheelio.io.pot_l);

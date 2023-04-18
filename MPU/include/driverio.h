@@ -57,6 +57,8 @@ class DriverIO
 
         Timer powerToggle_wait;
         Timer changeStateTimer;
+        Timer changeTorqueLimitTimer;
+        Timer changeRegenTimer;
 
         bool canTransitionToOff();
 

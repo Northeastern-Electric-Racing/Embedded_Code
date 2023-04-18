@@ -113,7 +113,7 @@ int16_t Pedals::calcTorque(double torqueScale)
 	}
 
 	float mph = fabs((motorController->getMotorSpeed() * MOTOR_RPM_TO_MPH_CONST));
-
+	int16_t regenTorqueLim = calcCLRegenLimit();
 	if (drive_state == PIT || drive_state == REVERSE) {
 		uint16_t newVal;
 		//Results in a value from 0.5 to 0 (at least halving the max torque at all times in pit or reverse)
@@ -143,13 +143,12 @@ int16_t Pedals::calcTorque(double torqueScale)
 		pedalTorque = pedalTorque * torqueLimitPercentage;
 		if (pedalTorque == 0 && mph > 5) {
 			uint32_t currTime = millis();
-			int16_t regenTorqueLim = calcCLRegenLimit();
 			if (!regenActive) {
 				regenStartTime = currTime;
+				regenActive = true;
 			}
-			regenActive = true;
 			if (currTime - regenStartTime < REGEN_RAMP_TIME) {
-				pedalTorque = (((float)currTime - (float)regenStartTime) / REGEN_RAMP_TIME) * (min(REGEN_STRENGTHS[regenLevel], regenTorqueLim));
+				pedalTorque = (((float)currTime - (float)regenStartTime) / REGEN_RAMP_TIME) * -1 * (min(REGEN_STRENGTHS[regenLevel], regenTorqueLim));
 			} else {
 				pedalTorque = -1 * min(REGEN_STRENGTHS[regenLevel], regenTorqueLim);
 			}
@@ -159,10 +158,19 @@ int16_t Pedals::calcTorque(double torqueScale)
 		}
 	}
 
-	//Serial.print("Pedal: ");
-	//Serial.println(pedalTorque);
-	//Serial.print("C Limit:");
-	//Serial.println(torqueLim);
+	Serial.print("Pedal: ");
+	Serial.println(pedalTorque);
+	Serial.print("C Limit:");
+	Serial.println(torqueLim);
+	Serial.print("Torque Limit Percentage");
+	Serial.println(torqueLimitPercentage);
+	Serial.print("Regen Torque Limit:");
+	Serial.println(regenTorqueLim);
+	Serial.print("Regen Level:");
+	Serial.println(REGEN_STRENGTHS[regenLevel]);
+	Serial.print("MPH: ");
+	Serial.println(mph);
+
 
 	return pedalTorque;
 }
@@ -204,10 +212,15 @@ int16_t Pedals::calcCLTorqueLimit()
 int16_t Pedals::calcCLRegenLimit()
 {
 	int16_t dcVoltage = abs(bms->getLiveVoltage());
-	int16_t dcCurrent = bms->getChargeCurrentLimit();
+	int16_t dcChargeCurrent = abs(bms->getChargeCurrentLimit());
 	int16_t motorSpeed = abs(motorController->getMotorSpeed());
 
-	return (CL_TO_TOQRUE_CONST * dcVoltage * dcCurrent) / (motorSpeed + 1);
+	Serial.print("Vdc: ");
+	Serial.println(dcVoltage);
+	Serial.print("dcChargeCurrent: ");
+	Serial.println(dcChargeCurrent);
+
+	return (7.84 * dcVoltage * dcChargeCurrent) / (500 + 1);
 }
 
 uint8_t Pedals::getTorqueLimitPercentage()

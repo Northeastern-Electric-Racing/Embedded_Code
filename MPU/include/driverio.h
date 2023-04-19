@@ -37,6 +37,8 @@ class DriverIO
         Button incrButton;
         Button decrButton;
 
+        uint8_t prev_state = OFF;
+
         bool isCharging = false;
 
         //For future development and integration with Raspberry Pi

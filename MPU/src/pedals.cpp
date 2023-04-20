@@ -309,11 +309,15 @@ void Pedals::controlLaunch(int16_t *torque, const float mph)
 
 	static unsigned long last_time;
 	static double total_error, last_error;
+	static int16_t prev_torque;
 	uint8_t curr_time = millis();
 	uint8_t delta_time = curr_time - last_time;
 
 	if (delta_time < T)
+	{
+		*torque = prev_torque;
 		return;
+	}
 
 	/* Calculate error based on difference between torque and feedback torque */
 	double error = motorController->getFeedbackTorque() - *torque;
@@ -336,6 +340,7 @@ void Pedals::controlLaunch(int16_t *torque, const float mph)
 	if (*torque <= 0) *torque = 0;
 	if (*torque > MAXIMUM_TORQUE) *torque = MAXIMUM_TORQUE;
 
+	prev_torque = *torque;
 	last_error = error;
 	last_time = curr_time;
 }

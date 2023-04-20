@@ -32,6 +32,7 @@ class CascadiaMC
 
         int16_t motorSpeed = 0;
         uint16_t radiatorTemp = 0;
+        int16_t feedback_torque = 0;
 
         Timer motorCommand_wait;
 
@@ -169,6 +170,10 @@ class CascadiaMC
          * @return uint16_t 
          */
         int16_t getRadiatorTemp();
+
+        void setFeedbackTorque(int16_t fb_torque);
+
+        int16_t getFeedbackTorque();
         
 };
 

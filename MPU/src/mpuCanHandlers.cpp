@@ -7,6 +7,7 @@
 
 #define CANMSG_WHEELIO      0x400
 #define CANMSG_BMSSTATUS    0x002
+#define CANMSG_MC_TORQUE_N_TIMER    0x0AC
 
 /***************************************************************************/
 /**
@@ -88,6 +89,12 @@ void bmsCurrents_cb(const CAN_message_t &msg)
     //6 and 7 are rolling avg current
 }
 
+void motorFeedbackTorque_cb(const CAN_message_t &msg)
+{
+    int16_t motorTemp = (msg.buf[5] << 8) | msg.buf[4];
+    motorController.setRadiatorTemp(motorTemp);
+}
+
 void mpuCanCallback(const CAN_message_t &msg)
 {
     switch(msg.id)
@@ -115,6 +122,8 @@ void mpuCanCallback(const CAN_message_t &msg)
             break;
         case CANMSG_WHEELIO:
             driverio.wheelIO_cb(msg);
+        case CANMSG_MC_TORQUE_N_TIMER:
+            motorFeedbackTorque_cb(msg);
         default:
             break;
     }

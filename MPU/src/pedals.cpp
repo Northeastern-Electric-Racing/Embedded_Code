@@ -306,34 +306,17 @@ void Pedals::controlLaunch(int16_t *torque, const float mph)
 	static const double Ki = 1; // integral gain
 	static const double Kd = 1; // derivative gain
 	static const uint8_t T = 1; // sample time in milliseconds (ms)
-	static const double SLIPPING_MPH_ROC = 5; // rate of change of motor rpm we deem as "slipping" (mph/ms)
-	static const double gforce_err_norm = 1; // weight for ormalizing gforce error values into a nice range
-	static const double mph_err_norm = 1; // weight for normalizing mph error values into a nice range
 
 	static unsigned long last_time;
 	static double total_error, last_error;
-	static double last_gforce;
-	static double last_mph;
-
-	double gforce_buf[3][1];
 	uint8_t curr_time = millis();
 	uint8_t delta_time = curr_time - last_time;
 
 	if (delta_time < T)
 		return;
 
-	/* Calculate error in torque based on rpm and vehicle speed */
-
-	/* Calculate the rate of change in GForce, and penalize a negative rate of change */
-	getGForce(gforce_buf);
-	double delta_gforce = (fabs(gforce_buf[0][0] - last_gforce)) / delta_time; // g's/ms
-	double gforce_err = delta_gforce < 0 ? delta_gforce : 0;
-
-	/* Calculate the rate of change in RPM, and penalize a large positive rate of change */
-	double delta_mph = (mph - last_mph) / delta_time; // mph/ms
-	double mph_err = delta_mph > SLIPPING_MPH_ROC ? delta_mph : 0;
-
-	double error = gforce_err_norm * gforce_err + mph_err_norm * mph_err;
+	/* Calculate error based on difference between torque and feedback torque */
+	double error = motorController->getFeedbackTorque() - *torque;
 
 	/* PID Loop to adjust torque based on accumulated error */
 
@@ -355,7 +338,4 @@ void Pedals::controlLaunch(int16_t *torque, const float mph)
 
 	last_error = error;
 	last_time = curr_time;
-	last_mph = mph;
-	
-	last_gforce = gforce_buf[0][0];
 }

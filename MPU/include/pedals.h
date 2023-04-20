@@ -61,6 +61,30 @@ class Pedals
          */
         int16_t calcTorque(double torqueScale);
 
+
+        /**
+         * @brief Calculates a new, limited torque based off of motor RPM to limit speed
+         * 
+         * @param torque 
+         * @param mph 
+         */
+        void limitTorque(int16_t *torque, const float mph);
+
+        /**
+         * @brief Implements a traction control algorithm to decrease slippage of the car
+         * 
+         * @param torque 
+         * @param mph 
+         */
+        void controlLaunch(int16_t *torque, const float mph);
+
+        /**
+         * @brief Retrieves the current acceleration of the car in g's from onboard accelerometer
+         * 
+         * @param gforce_buf 
+         */
+        void getGForce(double gforce_buf[3][1]);
+
         /**
          * @brief Calculates the torque limit based on the BMS's calculated discharge current limit
          * 

@@ -1,4 +1,5 @@
 #include "pedals.h"
+#include <math.h>
 
 
 Pedals::Pedals(){}
@@ -43,6 +44,12 @@ FaultStatus_t Pedals::readAccel()
 
 	//Calculate the correct amount of torque to command using precentage pressed value
 	appliedTorque = calcTorque(multiplier);
+	float mph = fabs((motorController->getMotorSpeed() * MOTOR_RPM_TO_MPH_CONST));
+
+	if (drive_state == SPEED)
+	{
+		controlLaunch(&appliedTorque, mph);
+	}
 
 	//Load the commanded torque to be sent to the motor controller
 	motorController->changeTorque(appliedTorque);
@@ -258,4 +265,97 @@ void Pedals::incrRegenLevel()
 uint8_t Pedals::getRegenLevel()
 {
 	return regenLevel;
+}
+
+void Pedals::getGForce(double gforce_buf[3][1])
+{
+	const uint8_t num_accel_readings = 1;
+	const double accel_angle_rad = 1.22173;
+	const double accel_transform[3][3] = {
+		{1, 0, 0}, 
+		{0, cos(accel_angle_rad), sin(accel_angle_rad)}, 
+		{0, sin(accel_angle_rad), cos(accel_angle_rad)}
+	};
+	const double norm_constant = 0.0029;
+	XYZData_t accel_data_buf[num_accel_readings];
+
+	/* Retrieve and normalize accelerometer data */
+	NERduino.getADXLdata(accel_data_buf, num_accel_readings);
+	double converted_data[3][1] = {
+		accel_data_buf[0].XData.data * norm_constant,
+		accel_data_buf[0].YData.data * norm_constant,
+		accel_data_buf[0].ZData.data * norm_constant
+	};
+
+	/* The accelerometer is mounted at a 70 degree angle to the horizontal, we need to rotate the data to account for this */
+	/* Matrix Multiplication*/
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 1; j++) {
+            gforce_buf[i][j] = 0;
+  
+            for (int k = 0; k < 3; k++) {
+                gforce_buf[i][j] += accel_transform[i][k] * converted_data[k][j];
+            }
+        }
+    }
+}
+
+void Pedals::controlLaunch(int16_t *torque, const float mph)
+{
+	static const double Kp = 1; // proportional gain
+	static const double Ki = 1; // integral gain
+	static const double Kd = 1; // derivative gain
+	static const uint8_t T = 1; // sample time in milliseconds (ms)
+	static const double SLIPPING_MPH_ROC = 5; // rate of change of motor rpm we deem as "slipping" (mph/ms)
+	static const double gforce_err_norm = 1; // weight for ormalizing gforce error values into a nice range
+	static const double mph_err_norm = 1; // weight for normalizing mph error values into a nice range
+
+	static unsigned long last_time;
+	static double total_error, last_error;
+	static double last_gforce;
+	static double last_mph;
+
+	double gforce_buf[3][1];
+	uint8_t curr_time = millis();
+	uint8_t delta_time = curr_time - last_time;
+
+	if (delta_time < T)
+		return;
+
+	/* Calculate error in torque based on rpm and vehicle speed */
+
+	/* Calculate the rate of change in GForce, and penalize a negative rate of change */
+	getGForce(gforce_buf);
+	double delta_gforce = (fabs(gforce_buf[0][0] - last_gforce)) / delta_time; // g's/ms
+	double gforce_err = delta_gforce < 0 ? delta_gforce : 0;
+
+	/* Calculate the rate of change in RPM, and penalize a large positive rate of change */
+	double delta_mph = (mph - last_mph) / delta_time; // mph/ms
+	double mph_err = delta_mph > SLIPPING_MPH_ROC ? delta_mph : 0;
+
+	double error = gforce_err_norm * gforce_err + mph_err_norm * mph_err;
+
+	/* PID Loop to adjust torque based on accumulated error */
+
+	/* PID integral calc */
+	total_error += error;
+	if (total_error >= *torque) total_error = *torque;
+	else if (total_error <= 0) total_error = 0;
+
+	/* PID derivative calc */
+	double delta_error = error - last_error;
+
+	/* PID weighted calc */
+	int16_t control_torque = (int16_t)(Kp*error + (Ki*T)*total_error + (Kd/T)*delta_error);
+	if (control_torque < *torque) *torque = control_torque;
+	
+	/* Cleansing values */
+	if (*torque <= 0) *torque = 0;
+	if (*torque > MAXIMUM_TORQUE) *torque = MAXIMUM_TORQUE;
+
+	last_error = error;
+	last_time = curr_time;
+	last_mph = mph;
+	
+	last_gforce = gforce_buf[0][0];
 }

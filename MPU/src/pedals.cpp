@@ -95,12 +95,12 @@ int16_t Pedals::calcTorque(double torqueScale)
 
 	pedalTorque = torqueScale * MAXIMUM_TORQUE;
 
-	int16_t torqueLim = calcCLTorqueLimit(); //2200
+	// int16_t torqueLim = calcCLTorqueLimit(); //2200
 
-	// Scale torque to match BMS current limit
-	if (pedalTorque > torqueLim) {
-		pedalTorque = torqueLim;
-	}
+	// // Scale torque to match BMS current limit
+	// if (pedalTorque > torqueLim) {
+	// 	pedalTorque = torqueLim;
+	// }
 
 	//Cleansing Value just in case (Somewhat redundant)
 	if(pedalTorque >= MAXIMUM_TORQUE)
@@ -158,18 +158,18 @@ int16_t Pedals::calcTorque(double torqueScale)
 		}
 	}
 
-	// Serial.print("Pedal: ");
-	// Serial.println(pedalTorque);
-	// Serial.print("C Limit:");
+	Serial.print("Pedal: ");
+	Serial.println(pedalTorque);
+	Serial.print("C Limit:");
 	// Serial.println(torqueLim);
-	// Serial.print("Torque Limit Percentage");
-	// Serial.println(torqueLimitPercentage);
-	// Serial.print("Regen Torque Limit:");
-	// Serial.println(regenTorqueLim);
-	// Serial.print("Regen Level:");
-	// Serial.println(REGEN_STRENGTHS[regenLevel]);
-	// Serial.print("MPH: ");
-	// Serial.println(mph);
+	Serial.print("Torque Limit Percentage");
+	Serial.println(torqueLimitPercentage);
+	Serial.print("Regen Torque Limit:");
+	Serial.println(regenTorqueLim);
+	Serial.print("Regen Level:");
+	Serial.println(REGEN_STRENGTHS[regenLevel]);
+	Serial.print("MPH: ");
+	Serial.println(mph);
 
 
 	return pedalTorque;
@@ -184,8 +184,8 @@ int16_t Pedals::calcCLTorqueLimit()
 
 	int16_t calculated = 102;
 
-	calculated = (0.9 * (7.84 * (dcVoltage / 10) * dcCurrent)) / (500 + 1);
-	// calculated = (dcCurrent * dcVoltage * sqrt(3)) / (motorSpeed * CL_TO_TOQRUE_CONST);
+	// calculated = (0.9 * (7.84 * (dcVoltage / 10) * dcCurrent)) / (500 + 1);
+	calculated = (dcCurrent * dcVoltage * sqrt(3)) / (motorSpeed * CL_TO_TOQRUE_CONST);
 
 	if ((calculated < 0) | (calculated > (MAXIMUM_TORQUE / 10))) {
 		calculated = MAXIMUM_TORQUE / 10;

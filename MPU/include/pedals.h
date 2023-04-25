@@ -28,7 +28,7 @@
 class Pedals
 {
     private:
-        int REGEN_STRENGTHS[4] = {0, 100, 250, 500}; // N-m to be applied, in N-m * 10
+        int REGEN_STRENGTHS[4] = {0, 300, 600, 1000}; // N-m to be applied, in N-m * 10
 
         uint32_t regenStartTime = 0;
         bool regenActive = false;

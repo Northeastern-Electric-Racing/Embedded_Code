@@ -101,7 +101,7 @@ class CascadiaMC
          * 
          * @param p_accelTorque 
          */
-        void changeTorque(uint16_t p_accelTorque);
+        void changeTorque(int16_t p_accelTorque);
 
         /**
          * @brief Returns the acceleration torque from the MC message

@@ -80,7 +80,7 @@ bool CascadiaMC::getDirection()
     return mcMsg.config.isForward;
 }
 
-void CascadiaMC::changeTorque(uint16_t p_accelTorque)
+void CascadiaMC::changeTorque(int16_t p_accelTorque)
 {
     mcMsg.config.accelTorque = p_accelTorque;
 }

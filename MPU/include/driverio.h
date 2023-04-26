@@ -14,7 +14,7 @@
 #include "orionbms.h"
 #include <nerduino.h>
 
-// Pins
+//Pins
 #define LED4_PIN 3
 #define LED5_PIN 5
 #define YLED_PIN 2

@@ -10,12 +10,9 @@ jobs:
   linter:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
+      - uses: actions/checkout@v2
         with:
-          remote: true
+          submodules: true
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:

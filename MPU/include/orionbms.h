@@ -10,7 +10,6 @@
 #include "mpuConfig.h"
 #include <nerduino.h>
 
-
 #define CRITICAL_CELLTEMP 40 // degrees celcius
 #define SHUTDOWN_CELLTEMP 55 // degrees celcius
 
@@ -19,9 +18,9 @@
 enum { AIR_CLOSED, AIR_OPEN };
 
 typedef enum {
-  BOOT_STATE, // State when BMS first starts up, used to initialize everything
-              // that needs configuring
-  READY_STATE,    // State when car is not on/BMS is not really doing anything
+  BOOT_STATE,  // State when BMS first starts up, used to initialize everything
+               // that needs configuring
+  READY_STATE, // State when car is not on/BMS is not really doing anything
   CHARGING_STATE, // State when car is on and is charging (Filling battery)
   FAULTED_STATE, // State when BMS has detected a catastrophic fault and we need
                  // to hault operations

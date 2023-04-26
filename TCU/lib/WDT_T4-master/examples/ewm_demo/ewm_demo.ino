@@ -19,14 +19,14 @@ void setup() {
   configewm.pin = 21;
   ewm.begin(configewm);
 
-  if ( 1 ) { /* feed the dog early */
+  if (1) { /* feed the dog early */
     delay(100);
     ewm.feed();
     /* window mode test */
     delay(100); /* <-- not keeping this here would cause resets by myCallback */
-    /* this is because right after you fed it, the loop would immediately have fed it within the window time */
+    /* this is because right after you fed it, the loop would immediately have
+     * fed it within the window time */
   }
-
 }
 
 void loop() {

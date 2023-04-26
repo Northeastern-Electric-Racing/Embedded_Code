@@ -1,14 +1,14 @@
 /**
  * @file message.h
  * @brief Defines standard message formats.
- * 
+ *
  */
 
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include <stdint.h>
 #include <rtc.h>
+#include <stdint.h>
 
 /* Message structure used throughout the system. */
 typedef struct {

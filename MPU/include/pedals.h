@@ -14,7 +14,6 @@
 #include "pedalHW.h"
 #include <nerduino.h>
 
-
 // Pins
 #define ACCEL1_PIN A0
 #define ACCEL2_PIN A1

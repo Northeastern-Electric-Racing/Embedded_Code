@@ -12,7 +12,6 @@
 #include "orionbms.h"
 #include <nerduino.h>
 
-
 #define SS_READY_SEN 39
 #define PUMP_PIN 8
 #define RADIATORFAN_PIN 28

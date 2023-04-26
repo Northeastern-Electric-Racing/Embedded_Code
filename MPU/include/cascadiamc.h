@@ -9,7 +9,6 @@
 #include "mpuConfig.h"
 #include <nerduino.h>
 
-
 class CascadiaMC {
 private:
   const unsigned char mcOff[8] = {0, 0, 0, 0, 0, 0, 0, 0};

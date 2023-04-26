@@ -1,144 +1,121 @@
 #include "driverio.h"
 #include <nerduino.h>
 
-DriverIO::DriverIO(){}
+DriverIO::DriverIO() {}
 
-DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms)
-{
-    powerToggle_wait.cancelTimer();
+DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms) {
+  powerToggle_wait.cancelTimer();
 
-    motorController = p_motorController;
-    bms = p_bms;
+  motorController = p_motorController;
+  bms = p_bms;
 
-    motorController->setDirection(false);
+  motorController->setDirection(false);
 }
 
-DriverIO::~DriverIO(){}
+DriverIO::~DriverIO() {}
 
-void DriverIO::handleSpeaker()
-{
-    speaker.attemptToStopSpeaker();
+void DriverIO::handleSpeaker() { speaker.attemptToStopSpeaker(); }
+
+void DriverIO::handleReverse() {
+  motorController->setDirection(drive_state != REVERSE);
 }
 
-void DriverIO::handleReverse()
-{
-    motorController->setDirection(drive_state != REVERSE);
+void DriverIO::handleButtonState(bool tsms_status) {
+  bool state_changed = false;
+
+  // Poll Button
+  incrButton.checkButtonPin();
+  decrButton.checkButtonPin();
+
+  if (tsms_status == false) {
+    motorController->setPower(false);
+    mpu_state = FAULT;
+    drive_state = OFF;
+    return;
+  }
+
+  if (isCharging) {
+    Serial.println("CHARGING!!");
+  }
+
+  // If the BMS is charging
+  if ((incrButton.isButtonPressed() || decrButton.isButtonPressed()) &&
+      bms->getChargeMode() && changeStateTimer.isTimerExpired()) {
+    bms->toggleAIR();
+    changeStateTimer.startTimer(CHANGE_STATE_TIME);
+    isCharging = !isCharging;
+    mpu_state = isCharging ? CHARGING : OFF;
+    drive_state = OFF;
+    Serial.println("TOGGLE CHARGING!!!");
+    return;
+  } else if (isCharging) {
+    return;
+  } else {
+    mpu_state = DRIVE;
+  }
+
+  // If the BMS is not charging
+  if (incrButton.isButtonPressed() && changeStateTimer.isTimerExpired()) {
+    prev_state = drive_state;
+    drive_state = (drive_state + 1) % MAX_DRIVE_STATES;
+    Serial.println("Increment!");
+    changeStateTimer.startTimer(CHANGE_STATE_TIME);
+    state_changed = true;
+  }
+  if (decrButton.isButtonPressed() && changeStateTimer.isTimerExpired()) {
+    prev_state = drive_state;
+    drive_state = ((drive_state - 1) % MAX_DRIVE_STATES);
+    if (drive_state == 255)
+      drive_state = REVERSE;
+
+    Serial.println("Decrement!");
+    changeStateTimer.startTimer(CHANGE_STATE_TIME);
+    state_changed = true;
+  }
+
+  bool motor_power = !(drive_state == OFF || mpu_state != DRIVE);
+
+  motorController->setPower(motor_power);
+
+  if (state_changed && prev_state == OFF &&
+      ((drive_state == PIT) || (drive_state == REVERSE))) {
+    speaker.playSpeaker();
+  }
+  powerToggle_wait.startTimer(POWER_TOGGLE_WAIT);
+
+  if (state_changed) {
+    motorController->setPower(false);
+  }
 }
 
-void DriverIO::handleButtonState(bool tsms_status)
-{
-    bool state_changed = false;
+void DriverIO::wheelIO_cb(const CAN_message_t &msg) {
+  union {
+    uint8_t msg[8];
 
-    //Poll Button
-    incrButton.checkButtonPin();
-    decrButton.checkButtonPin();
+    struct {
+      uint16_t pot_l;
+      uint16_t pot_r;
+      bool button5 : 1;
+      bool button6 : 1;
+      bool button3 : 1;
+      uint8_t x1 : 1;
+      bool paddle_r : 1;
+      bool paddle_l : 1;
+      bool button4 : 1;
+      bool button2 : 1;
+      uint8_t x2;
+      uint8_t x3;
+      uint8_t x4;
+    } io;
+  } wheelio;
 
-    if (tsms_status == false)
-    {
-        motorController->setPower(false);
-        mpu_state = FAULT;
-        drive_state = OFF;
-        return;
-    }
+  for (uint8_t byte = 0; byte < 8; byte++) {
+    wheelio.msg[byte] = msg.buf[byte];
+  }
 
-    if (isCharging)
-    {
-        Serial.println("CHARGING!!");
-    }
+  wheelio.io.pot_l = SWITCHBYTES(wheelio.io.pot_l);
+  wheelio.io.pot_r = SWITCHBYTES(wheelio.io.pot_r);
 
-    //If the BMS is charging
-    if((incrButton.isButtonPressed() ||
-        decrButton.isButtonPressed()) && 
-        bms->getChargeMode() &&
-        changeStateTimer.isTimerExpired())
-    {
-        bms->toggleAIR();
-        changeStateTimer.startTimer(CHANGE_STATE_TIME);
-        isCharging = !isCharging;
-        mpu_state = isCharging ? CHARGING : OFF;
-        drive_state = OFF;
-        Serial.println("TOGGLE CHARGING!!!");
-        return;
-    }
-    else if (isCharging)
-    {
-        return;
-    }
-    else
-    {
-        mpu_state = DRIVE;
-    }
-
-    //If the BMS is not charging
-    if(incrButton.isButtonPressed() && changeStateTimer.isTimerExpired())
-    {
-        prev_state = drive_state;
-        drive_state = (drive_state + 1) % MAX_DRIVE_STATES;
-        Serial.println("Increment!");
-        changeStateTimer.startTimer(CHANGE_STATE_TIME);
-        state_changed = true;
-    }
-    if(decrButton.isButtonPressed() && changeStateTimer.isTimerExpired())
-    {
-        prev_state = drive_state;
-        drive_state = ((drive_state - 1) % MAX_DRIVE_STATES);
-        if (drive_state == 255) drive_state = REVERSE;
-
-        Serial.println("Decrement!");
-        changeStateTimer.startTimer(CHANGE_STATE_TIME);
-        state_changed = true;
-    }
-
-    bool motor_power = !(drive_state == OFF || mpu_state != DRIVE);
-
-    motorController->setPower(motor_power);
-
-    if(state_changed && 
-        prev_state == OFF && 
-        ((drive_state == PIT) || (drive_state == REVERSE)))
-    {
-        speaker.playSpeaker();
-    }
-    powerToggle_wait.startTimer(POWER_TOGGLE_WAIT);
-
-    if(state_changed)
-    {
-        motorController->setPower(false);
-    }
-}
-
-void DriverIO::wheelIO_cb(const CAN_message_t &msg)
-{
-    union
-    {
-        uint8_t msg[8];
-
-        struct
-        {
-            uint16_t pot_l;
-            uint16_t pot_r;
-            bool button5 : 1;
-            bool button6 : 1;
-            bool button3 : 1;
-            uint8_t x1   : 1;
-            bool paddle_r : 1;
-            bool paddle_l : 1;
-            bool button4 : 1;
-            bool button2 : 1;
-            uint8_t x2;
-            uint8_t x3;
-            uint8_t x4;
-        } io;
-    } wheelio;
-
-    for(uint8_t byte = 0; byte < 8; byte++)
-    {
-        wheelio.msg[byte] = msg.buf[byte];
-    }
-
-    wheelio.io.pot_l = SWITCHBYTES(wheelio.io.pot_l);
-    wheelio.io.pot_r = SWITCHBYTES(wheelio.io.pot_r);
-
-    decrButton.setButtonState(wheelio.io.button2);
-    incrButton.setButtonState(wheelio.io.button4);
+  decrButton.setButtonState(wheelio.io.button2);
+  incrButton.setButtonState(wheelio.io.button4);
 }

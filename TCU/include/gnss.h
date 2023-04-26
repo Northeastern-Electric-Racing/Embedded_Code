@@ -9,14 +9,11 @@
 #include <Arduino.h>
 
 /* Return status codes for GNSS functions. */
-typedef enum {
-  GNSS_SUCCESS    = 0,
-  GNSS_ERROR_INIT = 1
-} GNSS_STATUS;
+typedef enum { GNSS_SUCCESS = 0, GNSS_ERROR_INIT = 1 } GNSS_STATUS;
 
 /**
  * @brief Initializes the GNSS Module
- * 
+ *
  * @param serialPort Serial port
  * @param baudRate Baud rate
  * @return GNSS_STATUS

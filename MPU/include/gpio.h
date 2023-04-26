@@ -6,48 +6,47 @@
 #ifndef GPIO_H
 #define GPIO_H
 
-#include <nerduino.h>
-#include "mpuConfig.h"
-#include "gpioHW.h"
 #include "cascadiamc.h"
+#include "gpioHW.h"
+#include "mpuConfig.h"
 #include "orionbms.h"
+#include <nerduino.h>
 
-#define SS_READY_SEN        39
-#define PUMP_PIN            8
-#define RADIATORFAN_PIN     28
+#define SS_READY_SEN 39
+#define PUMP_PIN 8
+#define RADIATORFAN_PIN 28
 
-class GPIO
-{
-    private:
-        TSMS tsms;
-        CascadiaMC *motorController;
-        OrionBMS *bms;
-        PDU *pdu;
+class GPIO {
+private:
+  TSMS tsms;
+  CascadiaMC *motorController;
+  OrionBMS *bms;
+  PDU *pdu;
 
-    public:
-        GPIO();
+public:
+  GPIO();
 
-        GPIO(CascadiaMC *p_motorController, OrionBMS *p_bms, PDU *p_pdu);
+  GPIO(CascadiaMC *p_motorController, OrionBMS *p_bms, PDU *p_pdu);
 
-        ~GPIO();
+  ~GPIO();
 
-        /**
-         * @brief Handles the case for the TSMS switching states
-         * 
-         */
-        bool getTSMS();
+  /**
+   * @brief Handles the case for the TSMS switching states
+   *
+   */
+  bool getTSMS();
 
-        /**
-         * @brief Handles the logic behind starting/stopping the pump
-         * 
-         */
-        void handlePump();
+  /**
+   * @brief Handles the logic behind starting/stopping the pump
+   *
+   */
+  void handlePump();
 
-        /**
-         * @brief Handles the logic behind starting/stopping the radiator fan
-         * 
-         */
-        void handleRadiatorFan();
+  /**
+   * @brief Handles the logic behind starting/stopping the radiator fan
+   *
+   */
+  void handleRadiatorFan();
 };
 
 #endif

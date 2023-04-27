@@ -43,6 +43,8 @@
 #define ANALOG_BRAKE_THRESH         185
 #define MAXIMUM_BRAKE               255
 
+#define REGAIN_TRACTION_ERR         -150  //difference in Nm between commanded and feedback torque
+
 #define MPU_STATUS_ID               0xA
 
 enum nero_states

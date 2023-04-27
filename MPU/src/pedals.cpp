@@ -302,45 +302,23 @@ void Pedals::getGForce(double gforce_buf[3][1])
 
 void Pedals::controlLaunch(int16_t *torque, const float mph)
 {
-	static const double Kp = 1; // proportional gain
-	static const double Ki = 1; // integral gain
-	static const double Kd = 1; // derivative gain
-	static const uint8_t T = 1; // sample time in milliseconds (ms)
-
-	static unsigned long last_time;
-	static double total_error, last_error;
-	static int16_t prev_torque;
-	uint8_t curr_time = millis();
-	uint8_t delta_time = curr_time - last_time;
-
-	if (delta_time < T)
-	{
-		*torque = prev_torque;
-		return;
-	}
+	static const uint8_t num_samples = 5;
+	static int16_t avg_err;
+	int16_t control_torque;
 
 	/* Calculate error based on difference between torque and feedback torque */
-	double error = motorController->getFeedbackTorque() - *torque;
+	int16_t error = motorController->getFeedbackTorque() - *torque;
 
-	/* PID Loop to adjust torque based on accumulated error */
+	/* Avg calc */
+	avg_err = avg_err + error / num_samples;
 
-	/* PID integral calc */
-	total_error += error;
-	if (total_error >= *torque) total_error = *torque;
-	else if (total_error <= 0) total_error = 0;
+	if (avg_err > REGAIN_TRACTION_ERR) return;
 
-	/* PID derivative calc */
-	double delta_error = error - last_error;
-
-	/* PID weighted calc */
-	int16_t control_torque = (int16_t)(Kp*error + (Ki*T)*total_error + (Kd/T)*delta_error);
-	if (control_torque < *torque) *torque = control_torque;
+	control_torque = motorController->getFeedbackTorque();
 	
 	/* Cleansing values */
+	if (control_torque < *torque) *torque = control_torque;
 	if (*torque <= 0) *torque = 0;
-	if (*torque > MAXIMUM_TORQUE) *torque = MAXIMUM_TORQUE;
+	if (*torque > MAXIMUM_TORQUE) *torque = MAXIMUM_TORQUE; //change ceiling
 
-	prev_torque = *torque;
-	last_error = error;
-	last_time = curr_time;
 }

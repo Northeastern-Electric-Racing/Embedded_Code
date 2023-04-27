@@ -91,8 +91,10 @@ void bmsCurrents_cb(const CAN_message_t &msg)
 
 void motorFeedbackTorque_cb(const CAN_message_t &msg)
 {
-    int16_t motorTemp = (msg.buf[5] << 8) | msg.buf[4];
-    motorController.setRadiatorTemp(motorTemp);
+    int16_t torque = (msg.buf[5] << 8) | msg.buf[4];
+    motorController.setFeedbackTorque(torque);
+    Serial.print("\nFB Torque");
+    Serial.println(torque);
 }
 
 void mpuCanCallback(const CAN_message_t &msg)

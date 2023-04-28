@@ -302,7 +302,7 @@ void Pedals::getGForce(double gforce_buf[3][1])
 
 void Pedals::controlLaunch(int16_t *torque, const float mph)
 {
-	static const uint8_t num_err_samples = 7;
+	static const uint8_t num_err_samples = 10;
 	static const uint8_t fb_torque_weight = 0.4;
 	static int16_t avg_err;
 	int16_t control_torque;

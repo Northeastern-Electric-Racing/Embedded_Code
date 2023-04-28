@@ -28,6 +28,11 @@
 class Pedals
 {
     private:
+        int REGEN_STRENGTHS[4] = {0, 300, 600, 1000}; // N-m to be applied, in N-m * 10
+
+        uint32_t regenStartTime = 0;
+        bool regenActive = false;
+
         bool brakePressed = false;
         uint32_t timeBrake = 0;     // the time at which the brake was last pressed
 
@@ -45,6 +50,10 @@ class Pedals
 
         int16_t appliedTorque = 0; // applied motor torque
         uint16_t torqueAccumulator[ACCUMULATOR_SIZE] = {0}; // accumulator for torque averaging when in pit lane or reverse
+
+        float torqueLimitPercentage = 1.0; // percentage of torque limiting
+
+        Regen_Level_t regenLevel = ZILCH;
 
         /**
          * @brief Calculates what torque to send to the motor controller
@@ -86,6 +95,34 @@ class Pedals
          * @return If the accelerators are not faulted
          */
         FaultStatus_t readAccel();
+
+        /**
+         * @brief retrieves the value of the torque percentage
+         * 
+         * @return int representing the percentage of torque limiting
+        */
+        uint8_t getTorqueLimitPercentage();
+
+        /**
+         * @brief Sets the percentage of torque limiting
+         * 
+         * @param percentage 
+        */
+        void setTorqueLimitPercentage(float percentage);
+
+        /**
+         * @brief Increments the level of regen torque
+         * 
+         * @param level 
+        */
+        void incrRegenLevel();
+
+        /**
+         * @brief Gets the level of regen torque
+         * 
+         * @param level
+        */
+        uint8_t getRegenLevel();
 };
 
 #endif

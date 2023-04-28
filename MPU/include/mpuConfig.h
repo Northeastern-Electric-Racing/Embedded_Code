@@ -11,6 +11,8 @@
 #define LED_BLINK_TIME          1000    //in milliseconds
 #define BUTTON_DEBOUNCE_TIME    50     //in milliseconds
 #define CHANGE_STATE_TIME       400     //ms
+#define CHANGE_TORQUE_LIMIT_TIME 400    //ms
+#define CHANGE_REGEN_TIME       400     //ms
 #define POWER_TOGGLE_WAIT       1500    //ms
 
 // GPIO Parameters
@@ -25,10 +27,11 @@
 #define CONT_TORQUE                 1020    // ' '
 #define POT_LOWER_BOUND             35      // a pot value from 0 to 1023
 #define POT_UPPER_BOUND             MAX_ADC_VALUE    // a pot value from 0 to 1023
+#define MAX_REGEN_TORQUE            500     // in Nm x 10
 
 // regen braking constants
 #define START_TIME                  0       // delay from when brake is pressed to when regen starts
-#define MAX_REGEN_TORQUE            -250    // maximum regen torque value
+#define REGEN_RAMP_TIME             500    // regen ramp time (in ms)
 #define RAMP_TIME                   10      // time until the maximum regen torque is reached (in seconds)
 #define MAX_BRAKE_ERRORS            5
 #define MAX_ACCEL_ERRORS            5
@@ -72,7 +75,14 @@ enum mpu_states
     FAULT,
     MAX_MPU_STATES
 };
-
 extern enum mpu_states mpu_state;
+
+enum Regen_Level_t
+{
+    ZILCH,
+    LIGHT,
+    MEDIUM,
+    STRONG
+};
 
 #endif //MPU_CONFIG_H

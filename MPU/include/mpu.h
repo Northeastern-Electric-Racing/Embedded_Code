@@ -7,8 +7,8 @@
 #define MPU_H
 
 #include <nerduino.h>
-#include "driverio.h"
 #include "gpio.h"
+#include "driverio.h"
 #include "pedals.h"
 #include "orionbms.h"
 #include "Watchdog_t4.h"

@@ -24,8 +24,8 @@ void setup()
 
     pdu = PDU();
     pedals = Pedals(&motorController, &bms, &pdu);
-    driverio = DriverIO(&motorController, &bms);
     gpio = GPIO(&motorController, &bms, &pdu);
+    driverio = DriverIO(&motorController, &bms, &gpio, &pedals);
     pinMode(RELAY_PIN, OUTPUT);
     writeFaultLatch(NOT_FAULTED);
 

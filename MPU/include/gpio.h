@@ -23,6 +23,7 @@ class GPIO
         CascadiaMC *motorController;
         OrionBMS *bms;
         PDU *pdu;
+        float radiatorFanSpeedPercentage = 1.0;
 
     public:
         GPIO();
@@ -48,6 +49,18 @@ class GPIO
          * 
          */
         void handleRadiatorFan();
+
+        /**
+         * @brief Sets the percentage of the radiator fan
+        */
+        void setRadiatorFanPercentage(float speed);
+
+        /**
+         * @brief retrieves the value of the motor fan dial
+         * 
+         * @return int representing the percentage of the motor fan dial
+        */
+        uint8_t getMotorFanDialPercentage();
 };
 
 #endif

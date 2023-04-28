@@ -13,6 +13,8 @@
 #include "cascadiamc.h"
 #include "orionbms.h"
 #include "driverioHW.h"
+#include "gpio.h"
+#include "pedals.h"
 
 //Pins
 #define LED4_PIN        3
@@ -32,11 +34,20 @@ class DriverIO
     private:
         CascadiaMC *motorController;
         OrionBMS *bms;
+        PDU *pdu;
+        GPIO *gpio;
+        Pedals *pedals;
 
         Speaker speaker {SPEAKER_PIN};
         Button incrButton;
         Button decrButton;
 
+        Dial accumulatorFanDial;
+        Dial motorFanDial;
+
+        Button regenButton;
+        Button torqueIncreasePaddle;
+        Button torqueDecreasePaddle;
         uint8_t prev_state = OFF;
 
         bool isCharging = false;
@@ -46,6 +57,8 @@ class DriverIO
 
         Timer powerToggle_wait;
         Timer changeStateTimer;
+        Timer changeTorqueLimitTimer;
+        Timer changeRegenTimer;
 
         bool canTransitionToOff();
 
@@ -54,7 +67,7 @@ class DriverIO
     public:
         DriverIO();
 
-        DriverIO(CascadiaMC *motorController, OrionBMS *p_bms);
+        DriverIO(CascadiaMC *motorController, OrionBMS *p_bms, GPIO *p_gpio, Pedals *p_pedals);
 
         ~DriverIO();
 
@@ -82,6 +95,18 @@ class DriverIO
          * @param msg 
          */
         void wheelIO_cb(const CAN_message_t &msg);
+
+        /**
+         * @brief updates the dials of the driverio
+         */
+        void handleDialState();
+
+        /**
+         * @brief retrieves the value of the accumulator fan dial
+         * 
+         * @return int representing the percentage of the accumulator fan dial
+        */
+        uint8_t getAccumulatorFanDialPercentage();
 };
 
 #endif

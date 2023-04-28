@@ -34,6 +34,24 @@ void GPIO::handlePump()
 void GPIO::handleRadiatorFan()
 {
     int16_t temp = motorController->getRadiatorTemp() / 10;
+    // int16_t temp = 70; // For Testing
+    if (temp > MAX_FANSPEED_TEMP) {
+        pdu->enableRadiatorFan(temp);
+        return;
+    }
 
-    pdu->enableRadiatorFan(temp > MAX_FANSPEED_TEMP);
+    if (drive_state == EFFICIENCY) {
+        temp = temp * radiatorFanSpeedPercentage; 
+    }
+    pdu->enableRadiatorFan(temp);
+}
+
+void GPIO::setRadiatorFanPercentage(float speed)
+{
+    radiatorFanSpeedPercentage = speed;
+}
+
+uint8_t GPIO::getMotorFanDialPercentage()
+{
+    return radiatorFanSpeedPercentage * 100;
 }

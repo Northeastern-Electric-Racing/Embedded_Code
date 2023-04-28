@@ -3,12 +3,14 @@
 
 DriverIO::DriverIO(){}
 
-DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms)
+DriverIO::DriverIO(CascadiaMC *p_motorController, OrionBMS *p_bms, GPIO *p_gpio, Pedals *p_pedals)
 {
     powerToggle_wait.cancelTimer();
 
     motorController = p_motorController;
     bms = p_bms;
+    gpio = p_gpio;
+    pedals = p_pedals;
 
     motorController->setDirection(false);
 }
@@ -32,6 +34,9 @@ void DriverIO::handleButtonState(bool tsms_status)
     //Poll Button
     incrButton.checkButtonPin();
     decrButton.checkButtonPin();
+    torqueDecreasePaddle.checkButtonPin();
+    torqueIncreasePaddle.checkButtonPin();
+    regenButton.checkButtonPin();
 
     if (tsms_status == false)
     {
@@ -70,6 +75,7 @@ void DriverIO::handleButtonState(bool tsms_status)
     }
 
     //If the BMS is not charging
+    // State buttons
     if(incrButton.isButtonPressed() && changeStateTimer.isTimerExpired())
     {
         prev_state = drive_state;
@@ -87,6 +93,38 @@ void DriverIO::handleButtonState(bool tsms_status)
         Serial.println("Decrement!");
         changeStateTimer.startTimer(CHANGE_STATE_TIME);
         state_changed = true;
+    }
+
+    // Efficiency mode buttons
+    if (drive_state == EFFICIENCY) {
+        if(torqueIncreasePaddle.isButtonPressed() && changeTorqueLimitTimer.isTimerExpired())
+        {
+            changeTorqueLimitTimer.startTimer(CHANGE_TORQUE_LIMIT_TIME);
+            float curr_torque_limit = (float)pedals->getTorqueLimitPercentage() / 100.0;
+            if (curr_torque_limit < 1.0)
+            {
+                curr_torque_limit += 0.1;
+                pedals->setTorqueLimitPercentage(curr_torque_limit);
+            }
+        }
+
+        if(torqueDecreasePaddle.isButtonPressed() && changeTorqueLimitTimer.isTimerExpired())
+        {
+            changeTorqueLimitTimer.startTimer(CHANGE_TORQUE_LIMIT_TIME);
+            float curr_torque_limit = (float)pedals->getTorqueLimitPercentage() / 100.0;
+            Serial.print("Current Torque Limit: ");
+            Serial.println(curr_torque_limit);
+            if (curr_torque_limit > 0.0)
+            {
+                curr_torque_limit -= 0.1;
+                pedals->setTorqueLimitPercentage(curr_torque_limit);
+            }
+        }
+
+        if(regenButton.isButtonPressed() && changeRegenTimer.isTimerExpired()) {
+            changeRegenTimer.startTimer(CHANGE_REGEN_TIME);
+            pedals->incrRegenLevel();
+        }
     }
 
     bool motor_power = !(drive_state == OFF || mpu_state != DRIVE);
@@ -141,4 +179,25 @@ void DriverIO::wheelIO_cb(const CAN_message_t &msg)
 
     decrButton.setButtonState(wheelio.io.button2);
     incrButton.setButtonState(wheelio.io.button4);
+    regenButton.setButtonState(wheelio.io.button5);
+    torqueIncreasePaddle.setButtonState(wheelio.io.paddle_r);
+    torqueDecreasePaddle.setButtonState(wheelio.io.paddle_l);
+    accumulatorFanDial.setDialValue(wheelio.io.pot_l);
+    motorFanDial.setDialValue(wheelio.io.pot_r);
+}
+
+void DriverIO::handleDialState()
+{
+    float motorFanPercentage = ((float)motorFanDial.getDialValue() / 4096.0);
+    if (motorFanPercentage < 0.1) motorFanPercentage = 0.0;
+    else if (motorFanPercentage > 0.9) motorFanPercentage = 1.0;
+    gpio->setRadiatorFanPercentage(motorFanPercentage);
+}
+
+uint8_t DriverIO::getAccumulatorFanDialPercentage() 
+{
+    float accumulatorFanPercentage = ((float)accumulatorFanDial.getDialValue() / 4096.0);
+    if (accumulatorFanPercentage < 0.1) accumulatorFanPercentage = 0.0;
+    else if (accumulatorFanPercentage > 0.9) accumulatorFanPercentage = 1.0;
+    return accumulatorFanPercentage * 100;
 }

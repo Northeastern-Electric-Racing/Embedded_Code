@@ -40,7 +40,7 @@
 #define BRAKES_ERROR_PERCENT        10 //percent
 #define LEAVING_BOOST_TORQUE_SCALE  0.9
 #define CL_TO_TOQRUE_CONST          16.51   //constant for calculating the current limited torque
-#define ANALOG_BRAKE_THRESH         185
+#define ANALOG_BRAKE_THRESH         182
 #define MAXIMUM_BRAKE               255
 
 #define REGAIN_TRACTION_ERR         -150  //difference in Nm between commanded and feedback torque

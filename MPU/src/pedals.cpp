@@ -58,12 +58,12 @@ FaultStatus_t Pedals::readAccel()
 	// Serial.print("Motor Speed:\t");
 	// Serial.print(mph);
 	// Serial.print("\t");
-	// Serial.print("Acceleration:\t");
-	// Serial.print(appliedTorque); // prints out applied torque
+	//Serial.print("Acceleration:\t");
+	//Serial.print(appliedTorque); // prints out applied torque
 	// Serial.print("Accumulator Values:\t");
 	// for (int i = 0; i < ACCUMULATOR_SIZE; i++) {
 	// 	Serial.print(torqueAccumulator[i]);
-	// 	Serial.print("\t");
+	//Serial.println("\t");
 	// }
 
 #endif
@@ -165,7 +165,7 @@ int16_t Pedals::calcTorque(double torqueScale)
 		}
 	}
 
-	Serial.print("Pedal: ");
+	/* Serial.print("Pedal: ");
 	Serial.println(pedalTorque);
 	Serial.print("C Limit:");
 	// Serial.println(torqueLim);
@@ -176,7 +176,7 @@ int16_t Pedals::calcTorque(double torqueScale)
 	Serial.print("Regen Level:");
 	Serial.println(REGEN_STRENGTHS[regenLevel]);
 	Serial.print("MPH: ");
-	Serial.println(mph);
+	Serial.println(mph); */
 
 
 	return pedalTorque;
@@ -302,7 +302,8 @@ void Pedals::getGForce(double gforce_buf[3][1])
 
 void Pedals::controlLaunch(int16_t *torque, const float mph)
 {
-	static const uint8_t num_samples = 5;
+	static const uint8_t num_err_samples = 7;
+	static const uint8_t fb_torque_weight = 0.4;
 	static int16_t avg_err;
 	int16_t control_torque;
 
@@ -310,11 +311,13 @@ void Pedals::controlLaunch(int16_t *torque, const float mph)
 	int16_t error = motorController->getFeedbackTorque() - *torque;
 
 	/* Avg calc */
-	avg_err = avg_err + error / num_samples;
+	avg_err = (avg_err + error) / num_err_samples;
+
+	Serial.println(avg_err);
 
 	if (avg_err > REGAIN_TRACTION_ERR) return;
 
-	control_torque = motorController->getFeedbackTorque();
+	control_torque = (motorController->getFeedbackTorque() * fb_torque_weight) + *torque * (1 - fb_torque_weight);
 	
 	/* Cleansing values */
 	if (control_torque < *torque) *torque = control_torque;

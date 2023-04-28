@@ -92,9 +92,10 @@ void bmsCurrents_cb(const CAN_message_t &msg)
 void motorFeedbackTorque_cb(const CAN_message_t &msg)
 {
     int16_t torque = (int16_t)(msg.buf[3] << 8) | msg.buf[2];
+    if (torque < -2300) return;
     motorController.setFeedbackTorque(torque);
-    Serial.print("\nFB Torque");
-    Serial.println(torque);
+    //Serial.print("\nFB Torque");
+    //Serial.println(torque);
 }
 
 void mpuCanCallback(const CAN_message_t &msg)

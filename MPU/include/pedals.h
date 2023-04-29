@@ -55,6 +55,8 @@ class Pedals
 
         Regen_Level_t regenLevel = ZILCH;
 
+        bool enableCL = false;
+
         /**
          * @brief Calculates what torque to send to the motor controller
          * 
@@ -147,6 +149,16 @@ class Pedals
          * @param level
         */
         uint8_t getRegenLevel();
+        
+        /**
+         * @brief Toggles the traction control
+        */
+        void toggleControlLaunch();
+
+        /**
+         * @brief Returns if launch control is enabled
+        */
+        bool getControlLaunch();
 };
 
 #endif

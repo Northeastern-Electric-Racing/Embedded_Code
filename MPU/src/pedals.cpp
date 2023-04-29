@@ -46,7 +46,7 @@ FaultStatus_t Pedals::readAccel()
 	appliedTorque = calcTorque(multiplier);
 	float mph = fabs((motorController->getMotorSpeed() * MOTOR_RPM_TO_MPH_CONST));
 
-	if (drive_state == SPEED)
+	if (drive_state == SPEED && enableCL)
 	{
 		controlLaunch(&appliedTorque, mph);
 	}
@@ -324,4 +324,14 @@ void Pedals::controlLaunch(int16_t *torque, const float mph)
 	if (*torque <= 0) *torque = 0;
 	if (*torque > MAXIMUM_TORQUE) *torque = MAXIMUM_TORQUE; //change ceiling
 
+}
+
+bool Pedals::getControlLaunch()
+{
+	return enableCL;
+}
+
+void Pedals::toggleControlLaunch()
+{
+	enableCL = !enableCL;
 }

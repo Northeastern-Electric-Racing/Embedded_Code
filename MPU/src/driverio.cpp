@@ -127,6 +127,13 @@ void DriverIO::handleButtonState(bool tsms_status)
         }
     }
 
+    if(drive_state == SPEED) {
+        if(regenButton.isButtonPressed() && changeRegenTimer.isTimerExpired()) {
+            changeRegenTimer.startTimer(CHANGE_REGEN_TIME);
+            pedals->toggleControlLaunch();
+        }
+    }
+
     bool motor_power = !(drive_state == OFF || mpu_state != DRIVE);
 
     motorController->setPower(motor_power);

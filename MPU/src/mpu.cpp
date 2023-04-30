@@ -84,8 +84,9 @@ void checkShutdownStatus()
 
 void shutOffCar()
 {
-    writeFaultLatch(FAULTED);
     motorController.emergencyShutdown();
+    delay(1000);
+    writeFaultLatch(FAULTED);
     Serial.println("Shutting off Car!!!!!");
     while(1){}
     writeFaultLatch(NOT_FAULTED);
@@ -118,7 +119,7 @@ void sendMPUStatus()
 {
     union
     {
-        uint8_t msg[5] = {0};
+        uint8_t msg[6] = {0};
 
         struct
         {
@@ -127,6 +128,7 @@ void sendMPUStatus()
             uint8_t radiatorFanPercentage;
             uint8_t torquePercentage;
             uint8_t regenStrength;
+            uint8_t tractionControl;
         } info;
     } mpu_msg;
 
@@ -169,6 +171,7 @@ void sendMPUStatus()
     mpu_msg.info.radiatorFanPercentage = gpio.getMotorFanDialPercentage();
     mpu_msg.info.torquePercentage = pedals.getTorqueLimitPercentage();
     mpu_msg.info.regenStrength = pedals.getRegenLevel();
+    mpu_msg.info.tractionControl = pedals.getControlLaunch();
 
-    sendMessageCAN1(MPU_STATUS_ID, 5, mpu_msg.msg);
+    sendMessageCAN1(MPU_STATUS_ID, 6, mpu_msg.msg);
 }

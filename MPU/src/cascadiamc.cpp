@@ -147,3 +147,13 @@ int16_t CascadiaMC::getRadiatorTemp()
 {
     return radiatorTemp;
 }
+
+void CascadiaMC::setFeedbackTorque(int16_t fb_torque)
+{
+    feedback_torque = fb_torque;
+}
+
+int16_t CascadiaMC::getFeedbackTorque()
+{
+    return feedback_torque;
+}

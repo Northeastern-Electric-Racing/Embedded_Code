@@ -1,4 +1,5 @@
 #include "pedals.h"
+#include <math.h>
 
 
 Pedals::Pedals(){}
@@ -43,6 +44,12 @@ FaultStatus_t Pedals::readAccel()
 
 	//Calculate the correct amount of torque to command using precentage pressed value
 	appliedTorque = calcTorque(multiplier);
+	float mph = fabs((motorController->getMotorSpeed() * MOTOR_RPM_TO_MPH_CONST));
+
+	if (drive_state == SPEED && enableCL)
+	{
+		controlLaunch(&appliedTorque, mph);
+	}
 
 	//Load the commanded torque to be sent to the motor controller
 	motorController->changeTorque(appliedTorque);
@@ -51,12 +58,12 @@ FaultStatus_t Pedals::readAccel()
 	// Serial.print("Motor Speed:\t");
 	// Serial.print(mph);
 	// Serial.print("\t");
-	// Serial.print("Acceleration:\t");
-	// Serial.print(appliedTorque); // prints out applied torque
+	//Serial.print("Acceleration:\t");
+	//Serial.print(appliedTorque); // prints out applied torque
 	// Serial.print("Accumulator Values:\t");
 	// for (int i = 0; i < ACCUMULATOR_SIZE; i++) {
 	// 	Serial.print(torqueAccumulator[i]);
-	// 	Serial.print("\t");
+	//Serial.println("\t");
 	// }
 
 #endif
@@ -158,7 +165,7 @@ int16_t Pedals::calcTorque(double torqueScale)
 		}
 	}
 
-	Serial.print("Pedal: ");
+	/* Serial.print("Pedal: ");
 	Serial.println(pedalTorque);
 	Serial.print("C Limit:");
 	// Serial.println(torqueLim);
@@ -169,7 +176,7 @@ int16_t Pedals::calcTorque(double torqueScale)
 	Serial.print("Regen Level:");
 	Serial.println(REGEN_STRENGTHS[regenLevel]);
 	Serial.print("MPH: ");
-	Serial.println(mph);
+	Serial.println(mph); */
 
 
 	return pedalTorque;
@@ -258,4 +265,73 @@ void Pedals::incrRegenLevel()
 uint8_t Pedals::getRegenLevel()
 {
 	return regenLevel;
+}
+
+void Pedals::getGForce(double gforce_buf[3][1])
+{
+	const uint8_t num_accel_readings = 1;
+	const double accel_angle_rad = 1.22173;
+	const double accel_transform[3][3] = {
+		{1, 0, 0}, 
+		{0, cos(accel_angle_rad), sin(accel_angle_rad)}, 
+		{0, sin(accel_angle_rad), cos(accel_angle_rad)}
+	};
+	const double norm_constant = 0.0029;
+	XYZData_t accel_data_buf[num_accel_readings];
+
+	/* Retrieve and normalize accelerometer data */
+	NERduino.getADXLdata(accel_data_buf, num_accel_readings);
+	double converted_data[3][1] = {
+		accel_data_buf[0].XData.data * norm_constant,
+		accel_data_buf[0].YData.data * norm_constant,
+		accel_data_buf[0].ZData.data * norm_constant
+	};
+
+	/* The accelerometer is mounted at a 70 degree angle to the horizontal, we need to rotate the data to account for this */
+	/* Matrix Multiplication*/
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 1; j++) {
+            gforce_buf[i][j] = 0;
+  
+            for (int k = 0; k < 3; k++) {
+                gforce_buf[i][j] += accel_transform[i][k] * converted_data[k][j];
+            }
+        }
+    }
+}
+
+void Pedals::controlLaunch(int16_t *torque, const float mph)
+{
+	static const uint8_t num_err_samples = 10;
+	static const uint8_t fb_torque_weight = 0.4;
+	static int16_t avg_err;
+	int16_t control_torque;
+
+	/* Calculate error based on difference between torque and feedback torque */
+	int16_t error = motorController->getFeedbackTorque() - *torque;
+
+	/* Avg calc */
+	avg_err = (avg_err + error) / num_err_samples;
+
+	Serial.println(avg_err);
+
+	if (avg_err > REGAIN_TRACTION_ERR) return;
+
+	control_torque = (motorController->getFeedbackTorque() * fb_torque_weight) + *torque * (1 - fb_torque_weight);
+	
+	/* Cleansing values */
+	if (control_torque < *torque) *torque = control_torque;
+	if (*torque <= 0) *torque = 0;
+	if (*torque > MAXIMUM_TORQUE) *torque = MAXIMUM_TORQUE; //change ceiling
+
+}
+
+bool Pedals::getControlLaunch()
+{
+	return enableCL;
+}
+
+void Pedals::toggleControlLaunch()
+{
+	enableCL = !enableCL;
 }

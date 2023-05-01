@@ -8,6 +8,7 @@
 #define CANMSG_WHEELIO      0x400
 #define CANMSG_BMSSTATUS    0x002
 #define CANMSG_MC_TORQUE_N_TIMER    0x0AC
+#define CANMSG_MC_VSM_STATES 0xAA
 
 /***************************************************************************/
 /**
@@ -55,6 +56,18 @@ void bmsCurrentLimits_cb(const CAN_message_t &msg)
     bms.setChargeCurrentLimit(chargeCurrentLimit);
 }
 
+void vsmState_cb(const CAN_message_t &msg) {
+    uint16_t vsm_state = (msg.buf[1] << 8) | msg.buf[0];
+    if (vsm_state >= 1 && vsm_state <= 3) {
+        precharge_state = PRECHARGING;
+    } else if (vsm_state == 5) {
+        precharge_state = READY;
+    } else if (vsm_state == 7) {
+        precharge_state == FAULTED;
+    } else {
+        precharge_state == GLV_ON;
+    }
+ }
 
 void motorMotion_cb(const CAN_message_t &msg)
 {
@@ -127,6 +140,8 @@ void mpuCanCallback(const CAN_message_t &msg)
             driverio.wheelIO_cb(msg);
         case CANMSG_MC_TORQUE_N_TIMER:
             motorFeedbackTorque_cb(msg);
+        case CANMSG_MC_VSM_STATES:
+            vsmState_cb(msg);
         default:
             break;
     }

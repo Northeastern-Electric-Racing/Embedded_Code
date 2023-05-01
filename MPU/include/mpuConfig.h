@@ -79,6 +79,16 @@ enum mpu_states
 };
 extern enum mpu_states mpu_state;
 
+enum precharge_states
+{
+    GLV_ON,
+    TSMS_ON,
+    PRECHARGING,
+    READY,
+    MC_FAULTED
+};
+extern enum precharge_states precharge_state;
+
 enum Regen_Level_t
 {
     ZILCH,

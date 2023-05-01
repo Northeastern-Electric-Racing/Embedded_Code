@@ -129,6 +129,7 @@ void sendMPUStatus()
             uint8_t torquePercentage;
             uint8_t regenStrength;
             uint8_t tractionControl;
+            uint8_t prechargeState;
         } info;
     } mpu_msg;
 
@@ -172,6 +173,7 @@ void sendMPUStatus()
     mpu_msg.info.torquePercentage = pedals.getTorqueLimitPercentage();
     mpu_msg.info.regenStrength = pedals.getRegenLevel();
     mpu_msg.info.tractionControl = pedals.getControlLaunch();
+    mpu_msg.info.prechargeState = precharge_state;
 
     sendMessageCAN1(MPU_STATUS_ID, 6, mpu_msg.msg);
 }

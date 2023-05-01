@@ -92,16 +92,6 @@ uint16_t CascadiaMC::getTorque()
 }
 
 
-void CascadiaMC::raiseFault()
-{
-    if (isFaulted == false) {
-        Serial.println("CUCK");
-        delay(1000);
-    }
-    isFaulted = true;
-}
-
-
 bool CascadiaMC::checkFault()
 {
     return isFaulted;

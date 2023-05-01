@@ -58,15 +58,7 @@ void bmsCurrentLimits_cb(const CAN_message_t &msg)
 
 void vsmState_cb(const CAN_message_t &msg) {
     uint16_t vsm_state = (msg.buf[1] << 8) | msg.buf[0];
-    if (vsm_state >= 1 && vsm_state <= 3) {
-        precharge_state = PRECHARGING;
-    } else if (vsm_state == 5) {
-        precharge_state = READY;
-    } else if (vsm_state == 7) {
-        precharge_state == MC_FAULTED;
-    } else {
-        precharge_state == GLV_ON;
-    }
+    motorController.setVSMState(vsm_state);
  }
 
 void motorMotion_cb(const CAN_message_t &msg)

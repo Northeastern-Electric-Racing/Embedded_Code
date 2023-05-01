@@ -168,6 +168,19 @@ void sendMPUStatus()
             break;
     };
 
+    uint16_t vsm_state = motorController.getVSMState();
+    if (vsm_state >= 1 && vsm_state <= 3) {
+        precharge_state = PRECHARGING;
+    } else if (vsm_state == 5) {
+        precharge_state = READY;
+    } else if (vsm_state == 7) {
+        precharge_state == MC_FAULTED;
+    } else if (gpio.getTSMS()){
+        precharge_state == TSMS_ON;
+    } else {
+        precharge_state = GLV_ON;
+    }
+
     mpu_msg.info.accumulatorFanPercentage = driverio.getAccumulatorFanDialPercentage();
     mpu_msg.info.radiatorFanPercentage = gpio.getMotorFanDialPercentage();
     mpu_msg.info.torquePercentage = pedals.getTorqueLimitPercentage();
@@ -175,5 +188,5 @@ void sendMPUStatus()
     mpu_msg.info.tractionControl = pedals.getControlLaunch();
     mpu_msg.info.prechargeState = precharge_state;
 
-    sendMessageCAN1(MPU_STATUS_ID, 6, mpu_msg.msg);
+    sendMessageCAN1(MPU_STATUS_ID, 7, mpu_msg.msg);
 }

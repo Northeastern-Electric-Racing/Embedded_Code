@@ -147,3 +147,11 @@ int16_t CascadiaMC::getFeedbackTorque()
 {
     return feedback_torque;
 }
+
+void CascadiaMC::setVSMState(uint16_t p_vsmState) {
+    vsmState = p_vsmState;
+}
+
+uint16_t CascadiaMC::getVSMState() {
+    return vsmState;
+}

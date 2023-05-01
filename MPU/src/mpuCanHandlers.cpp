@@ -63,7 +63,7 @@ void vsmState_cb(const CAN_message_t &msg) {
     } else if (vsm_state == 5) {
         precharge_state = READY;
     } else if (vsm_state == 7) {
-        precharge_state == FAULTED;
+        precharge_state == MC_FAULTED;
     } else {
         precharge_state == GLV_ON;
     }

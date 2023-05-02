@@ -149,6 +149,10 @@ int16_t CascadiaMC::getFeedbackTorque()
 }
 
 void CascadiaMC::setVSMState(uint16_t p_vsmState) {
+    if (vsmState > 20) {
+        vsmState = prevVsmState;
+        return;
+    }
     vsmState = p_vsmState;
 }
 

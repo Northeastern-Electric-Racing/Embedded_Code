@@ -119,7 +119,7 @@ void sendMPUStatus()
 {
     union
     {
-        uint8_t msg[6] = {0};
+        uint8_t msg[7] = {0};
 
         struct
         {
@@ -169,14 +169,17 @@ void sendMPUStatus()
     };
 
     uint16_t vsm_state = motorController.getVSMState();
+    uint8_t precharge_state = 0;
+    Serial.print("VSM State: ");
+    Serial.println(vsm_state);
     if (vsm_state >= 1 && vsm_state <= 3) {
         precharge_state = PRECHARGING;
     } else if (vsm_state == 5) {
         precharge_state = READY;
     } else if (vsm_state == 7) {
-        precharge_state == MC_FAULTED;
+        precharge_state = MC_FAULTED;
     } else if (gpio.getTSMS()){
-        precharge_state == TSMS_ON;
+        precharge_state = TSMS_ON;
     } else {
         precharge_state = GLV_ON;
     }

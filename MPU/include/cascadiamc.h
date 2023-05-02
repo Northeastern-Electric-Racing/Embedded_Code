@@ -33,6 +33,7 @@ class CascadiaMC
         int16_t motorSpeed = 0;
         uint16_t radiatorTemp = 0;
         int16_t feedback_torque = 0;
+        uint16_t prevVsmState = 0;
         uint16_t vsmState = 0;
 
         Timer motorCommand_wait;

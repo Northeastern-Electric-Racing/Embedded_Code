@@ -57,7 +57,7 @@ void bmsCurrentLimits_cb(const CAN_message_t &msg)
 }
 
 void vsmState_cb(const CAN_message_t &msg) {
-    uint16_t vsm_state = (msg.buf[1] << 8) | msg.buf[0];
+    uint16_t vsm_state = (int16_t)(msg.buf[1] << 8) | msg.buf[0];
     motorController.setVSMState(vsm_state);
  }
 

@@ -87,7 +87,6 @@ enum precharge_states
     READY,
     MC_FAULTED
 };
-extern enum precharge_states precharge_state;
 
 enum Regen_Level_t
 {

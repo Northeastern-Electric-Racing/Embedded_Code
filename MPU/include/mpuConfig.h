@@ -23,7 +23,7 @@
 #define CAN_CMD_DELAY   5 // ms
 
 // motor torque constants
-#define MAXIMUM_TORQUE              2220    // in Nm x 10 (ex: 123 = 12.3Nm)
+#define MAXIMUM_TORQUE              2150    // in Nm x 10 (ex: 123 = 12.3Nm)
 #define CONT_TORQUE                 1020    // ' '
 #define POT_LOWER_BOUND             35      // a pot value from 0 to 1023
 #define POT_UPPER_BOUND             MAX_ADC_VALUE    // a pot value from 0 to 1023

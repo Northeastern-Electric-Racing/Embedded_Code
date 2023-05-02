@@ -153,6 +153,7 @@ void CascadiaMC::setVSMState(uint16_t p_vsmState) {
         vsmState = prevVsmState;
         return;
     }
+    prevVsmState = vsmState;
     vsmState = p_vsmState;
 }
 

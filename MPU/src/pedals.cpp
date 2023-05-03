@@ -304,9 +304,6 @@ void Pedals::controlLaunch(int16_t *torque, const float mph)
 {
 	static const uint8_t num_err_samples = 10;
 	static const uint8_t fb_torque_weight = 0.4;
-	static const uint16_t max_torque_diff = 100;
-
-
 	static int16_t avg_err;
 	int16_t control_torque;
 
@@ -318,18 +315,14 @@ void Pedals::controlLaunch(int16_t *torque, const float mph)
 
 	Serial.println(avg_err);
 
-	if (avg_err > REGAIN_TRACTION_ERR) 
-	{
-		if (*torque > (MAXIMUM_TORQUE - max_torque_diff)) *torque = MAXIMUM_TORQUE - max_torque_diff; //change ceiling
-		return;
-	}
+	if (avg_err > REGAIN_TRACTION_ERR) return;
 
 	control_torque = (motorController->getFeedbackTorque() * fb_torque_weight) + *torque * (1 - fb_torque_weight);
 	
 	/* Cleansing values */
 	if (control_torque < *torque) *torque = control_torque;
 	if (*torque <= 0) *torque = 0;
-	if (*torque > (MAXIMUM_TORQUE - max_torque_diff)) *torque = MAXIMUM_TORQUE - max_torque_diff; //change ceiling
+	if (*torque > (MAXIMUM_TORQUE)) *torque = MAXIMUM_TORQUE; //change ceiling
 
 }
 

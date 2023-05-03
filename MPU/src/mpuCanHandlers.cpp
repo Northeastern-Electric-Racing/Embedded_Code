@@ -9,6 +9,7 @@
 #define CANMSG_BMSSTATUS    0x002
 #define CANMSG_MC_TORQUE_N_TIMER    0x0AC
 #define CANMSG_MC_VSM_STATES 0xAA
+#define CANMSG_BMS_PREFAULT 0x500
 
 /***************************************************************************/
 /**

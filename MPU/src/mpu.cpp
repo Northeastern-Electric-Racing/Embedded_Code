@@ -11,6 +11,7 @@ bool ssReady = false;
 bool tsms_status = false;
 Timer canTest_wait;
 Timer spinningCheck_wait;
+Timer bms_fault_timer;
 
 void driverioProcess()
 {

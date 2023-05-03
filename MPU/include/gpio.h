@@ -25,6 +25,8 @@ class GPIO
         PDU *pdu;
         float radiatorFanSpeedPercentage = 1.0;
 
+        bool bms_prefault = true;
+
     public:
         GPIO();
 
@@ -61,6 +63,10 @@ class GPIO
          * @return int representing the percentage of the motor fan dial
         */
         uint8_t getMotorFanDialPercentage();
+
+        void toggleBMSPreFault();
+
+        uint8_t getBMSPreFault();
 };
 
 #endif

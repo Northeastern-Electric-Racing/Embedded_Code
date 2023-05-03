@@ -55,3 +55,13 @@ uint8_t GPIO::getMotorFanDialPercentage()
 {
     return radiatorFanSpeedPercentage * 100;
 }
+
+void GPIO::toggleBMSPreFault()
+{
+    bms_prefault = !bms_prefault;
+}
+
+uint8_t GPIO::getBMSPreFault()
+{
+    return bms_prefault;
+}

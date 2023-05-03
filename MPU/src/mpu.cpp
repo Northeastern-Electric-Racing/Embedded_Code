@@ -50,7 +50,7 @@ void gpioProcess()
     isShutdown = isShutdown ? true : !isCANLineOK();
     if(!isCANLineOK()){Serial.println("CAN FAULT");}
 
-    if(!bms_fault_timer.isTimerExpired())
+    if(!bms_fault_timer.isTimerExpired() && gpio.getBMSPreFault())
     {
         writeFaultLatch(FAULTED);
     }

@@ -103,6 +103,11 @@ void motorFeedbackTorque_cb(const CAN_message_t &msg)
     //Serial.println(torque);
 }
 
+void bsmPrefault_cb(const CAN_message_t &msg)
+{
+    bms_fault_timer.startTimer(2000);
+}
+
 void mpuCanCallback(const CAN_message_t &msg)
 {
     switch(msg.id)
@@ -130,10 +135,16 @@ void mpuCanCallback(const CAN_message_t &msg)
             break;
         case CANMSG_WHEELIO:
             driverio.wheelIO_cb(msg);
+            break;
         case CANMSG_MC_TORQUE_N_TIMER:
             motorFeedbackTorque_cb(msg);
+            break;
         case CANMSG_MC_VSM_STATES:
             vsmState_cb(msg);
+            break;
+        case CANMSG_BMS_PREFAULT:
+            bsmPrefault_cb(msg);
+            break;
         default:
             break;
     }

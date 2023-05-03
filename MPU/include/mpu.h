@@ -28,6 +28,7 @@ extern bool tsms_status;
 
 extern Timer canTest_wait;
 extern Timer spinningCheck_wait;
+extern Timer bms_fault_timer;
 
 /**
  * @brief Writes the fault latch whichever condition you pass (see above enumerator)

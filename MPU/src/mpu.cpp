@@ -48,6 +48,15 @@ void gpioProcess()
 
     isShutdown = isShutdown ? true : !isCANLineOK();
     if(!isCANLineOK()){Serial.println("CAN FAULT");}
+
+    if(!bms_fault_timer.isTimerExpired())
+    {
+        writeFaultLatch(FAULTED);
+    }
+    else
+    {
+        writeFaultLatch(NOT_FAULTED);
+    }
 }
 
 bool isCANLineOK()

@@ -168,8 +168,8 @@ void sendMPUStatus()
 
     uint16_t vsm_state = motorController.getVSMState();
     uint8_t precharge_state = 0;
-    Serial.print("VSM State: ");
-    Serial.println(vsm_state);
+    //Serial.print("VSM State: ");
+    //Serial.println(vsm_state);
     if (vsm_state >= 1 && vsm_state <= 3) {
         precharge_state = PRECHARGING;
     } else if (vsm_state == 5) {

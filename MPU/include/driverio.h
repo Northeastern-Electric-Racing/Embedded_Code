@@ -60,6 +60,7 @@ class DriverIO
         Timer changeStateTimer;
         Timer changeTorqueLimitTimer;
         Timer changeRegenTimer;
+        Timer changebms;
 
         bool canTransitionToOff();
 

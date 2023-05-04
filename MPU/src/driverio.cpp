@@ -37,6 +37,7 @@ void DriverIO::handleButtonState(bool tsms_status)
     torqueDecreasePaddle.checkButtonPin();
     torqueIncreasePaddle.checkButtonPin();
     regenButton.checkButtonPin();
+    bmsFaultButton.checkButtonPin();
 
     if (tsms_status == false)
     {
@@ -126,7 +127,7 @@ void DriverIO::handleButtonState(bool tsms_status)
             pedals->incrRegenLevel();
         }
 
-        if(bmsFaultButton.isButtonPressed())
+        if(bmsFaultButton.isButtonPressed() && changebms.isTimerExpired())
         {
             gpio->toggleBMSPreFault();
         }

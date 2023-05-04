@@ -127,7 +127,7 @@ void sendMPUStatus()
 {
     union
     {
-        uint8_t msg[7] = {0};
+        uint8_t msg[8] = {0};
 
         struct
         {
@@ -138,6 +138,7 @@ void sendMPUStatus()
             uint8_t regenStrength;
             uint8_t tractionControl;
             uint8_t prechargeState;
+            uint8_t prefault;
         } info;
     } mpu_msg;
 
@@ -198,6 +199,7 @@ void sendMPUStatus()
     mpu_msg.info.regenStrength = pedals.getRegenLevel();
     mpu_msg.info.tractionControl = pedals.getControlLaunch();
     mpu_msg.info.prechargeState = precharge_state;
+    mpu_msg.info.prefault = gpio.getBMSPreFault();
 
-    sendMessageCAN1(MPU_STATUS_ID, 7, mpu_msg.msg);
+    sendMessageCAN1(MPU_STATUS_ID, 8, mpu_msg.msg);
 }

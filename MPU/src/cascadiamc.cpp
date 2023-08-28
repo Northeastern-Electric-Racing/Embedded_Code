@@ -92,16 +92,6 @@ uint16_t CascadiaMC::getTorque()
 }
 
 
-void CascadiaMC::raiseFault()
-{
-    if (isFaulted == false) {
-        Serial.println("CUCK");
-        delay(1000);
-    }
-    isFaulted = true;
-}
-
-
 bool CascadiaMC::checkFault()
 {
     return isFaulted;
@@ -156,4 +146,17 @@ void CascadiaMC::setFeedbackTorque(int16_t fb_torque)
 int16_t CascadiaMC::getFeedbackTorque()
 {
     return feedback_torque;
+}
+
+void CascadiaMC::setVSMState(uint16_t p_vsmState) {
+    if (vsmState > 20) {
+        vsmState = prevVsmState;
+        return;
+    }
+    prevVsmState = vsmState;
+    vsmState = p_vsmState;
+}
+
+uint16_t CascadiaMC::getVSMState() {
+    return vsmState;
 }

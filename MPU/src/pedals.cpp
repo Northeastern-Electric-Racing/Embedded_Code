@@ -74,6 +74,12 @@ FaultStatus_t Pedals::readAccel()
 
 FaultStatus_t Pedals::readBrake()
 {
+	static uint16_t avg = 0;
+	static const uint8_t num_samples = 10;
+
+	// compare min and max
+	// signficant dip or absolute min to enter not pressed
+
 	//Begin or continue the pedal reading process
 	uint16_t pedalVal = brakes.readValue();
 
@@ -82,13 +88,14 @@ FaultStatus_t Pedals::readBrake()
 	sendMessageCAN1(0xB1, 2, canBuf);
 
 	//If the pedal reading process is NOT finished, return NOT_FAULTED because it hasn't finished collecting data
-	if(pedalVal == NOT_DONE_READING) return NOT_FAULTED;
+	if (pedalVal == NOT_DONE_READING) return NOT_FAULTED;
 
 	//If the pedal reading process has detected a FAULT, return FAULT
-	if(brakes.isFaulted() == FAULTED) return FAULTED;
+	if (brakes.isFaulted() == FAULTED) return FAULTED;
 
-	//Set brakePressed to whether or not the brake value is greater than the braking threshold
-	brakePressed = pedalVal > ANALOG_BRAKE_THRESH ? HIGH : LOW;
+	avg = (avg * (num_samples - 1) + pedalVal) / num_samples;
+
+	brakePressed = avg > ANALOG_BRAKE_THRESH;
 
 	pdu->enableBrakeLight(brakePressed);
 
@@ -313,7 +320,7 @@ void Pedals::controlLaunch(int16_t *torque, const float mph)
 	/* Avg calc */
 	avg_err = (avg_err + error) / num_err_samples;
 
-	Serial.println(avg_err);
+	//Serial.println(avg_err);
 
 	if (avg_err > REGAIN_TRACTION_ERR) return;
 
@@ -322,7 +329,7 @@ void Pedals::controlLaunch(int16_t *torque, const float mph)
 	/* Cleansing values */
 	if (control_torque < *torque) *torque = control_torque;
 	if (*torque <= 0) *torque = 0;
-	if (*torque > MAXIMUM_TORQUE) *torque = MAXIMUM_TORQUE; //change ceiling
+	if (*torque > (MAXIMUM_TORQUE)) *torque = MAXIMUM_TORQUE; //change ceiling
 
 }
 

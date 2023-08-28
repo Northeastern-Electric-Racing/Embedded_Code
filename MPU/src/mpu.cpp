@@ -11,6 +11,7 @@ bool ssReady = false;
 bool tsms_status = false;
 Timer canTest_wait;
 Timer spinningCheck_wait;
+Timer bms_fault_timer;
 
 void driverioProcess()
 {
@@ -32,13 +33,11 @@ void pedalsProcess()
     FaultStatus_t pedalFault = NOT_FAULTED;
     pedalFault = pedals.readBrake();
     pedalFault = pedals.readAccel();
-    /*
     if(pedalFault == FAULTED)
     {
         Serial.println("ACCEL FAULT");
         isShutdown = true;
     }
-    */
 }
 
 
@@ -50,6 +49,15 @@ void gpioProcess()
 
     isShutdown = isShutdown ? true : !isCANLineOK();
     if(!isCANLineOK()){Serial.println("CAN FAULT");}
+
+    if(!bms_fault_timer.isTimerExpired() && gpio.getBMSPreFault())
+    {
+        writeFaultLatch(FAULTED);
+    }
+    else
+    {
+        writeFaultLatch(NOT_FAULTED);
+    }
 }
 
 bool isCANLineOK()
@@ -119,7 +127,7 @@ void sendMPUStatus()
 {
     union
     {
-        uint8_t msg[6] = {0};
+        uint8_t msg[8] = {0};
 
         struct
         {
@@ -129,6 +137,8 @@ void sendMPUStatus()
             uint8_t torquePercentage;
             uint8_t regenStrength;
             uint8_t tractionControl;
+            uint8_t prechargeState;
+            uint8_t prefault;
         } info;
     } mpu_msg;
 
@@ -167,11 +177,29 @@ void sendMPUStatus()
             break;
     };
 
+    uint16_t vsm_state = motorController.getVSMState();
+    uint8_t precharge_state = 0;
+    //Serial.print("VSM State: ");
+    //Serial.println(vsm_state);
+    if (vsm_state >= 1 && vsm_state <= 3) {
+        precharge_state = PRECHARGING;
+    } else if (vsm_state == 5) {
+        precharge_state = READY;
+    } else if (vsm_state == 7) {
+        precharge_state = MC_FAULTED;
+    } else if (gpio.getTSMS()){
+        precharge_state = TSMS_ON;
+    } else {
+        precharge_state = GLV_ON;
+    }
+
     mpu_msg.info.accumulatorFanPercentage = driverio.getAccumulatorFanDialPercentage();
     mpu_msg.info.radiatorFanPercentage = gpio.getMotorFanDialPercentage();
     mpu_msg.info.torquePercentage = pedals.getTorqueLimitPercentage();
     mpu_msg.info.regenStrength = pedals.getRegenLevel();
     mpu_msg.info.tractionControl = pedals.getControlLaunch();
+    mpu_msg.info.prechargeState = precharge_state;
+    mpu_msg.info.prefault = gpio.getBMSPreFault();
 
-    sendMessageCAN1(MPU_STATUS_ID, 6, mpu_msg.msg);
+    sendMessageCAN1(MPU_STATUS_ID, 8, mpu_msg.msg);
 }

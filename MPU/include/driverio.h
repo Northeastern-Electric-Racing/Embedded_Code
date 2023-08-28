@@ -48,6 +48,7 @@ class DriverIO
         Button regenButton;
         Button torqueIncreasePaddle;
         Button torqueDecreasePaddle;
+        Button bmsFaultButton;
         uint8_t prev_state = OFF;
 
         bool isCharging = false;
@@ -59,6 +60,7 @@ class DriverIO
         Timer changeStateTimer;
         Timer changeTorqueLimitTimer;
         Timer changeRegenTimer;
+        Timer changebms;
 
         bool canTransitionToOff();
 

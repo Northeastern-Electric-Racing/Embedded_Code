@@ -8,6 +8,8 @@
 #define CANMSG_WHEELIO      0x400
 #define CANMSG_BMSSTATUS    0x002
 #define CANMSG_MC_TORQUE_N_TIMER    0x0AC
+#define CANMSG_MC_VSM_STATES 0xAA
+#define CANMSG_BMS_PREFAULT 0x500
 
 /***************************************************************************/
 /**
@@ -55,6 +57,10 @@ void bmsCurrentLimits_cb(const CAN_message_t &msg)
     bms.setChargeCurrentLimit(chargeCurrentLimit);
 }
 
+void vsmState_cb(const CAN_message_t &msg) {
+    uint16_t vsm_state = (int16_t)(msg.buf[1] << 8) | msg.buf[0];
+    motorController.setVSMState(vsm_state);
+ }
 
 void motorMotion_cb(const CAN_message_t &msg)
 {
@@ -98,6 +104,11 @@ void motorFeedbackTorque_cb(const CAN_message_t &msg)
     //Serial.println(torque);
 }
 
+void bsmPrefault_cb(const CAN_message_t &msg)
+{
+    bms_fault_timer.startTimer(2000);
+}
+
 void mpuCanCallback(const CAN_message_t &msg)
 {
     switch(msg.id)
@@ -125,8 +136,16 @@ void mpuCanCallback(const CAN_message_t &msg)
             break;
         case CANMSG_WHEELIO:
             driverio.wheelIO_cb(msg);
+            break;
         case CANMSG_MC_TORQUE_N_TIMER:
             motorFeedbackTorque_cb(msg);
+            break;
+        case CANMSG_MC_VSM_STATES:
+            vsmState_cb(msg);
+            break;
+        case CANMSG_BMS_PREFAULT:
+            bsmPrefault_cb(msg);
+            break;
         default:
             break;
     }

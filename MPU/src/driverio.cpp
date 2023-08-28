@@ -37,6 +37,7 @@ void DriverIO::handleButtonState(bool tsms_status)
     torqueDecreasePaddle.checkButtonPin();
     torqueIncreasePaddle.checkButtonPin();
     regenButton.checkButtonPin();
+    bmsFaultButton.checkButtonPin();
 
     if (tsms_status == false)
     {
@@ -125,6 +126,11 @@ void DriverIO::handleButtonState(bool tsms_status)
             changeRegenTimer.startTimer(CHANGE_REGEN_TIME);
             pedals->incrRegenLevel();
         }
+
+        if(bmsFaultButton.isButtonPressed() && changebms.isTimerExpired())
+        {
+            gpio->toggleBMSPreFault();
+        }
     }
 
     if(drive_state == SPEED) {
@@ -187,6 +193,7 @@ void DriverIO::wheelIO_cb(const CAN_message_t &msg)
     decrButton.setButtonState(wheelio.io.button2);
     incrButton.setButtonState(wheelio.io.button4);
     regenButton.setButtonState(wheelio.io.button5);
+    bmsFaultButton.setButtonState(wheelio.io.button6);
     torqueIncreasePaddle.setButtonState(wheelio.io.paddle_r);
     torqueDecreasePaddle.setButtonState(wheelio.io.paddle_l);
     accumulatorFanDial.setDialValue(wheelio.io.pot_l);

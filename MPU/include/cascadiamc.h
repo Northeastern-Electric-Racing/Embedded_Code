@@ -33,6 +33,8 @@ class CascadiaMC
         int16_t motorSpeed = 0;
         uint16_t radiatorTemp = 0;
         int16_t feedback_torque = 0;
+        uint16_t prevVsmState = 0;
+        uint16_t vsmState = 0;
 
         Timer motorCommand_wait;
 
@@ -111,12 +113,6 @@ class CascadiaMC
         uint16_t getTorque();
 
         /**
-         * @brief Raises the Fault for Failing to Generate High Voltage
-         * 
-         */
-        void raiseFault();
-
-        /**
          * @brief Checks for the Fault for Failing to Generate High Voltage
          * 
          */
@@ -175,6 +171,9 @@ class CascadiaMC
 
         int16_t getFeedbackTorque();
         
+        void setVSMState(uint16_t p_vsmState);
+
+        uint16_t getVSMState();
 };
 
 #endif
